@@ -1,7 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { getEvents, deleteEvent, closeEvent, closeEntry } from "../backend/services/eventService";
+import {
+  getEvents,
+  deleteEvent,
+  closeEvent,
+  closeEntry,
+} from "../backend/services/eventService";
 // import {Pagination} from 'react-bootstrap';
 import SnackBar from "../components/SnackBar";
 import Swal from "sweetalert2";
@@ -30,6 +35,8 @@ class Events extends React.Component {
       originalEvents: [],
       upcomingEvents: [],
       pastEvents: [],
+      selected: [],
+      selectedIndex: [],
       activePage: 1,
       pages: 1,
       q: "",
@@ -70,13 +77,19 @@ class Events extends React.Component {
         const upcoming = response.filter((element) => {
           let date = moment(new Date(element.date.seconds * 1000));
           let curentDate = new Date();
-          console.log(`${element.name} minutes up:`, date.diff(curentDate, "minutes"));
+          console.log(
+            `${element.name} minutes up:`,
+            date.diff(curentDate, "minutes")
+          );
           return date.diff(curentDate, "minutes") > 0 && element.status == true;
         });
         const past = response.filter((element) => {
           let date = moment(new Date(element.date.seconds * 1000));
           let curentDate = new Date();
-          console.log(`${element.name} minutes past:`, date.diff(curentDate, "minutes"));
+          console.log(
+            `${element.name} minutes past:`,
+            date.diff(curentDate, "minutes")
+          );
 
           return date.diff(curentDate, "minutes") < 0 || !element.status;
         });
@@ -160,7 +173,9 @@ class Events extends React.Component {
     const index = events.indexOf(selectedEvent);
     Swal.fire({
       title: "Are you sure?",
-      text: events[index].status ? "You want to close this event!" : "You want to open this event!",
+      text: events[index].status
+        ? "You want to close this event!"
+        : "You want to open this event!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -170,12 +185,14 @@ class Events extends React.Component {
       if (result.value) {
         closeEvent(eventId, !events[index].status)
           .then((response) => {
-            // const users = this.state.users.slice();
+            // const events = this.state.events.slice();
             events[index].status = !events[index].status;
             this.setState({
               events,
               showSnackBar: true,
-              snackBarMessage: events[index].status ? "Event opened successfully" : "Event closed successfully",
+              snackBarMessage: events[index].status
+                ? "Event opened successfully"
+                : "Event closed successfully",
               snackBarVariant: "success",
             });
             this.fetchEvent();
@@ -183,10 +200,121 @@ class Events extends React.Component {
           .catch(() => {
             this.setState({
               showSnackBar: true,
-              snackBarMessage: "Error deleting user",
+              snackBarMessage: "Error deleting event",
               snackBarVariant: "error",
             });
           });
+      }
+    });
+  }
+
+  deleteEventMultiple(eventId, index) {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Delete",
+    }).then((result) => {
+      if (result.value) {
+        this.state.selected.map((eventId, index) => {
+          deleteEvent(eventId)
+            .then((response) => {
+              const events = this.state.events.slice();
+              events.splice(this.state.selectedIndex[index], 1);
+              this.setState({
+                events,
+                originalEvents: events,
+                showSnackBar: true,
+                snackBarMessage: "Event deleted successfully",
+                snackBarVariant: "success",
+              });
+            })
+            .catch(() => {
+              this.setState({
+                showSnackBar: true,
+                snackBarMessage: "Error deleting event",
+                snackBarVariant: "error",
+              });
+            });
+        });
+      }
+    });
+  }
+
+  CloseEventMultiple() {
+    const events = this.state.events;
+
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You want to close these events!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Close",
+    }).then((result) => {
+      if (result.value) {
+        this.state.selected.map((eventId, index) => {
+          closeEvent(eventId, false)
+            .then((response) => {
+              // const events = this.state.events.slice();
+              events[index].status = false;
+              this.setState({
+                events,
+                showSnackBar: true,
+                snackBarMessage: "Event closed successfully",
+                snackBarVariant: "success",
+              });
+              this.fetchEvent();
+            })
+            .catch(() => {
+              this.setState({
+                showSnackBar: true,
+                snackBarMessage: "Error deleting event",
+                snackBarVariant: "error",
+              });
+            });
+        });
+      }
+    });
+  }
+
+  CloseEntryMultiple() {
+    const events = this.state.events;
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You want to close the entries of these events!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Close",
+    }).then((result) => {
+      if (result.value) {
+        this.state.selected.map((eventId, index) => {
+          closeEntry(eventId, false)
+            .then((response) => {
+              // const events = this.state.events.slice();
+              events[index].entry = false;
+              this.setState({
+                events,
+                showSnackBar: true,
+                snackBarMessage: "Event entries closed successfully",
+                snackBarVariant: "success",
+              });
+              this.fetchEvent();
+            })
+            .catch(() => {
+              this.setState({
+                showSnackBar: true,
+                snackBarMessage: "Error deleting event",
+                snackBarVariant: "error",
+              });
+            });
+        });
       }
     });
   }
@@ -197,7 +325,9 @@ class Events extends React.Component {
     const index = events.indexOf(selectedEvent);
     Swal.fire({
       title: "Are you sure?",
-      text: events[index].entry ? "You want to close the entries for this event!" : "You want to open the entries of this event!",
+      text: events[index].entry
+        ? "You want to close the entries for this event!"
+        : "You want to open the entries of this event!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -207,12 +337,14 @@ class Events extends React.Component {
       if (result.value) {
         closeEntry(eventId, !events[index].entry)
           .then((response) => {
-            // const users = this.state.users.slice();
+            // const events = this.state.events.slice();
             events[index].entry = !events[index].entry;
             this.setState({
               events,
               showSnackBar: true,
-              snackBarMessage: events[index].entry ? "Event entries opened successfully" : "Event entries closed successfully",
+              snackBarMessage: events[index].entry
+                ? "Event entries opened successfully"
+                : "Event entries closed successfully",
               snackBarVariant: "success",
             });
             this.fetchEvent();
@@ -220,7 +352,7 @@ class Events extends React.Component {
           .catch(() => {
             this.setState({
               showSnackBar: true,
-              snackBarMessage: "Error deleting user",
+              snackBarMessage: "Error deleting event",
               snackBarVariant: "error",
             });
           });
@@ -275,16 +407,34 @@ class Events extends React.Component {
 
   render() {
     // console.log(this.state);
-    const { loading, events, pastEvents, upcomingEvents, activeTab, responseMessage, showSnackBar, snackBarMessage, snackBarVariant } = this.state;
+    const {
+      loading,
+      events,
+      pastEvents,
+      upcomingEvents,
+      activeTab,
+      responseMessage,
+      showSnackBar,
+      snackBarMessage,
+      snackBarVariant,
+    } = this.state;
     return (
       <RootConsumer>
         {(context) => {
           globalContext = context;
-          const eventList = context.eventTab == "1" ? upcomingEvents : pastEvents;
+          const eventList =
+            context.eventTab == "1" ? upcomingEvents : pastEvents;
 
           return (
             <div className="row animated fadeIn">
-              {showSnackBar && <SnackBar open={showSnackBar} message={snackBarMessage} variant={snackBarVariant} onClose={() => this.closeSnackBar()} />}
+              {showSnackBar && (
+                <SnackBar
+                  open={showSnackBar}
+                  message={snackBarMessage}
+                  variant={snackBarVariant}
+                  onClose={() => this.closeSnackBar()}
+                />
+              )}
               <div className="col-12">
                 <div className="row space-1">
                   <div className="col-sm-4">
@@ -323,6 +473,40 @@ class Events extends React.Component {
                     </Link>
                   </div>
                 </div>
+                {this.state.selected.length > 1 && (
+                  <div className="row space-1">
+                    <div className="col-sm-6"></div>
+                    {/* <div className="col-sm-4"></div> */}
+                    <div className="col-sm-2 pull-right mobile-space">
+                      <button
+                        type="button"
+                        className="btn btn-danger"
+                        onClick={() => this.deleteEventMultiple()}
+                      >
+                        Delete Multiple
+                      </button>
+                    </div>
+
+                    <div className="col-sm-2 pull-right mobile-space">
+                      <button
+                        type="button"
+                        className="btn btn-danger"
+                        onClick={() => this.CloseEventMultiple()}
+                      >
+                        Close Multiple Events
+                      </button>
+                    </div>
+                    <div className="col-sm-2 pull-right mobile-space">
+                      <button
+                        type="button"
+                        className="btn btn-danger"
+                        onClick={() => this.CloseEntryMultiple()}
+                      >
+                        Close Multiple Entries
+                      </button>
+                    </div>
+                  </div>
+                )}
                 <Nav tabs>
                   <NavItem>
                     <NavLink
@@ -353,6 +537,40 @@ class Events extends React.Component {
                   <table className="table table-striped">
                     <thead>
                       <tr>
+                        <th>
+                          <input
+                            type="checkbox"
+                            checked={
+                              this.state.selected.length ===
+                              this.state.events.length
+                                ? true
+                                : false
+                            }
+                            onChange={(e) => {
+                              console.log("This is temp");
+                              if (
+                                this.state.selected.length ===
+                                this.state.events.length
+                              ) {
+                                this.setState({
+                                  selected: [],
+                                  selectedIndex: [],
+                                });
+                              } else {
+                                var temp = [];
+                                var tempIndex = [];
+                                this.state.events.map((event, index) => {
+                                  temp.push(event.uuid);
+                                  tempIndex.push(index);
+                                });
+                                this.setState({
+                                  selected: temp,
+                                  selectedIndex: tempIndex,
+                                });
+                              }
+                            }}
+                          ></input>
+                        </th>
                         <th>Sr. #</th>
                         <th>Title</th>
                         <th>Image</th>
@@ -369,18 +587,142 @@ class Events extends React.Component {
                       {eventList && eventList.length >= 1 ? (
                         eventList.map((event, index) => (
                           <tr key={index}>
-                            <td onClick={() => this.props.history.push(`/events/event-details/${event.uuid}`)}>{index + 1}</td>
-                            <td onClick={() => this.props.history.push(`/events/event-details/${event.uuid}`)}>{event.name}</td>
-                            <td onClick={() => this.props.history.push(`/events/event-details/${event.uuid}`)}>{<img style={{ height: "50px", width: "50px" }} src={event.image} />}</td>
-                            <td onClick={() => this.props.history.push(`/events/event-details/${event.uuid}`)}>{event.location}</td>
-                            <td onClick={() => this.props.history.push(`/events/event-details/${event.uuid}`)}>£{event.fee ? event.fee : 0}</td>
-                            <td onClick={() => this.props.history.push(`/events/event-details/${event.uuid}`)}>{moment(new Date(event.date.seconds * 1000)).format("DD MMM YYYY")}</td>
-                            <td onClick={() => this.props.history.push(`/events/event-details/${event.uuid}`)}>
+                            <td>
+                              <input
+                                type="checkbox"
+                                checked={
+                                  this.state.selected.includes(event.uuid)
+                                    ? true
+                                    : false
+                                }
+                                onChange={(e) => {
+                                  console.log("This is temp");
+                                  if (
+                                    this.state.selected.includes(event.uuid)
+                                  ) {
+                                    var temp = [];
+                                    var tempIndex = [];
+                                    this.state.selected.map((id, index) => {
+                                      if (id != event.uuid) {
+                                        console.log(
+                                          "This is true",
+                                          event.uuid,
+                                          id
+                                        );
+                                        temp.push(id);
+                                        tempIndex.push(
+                                          this.state.selectedIndex[index]
+                                        );
+                                      }
+                                    });
+                                    console.log(
+                                      "This is temmp after removing",
+                                      temp
+                                    );
+                                    this.setState({
+                                      selected: temp,
+                                      selectedIndex: tempIndex,
+                                    });
+                                  } else {
+                                    var temp = this.state.selected;
+                                    var tempIndex = this.state.selectedIndex;
+                                    temp.push(event.uuid);
+                                    tempIndex.push(index);
+                                    this.setState({
+                                      selected: temp,
+                                      selectedIndex: tempIndex,
+                                    });
+                                  }
+                                }}
+                              ></input>
+                            </td>
+
+                            <td
+                              onClick={() =>
+                                this.props.history.push(
+                                  `/events/event-details/${event.uuid}`
+                                )
+                              }
+                            >
+                              {index + 1}
+                            </td>
+                            <td
+                              onClick={() =>
+                                this.props.history.push(
+                                  `/events/event-details/${event.uuid}`
+                                )
+                              }
+                            >
+                              {event.name}
+                            </td>
+                            <td
+                              onClick={() =>
+                                this.props.history.push(
+                                  `/events/event-details/${event.uuid}`
+                                )
+                              }
+                            >
+                              {
+                                <img
+                                  style={{ height: "50px", width: "50px" }}
+                                  src={event.image}
+                                />
+                              }
+                            </td>
+                            <td
+                              onClick={() =>
+                                this.props.history.push(
+                                  `/events/event-details/${event.uuid}`
+                                )
+                              }
+                            >
+                              {event.location}
+                            </td>
+                            <td
+                              onClick={() =>
+                                this.props.history.push(
+                                  `/events/event-details/${event.uuid}`
+                                )
+                              }
+                            >
+                              £{event.fee ? event.fee : 0}
+                            </td>
+                            <td
+                              onClick={() =>
+                                this.props.history.push(
+                                  `/events/event-details/${event.uuid}`
+                                )
+                              }
+                            >
+                              {moment(
+                                new Date(event.date.seconds * 1000)
+                              ).format("DD MMM YYYY")}
+                            </td>
+                            <td
+                              onClick={() =>
+                                this.props.history.push(
+                                  `/events/event-details/${event.uuid}`
+                                )
+                              }
+                            >
                               {!!event.time && Object.keys(event.time).length
-                                ? `${moment(new Date(event.time.startTime.seconds * 1000)).format("hh:mm A")} - ${moment(new Date(event.time.endTime.seconds * 1000)).format("hh:mm A")}`
+                                ? `${moment(
+                                    new Date(
+                                      event.time.startTime.seconds * 1000
+                                    )
+                                  ).format("hh:mm A")} - ${moment(
+                                    new Date(event.time.endTime.seconds * 1000)
+                                  ).format("hh:mm A")}`
                                 : null}
                             </td>
-                            <td onClick={() => this.props.history.push(`/events/event-details/${event.uuid}`)} dangerouslySetInnerHTML={{ __html: event.about }}></td>
+                            <td
+                              onClick={() =>
+                                this.props.history.push(
+                                  `/events/event-details/${event.uuid}`
+                                )
+                              }
+                              dangerouslySetInnerHTML={{ __html: event.about }}
+                            ></td>
 
                             {event.status ? (
                               <td>
@@ -392,14 +734,23 @@ class Events extends React.Component {
                                       color: "green",
                                     }}
                                     aria-hidden="true"
-                                    onClick={() => this.CloseEvent(event.uuid, event)}
+                                    onClick={() =>
+                                      this.CloseEvent(event.uuid, event)
+                                    }
                                   ></span>
                                 </Tooltip>
                               </td>
                             ) : (
                               <td>
                                 <Tooltip title="Open Event" aria-label="close">
-                                  <span className="fa fa-close" style={{ cursor: "pointer", color: "red" }} aria-hidden="true" onClick={() => this.CloseEvent(event.uuid, event)}></span>
+                                  <span
+                                    className="fa fa-close"
+                                    style={{ cursor: "pointer", color: "red" }}
+                                    aria-hidden="true"
+                                    onClick={() =>
+                                      this.CloseEvent(event.uuid, event)
+                                    }
+                                  ></span>
                                 </Tooltip>
                               </td>
                             )}
@@ -407,7 +758,10 @@ class Events extends React.Component {
                             {eventList != pastEvents ? (
                               event.entry ? (
                                 <td>
-                                  <Tooltip title="Close Entry" aria-label="open">
+                                  <Tooltip
+                                    title="Close Entry"
+                                    aria-label="open"
+                                  >
                                     <span
                                       className="fa fa-unlock"
                                       style={{
@@ -415,13 +769,18 @@ class Events extends React.Component {
                                         color: "green",
                                       }}
                                       aria-hidden="true"
-                                      onClick={() => this.CloseEntry(event.uuid, event)}
+                                      onClick={() =>
+                                        this.CloseEntry(event.uuid, event)
+                                      }
                                     ></span>
                                   </Tooltip>
                                 </td>
                               ) : (
                                 <td>
-                                  <Tooltip title="Open Entry" aria-label="close">
+                                  <Tooltip
+                                    title="Open Entry"
+                                    aria-label="close"
+                                  >
                                     <span
                                       className="fa fa-lock"
                                       style={{
@@ -429,7 +788,9 @@ class Events extends React.Component {
                                         color: "red",
                                       }}
                                       aria-hidden="true"
-                                      onClick={() => this.CloseEntry(event.uuid, event)}
+                                      onClick={() =>
+                                        this.CloseEntry(event.uuid, event)
+                                      }
                                     ></span>
                                   </Tooltip>
                                 </td>
@@ -439,13 +800,23 @@ class Events extends React.Component {
                             <td>
                               <Link to={`/events/edit-event/${event.uuid}`}>
                                 <Tooltip title="Edit" aria-label="edit">
-                                  <span className="fa fa-edit" aria-hidden="true"></span>
+                                  <span
+                                    className="fa fa-edit"
+                                    aria-hidden="true"
+                                  ></span>
                                 </Tooltip>
                               </Link>
                             </td>
                             <td>
                               <Tooltip title="Delete" aria-label="delete">
-                                <span className="fa fa-trash" style={{ cursor: "pointer" }} aria-hidden="true" onClick={() => this.deleteEvent(event.uuid, index)}></span>
+                                <span
+                                  className="fa fa-trash"
+                                  style={{ cursor: "pointer" }}
+                                  aria-hidden="true"
+                                  onClick={() =>
+                                    this.deleteEvent(event.uuid, index)
+                                  }
+                                ></span>
                               </Tooltip>
                             </td>
                           </tr>

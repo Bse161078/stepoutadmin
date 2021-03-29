@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { CSVLink } from "react-csv";
 // import { Pagination } from "react-bootstrap";
 
 import {
@@ -26,7 +27,8 @@ export default class Users extends React.Component {
       users: [],
       allusers: [],
       activePage: 1,
-
+      selected: [],
+      selectedIndex: [],
       pages: 1,
       q: "",
       loading: false,
@@ -122,6 +124,79 @@ export default class Users extends React.Component {
               snackBarVariant: "error",
             });
           });
+      }
+    });
+  }
+
+  removeUserMultiple() {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Delete",
+    }).then((result) => {
+      if (result.value) {
+        this.state.selected.map((userId, index) => {
+          deleteUser(userId)
+            .then((response) => {
+              const users = this.state.users.slice();
+              users.splice(index, 1);
+              this.setState({
+                users,
+                showSnackBar: true,
+                snackBarMessage: "User deleted successfully",
+                snackBarVariant: "success",
+              });
+            })
+            .catch(() => {
+              this.setState({
+                showSnackBar: true,
+                snackBarMessage: "Error deleting user",
+                snackBarVariant: "error",
+              });
+            });
+        });
+      }
+    });
+  }
+
+  blockUserMultiple() {
+    const users = this.state.users.slice();
+    Swal.fire({
+      title: "Are you sure?",
+      // text: users[index].isActive
+      //   ? "You want to Block these user!"
+      //   : "You want to Un-block this user!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Block",
+    }).then((result) => {
+      if (result.value) {
+        this.state.selected.map((userId, index) => {
+          blockUser(userId, false)
+            .then((response) => {
+              // const users = this.state.users.slice();
+              users[index].isActive = false;
+              this.setState({
+                users,
+                showSnackBar: true,
+                snackBarMessage: "User blocked successfully",
+                snackBarVariant: "success",
+              });
+            })
+            .catch(() => {
+              this.setState({
+                showSnackBar: true,
+                snackBarMessage: "Error deleting user",
+                snackBarVariant: "error",
+              });
+            });
+        });
       }
     });
   }
@@ -254,6 +329,19 @@ export default class Users extends React.Component {
       snackBarMessage,
       snackBarVariant,
     } = this.state;
+    console.log("This is", this.state.selected);
+    const exportToCSV = () => {};
+    var header = [["Sr. #", "Name", "Phone", "Membership", "Blocked"]];
+    var data = [];
+    this.state.allusers.map((user, index) => {
+      data.push([
+        index + 1,
+        user.lname + "," + user.fname,
+        user.phone,
+        user.membership,
+        user.isActive ? "Block" : "Un Block",
+      ]);
+    });
     return (
       <div className="row animated fadeIn">
         {showSnackBar && (
@@ -278,14 +366,22 @@ export default class Users extends React.Component {
               </Link>
             </div>
             <div className="col-sm-2 pull-right mobile-space">
-              <ReactHTMLTableToExcel
+              {/* <ReactHTMLTableToExcel
                 id="test-table-xls-button"
                 className="btn btn-success"
                 table="table-to-xls"
                 filename="Users"
                 sheet="tablexls"
                 buttonText="Download as XLS"
-              />
+              /> */}
+              <CSVLink
+                className="btn btn-success"
+                filename={"users.csv"}
+                data={data}
+                headers={header}
+              >
+                Download CSV
+              </CSVLink>
             </div>
           </div>
           <div className="row space-1">
@@ -315,6 +411,32 @@ export default class Users extends React.Component {
             </div>
             <div className="col-sm-4"></div>
           </div>
+          {this.state.selected.length > 1 && (
+            <div className="row space-1">
+              <div className="col-sm-8">
+                <h3>List of Users</h3>
+              </div>
+              {/* <div className="col-sm-4"></div> */}
+              <div className="col-sm-2 pull-right mobile-space">
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  onClick={() => this.removeUserMultiple()}
+                >
+                  Delete Multiple
+                </button>
+              </div>
+              <div className="col-sm-2 pull-right mobile-space">
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  onClick={() => this.blockUserMultiple()}
+                >
+                  Close Multiple
+                </button>
+              </div>
+            </div>
+          )}
 
           <table
             className="table table-striped"
@@ -405,6 +527,38 @@ export default class Users extends React.Component {
             <table className="table table-striped">
               <thead>
                 <tr>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={
+                        this.state.selected.length === this.state.users.length
+                          ? true
+                          : false
+                      }
+                      onChange={(e) => {
+                        console.log("This is temp");
+                        if (
+                          this.state.selected.length === this.state.users.length
+                        ) {
+                          this.setState({
+                            selected: [],
+                            selectedIndex: [],
+                          });
+                        } else {
+                          var temp = [];
+                          var tempIndex = [];
+                          this.state.users.map((user, index) => {
+                            temp.push(user.uuid);
+                            tempIndex.push(index);
+                          });
+                          this.setState({
+                            selected: temp,
+                            selectedIndex: tempIndex,
+                          });
+                        }
+                      }}
+                    ></input>
+                  </td>
                   <th>Sr. #</th>
                   <th>Image</th>
                   <th>Name</th>
@@ -416,63 +570,113 @@ export default class Users extends React.Component {
               </thead>
               <tbody>
                 {this.state.users && this.state.users.length >= 1 ? (
-                  this.state.users.map((user, index) => (
-                    <tr key={index}>
-                      <td>{index + 1}</td>
-                      <td>
-                        {
-                          <img
-                            style={{ height: "50px", width: "50px" }}
-                            src={user.profileImage}
-                          />
-                        }
-                      </td>
-                      <td>
-                        {user.lname}, {user.fname}
-                      </td>
-                      <td>{user.phone}</td>
-                      <td>{user.membership}</td>
+                  this.state.users.map((user, index) => {
+                    // console.log(
+                    //   "THis is result ",
+                    //   this.state.selected.includes(user.uuid),
+                    //   user.uuid
+                    // );
+                    return (
+                      <tr key={index}>
+                        <td>
+                          <input
+                            type="checkbox"
+                            checked={
+                              this.state.selected.includes(user.uuid)
+                                ? true
+                                : false
+                            }
+                            onChange={(e) => {
+                              console.log("This is temp");
+                              if (this.state.selected.includes(user.uuid)) {
+                                var temp = [];
+                                var tempIndex = [];
+                                this.state.selected.map((id, index) => {
+                                  if (id != user.uuid) {
+                                    console.log("This is true", user.uuid, id);
+                                    temp.push(id);
+                                    tempIndex.push(
+                                      this.state.selectedIndex[index]
+                                    );
+                                  }
+                                });
+                                console.log(
+                                  "This is temmp after removing",
+                                  temp
+                                );
+                                this.setState({
+                                  selected: temp,
+                                  selectedIndex: tempIndex,
+                                });
+                              } else {
+                                var temp = this.state.selected;
+                                var tempIndex = this.state.selectedIndex;
+                                temp.push(user.uuid);
+                                tempIndex.push(index);
+                                this.setState({
+                                  selected: temp,
+                                  selectedIndex: tempIndex,
+                                });
+                              }
+                            }}
+                          ></input>
+                        </td>
+                        <td>{index + 1}</td>
+                        <td>
+                          {
+                            <img
+                              style={{ height: "50px", width: "50px" }}
+                              src={user.profileImage}
+                            />
+                          }
+                        </td>
+                        <td>
+                          {user.lname}, {user.fname}
+                        </td>
+                        <td>{user.phone}</td>
+                        <td>{user.membership}</td>
 
-                      <td>
-                        <div className="app-body-row">
-                          <div style={{ marginRight: "10px" }}>
-                            {user.isActive ? "No" : "Yes"}
+                        <td>
+                          <div className="app-body-row">
+                            <div style={{ marginRight: "10px" }}>
+                              {user.isActive ? "No" : "Yes"}
+                            </div>
+                            <Tooltip
+                              title={user.isActive ? "Block" : "Un Block"}
+                              aria-label="block"
+                            >
+                              <span
+                                className="fa fa-edit"
+                                style={{ cursor: "pointer" }}
+                                aria-hidden="true"
+                                onClick={() => this.blockUser(user.uuid, index)}
+                              ></span>
+                            </Tooltip>
                           </div>
-                          <Tooltip
-                            title={user.isActive ? "Block" : "Un Block"}
-                            aria-label="block"
-                          >
+                        </td>
+                        <td>
+                          <Link to={`/users/edit-user/${user.uuid}`}>
+                            <Tooltip title="Edit" aria-label="edit">
+                              <span
+                                className="fa fa-edit"
+                                aria-hidden="true"
+                              ></span>
+                            </Tooltip>
+                          </Link>
+                        </td>
+                        <td>
+                          <Tooltip title="Delete" aria-label="delete">
                             <span
-                              className="fa fa-edit"
+                              className="fa fa-trash"
                               style={{ cursor: "pointer" }}
                               aria-hidden="true"
-                              onClick={() => this.blockUser(user.uuid, index)}
+                              onClick={() => this.removeUser(user.uuid, index)}
                             ></span>
                           </Tooltip>
-                        </div>
-                      </td>
-                      <td>
-                        <Link to={`/users/edit-user/${user.uuid}`}>
-                          <Tooltip title="Edit" aria-label="edit">
-                            <span
-                              className="fa fa-edit"
-                              aria-hidden="true"
-                            ></span>
-                          </Tooltip>
-                        </Link>
-                      </td>
-                      <td>
-                        <Tooltip title="Delete" aria-label="delete">
-                          <span
-                            className="fa fa-trash"
-                            style={{ cursor: "pointer" }}
-                            aria-hidden="true"
-                            onClick={() => this.removeUser(user.uuid, index)}
-                          ></span>
-                        </Tooltip>
-                      </td>
-                    </tr>
-                  ))
+                        </td>
+                      </tr>
+                    );
+                  })
                 ) : (
                   <tr>
                     <td colSpan="15" className="text-center">
