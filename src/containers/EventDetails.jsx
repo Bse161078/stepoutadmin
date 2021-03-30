@@ -743,6 +743,7 @@ export default class EventDetails extends React.Component {
       participants,
     } = this.state;
     users[i].selected = !users[i].selected;
+    console.log("THis is select user ", users[i].selected);
     let temp = this.state.participants;
 
     let waitingStatus = false;
@@ -798,7 +799,7 @@ export default class EventDetails extends React.Component {
     } = this.state;
     event.preventDefault();
     const { match, history } = this.props;
-
+    console.log("THis is event entroy", appEvent);
     if (appEvent.entry) {
       updatedParticipants.forEach((element) => {
         users.forEach((user) => {
@@ -809,7 +810,7 @@ export default class EventDetails extends React.Component {
           }
         });
       });
-
+      console.log("This is updated participants", updatedParticipants);
       if (match.params.eventId) {
         updateEventParticipants(match.params.eventId, updatedParticipants)
           .then((response) => {
@@ -2032,7 +2033,7 @@ export default class EventDetails extends React.Component {
 
                         <td onClick={() => this.selectUser(index)}>
                           {user.selected ? (
-                            <Tooltip title="Selected" aria-label="selected">
+                            <Tooltip title="Selected" aria-label="Make  paid">
                               <span
                                 className="fa fa-check"
                                 style={{ cursor: "pointer" }}
@@ -2046,6 +2047,7 @@ export default class EventDetails extends React.Component {
                             let allUsers = this.state.users;
                             allUsers[index].paid = !user.paid;
                             this.setState({ users: allUsers });
+                            this.selectUser(index);
                           }}
                         >
                           {user.paid ? (
