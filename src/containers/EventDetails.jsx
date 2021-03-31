@@ -256,9 +256,14 @@ export default class EventDetails extends React.Component {
         users.forEach((element) => {
           element.selected = false;
         });
-
+        users = users.sort(function (x, y) {
+          console.log("This is time", y.fname[0] < x.fname[0]);
+          return y.fname[0] < x.fname[0];
+        });
+        console.log("These are sorted users", users);
         this.setState({
           users: users,
+          allusers: users,
           participants: participants,
           filteredUsers: filteredUsers,
           paidParticipants: paid,
@@ -674,6 +679,34 @@ export default class EventDetails extends React.Component {
     const list = Object.assign({}, selectedList);
 
     otherResults.ntpPlayer = list;
+  };
+
+  FilterFn = (text) => {
+    if (text !== "") {
+      console.log("It is coming here", text);
+      let newData = this.state.allusers.filter(function (item) {
+        let itemData = item.name ? item.name.toUpperCase() : "".toUpperCase();
+        let textData = text.toUpperCase();
+        return itemData.indexOf(textData) > -1;
+      });
+
+      this.setState({
+        users: newData,
+        isSearching: true,
+      });
+    } else {
+      this.setState({
+        users: this.state.allusers,
+        isSearching: false,
+      });
+    }
+  };
+
+  handleInputChange = (event) => {
+    const { value } = event.target;
+    console.log("THis is target value", value);
+    this.setState({ q: event.target.value });
+    this.FilterFn(event.target.value);
   };
 
   onSelectLongestDrive = (event, selectedList) => {
@@ -1996,114 +2029,137 @@ export default class EventDetails extends React.Component {
             Select New Participants
           </ModalHeader>
           <ModalBody>
+            <div className="input-group">
+              <input
+                value={this.state.q}
+                onChange={this.handleInputChange}
+                className="form-control"
+                type="text"
+                name="search"
+                placeholder="Enter search keyword"
+                value={this.state.q}
+                // onChange={(event) => this.setState({ q: event.target.value })}
+              />
+              <span className="input-group-btn">
+                <button
+                  type="button"
+                  onClick={() => this.handleSearch()}
+                  className="btn btn-info search-btn"
+                >
+                  Search
+                </button>
+              </span>
+            </div>
             <div className="table-responsive">
-              <table className="table table-striped">
-                <thead>
-                  <tr>
-                    <th>Sr. #</th>
-                    <th>Image</th>
-                    <th>Name</th>
-                    <th>Phone</th>
-                    <th></th>
-                    <th>Paid</th>
-                    <th>Waiting</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {this.state.users && this.state.users.length >= 1 ? (
-                    this.state.users.map((user, index) => (
-                      <tr key={index}>
-                        <td onClick={() => this.selectUser(index)}>
-                          {index + 1}
-                        </td>
-                        <td onClick={() => this.selectUser(index)}>
-                          {
-                            <img
-                              style={{ height: "50px", width: "50px" }}
-                              src={user.profileImage}
-                            />
-                          }
-                        </td>
-                        <td onClick={() => this.selectUser(index)}>
-                          {user.name}
-                        </td>
-                        <td onClick={() => this.selectUser(index)}>
-                          {user.phone}
-                        </td>
+              <div style={{ maxHeight: 300, overflow: "scroll" }}>
+                <table className="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>Sr. #</th>
+                      <th>Image</th>
+                      <th>Name</th>
+                      <th>Phone</th>
+                      <th></th>
+                      <th>Paid</th>
+                      <th>Waiting</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {this.state.users && this.state.users.length >= 1 ? (
+                      this.state.users.map((user, index) => (
+                        <tr key={index}>
+                          <td onClick={() => this.selectUser(index)}>
+                            {index + 1}
+                          </td>
+                          <td onClick={() => this.selectUser(index)}>
+                            {
+                              <img
+                                style={{ height: "50px", width: "50px" }}
+                                src={user.profileImage}
+                              />
+                            }
+                          </td>
+                          <td onClick={() => this.selectUser(index)}>
+                            {user.name}
+                          </td>
+                          <td onClick={() => this.selectUser(index)}>
+                            {user.phone}
+                          </td>
 
-                        <td onClick={() => this.selectUser(index)}>
-                          {user.selected ? (
-                            <Tooltip title="Selected" aria-label="Make  paid">
-                              <span
-                                className="fa fa-check"
-                                style={{ cursor: "pointer" }}
-                                aria-hidden="true"
-                              ></span>
-                            </Tooltip>
-                          ) : null}
-                        </td>
-                        <td
-                          onClick={() => {
-                            let allUsers = this.state.users;
-                            allUsers[index].paid = !user.paid;
-                            this.setState({ users: allUsers });
-                            this.selectUser(index);
-                          }}
-                        >
-                          {user.paid ? (
-                            <Tooltip title="Selected" aria-label="selected">
-                              <span
-                                className="fa fa-check-square-o"
-                                style={{ cursor: "pointer" }}
-                                aria-hidden="true"
-                              ></span>
-                            </Tooltip>
-                          ) : (
-                            <Tooltip title="Selected" aria-label="selected">
-                              <span
-                                className="fa fa-square-o"
-                                style={{ cursor: "pointer" }}
-                                aria-hidden="true"
-                              ></span>
-                            </Tooltip>
-                          )}
-                        </td>
-                        <td
-                          onClick={() => {
-                            let allUsers = this.state.users;
-                            allUsers[index].waiting = !user.waiting;
-                            this.setState({ users: allUsers });
-                          }}
-                        >
-                          {user.waiting ? (
-                            <Tooltip title="Selected" aria-label="selected">
-                              <span
-                                className="fa fa-check-square-o"
-                                style={{ cursor: "pointer" }}
-                                aria-hidden="true"
-                              ></span>
-                            </Tooltip>
-                          ) : (
-                            <Tooltip title="Selected" aria-label="selected">
-                              <span
-                                className="fa fa-square-o"
-                                style={{ cursor: "pointer" }}
-                                aria-hidden="true"
-                              ></span>
-                            </Tooltip>
-                          )}
+                          <td onClick={() => this.selectUser(index)}>
+                            {user.selected ? (
+                              <Tooltip title="Selected" aria-label="Make  paid">
+                                <span
+                                  className="fa fa-check"
+                                  style={{ cursor: "pointer" }}
+                                  aria-hidden="true"
+                                ></span>
+                              </Tooltip>
+                            ) : null}
+                          </td>
+                          <td
+                            onClick={() => {
+                              let allUsers = this.state.users;
+                              allUsers[index].paid = !user.paid;
+                              this.setState({ users: allUsers });
+                              this.selectUser(index);
+                            }}
+                          >
+                            {user.paid ? (
+                              <Tooltip title="Selected" aria-label="selected">
+                                <span
+                                  className="fa fa-check-square-o"
+                                  style={{ cursor: "pointer" }}
+                                  aria-hidden="true"
+                                ></span>
+                              </Tooltip>
+                            ) : (
+                              <Tooltip title="Selected" aria-label="selected">
+                                <span
+                                  className="fa fa-square-o"
+                                  style={{ cursor: "pointer" }}
+                                  aria-hidden="true"
+                                ></span>
+                              </Tooltip>
+                            )}
+                          </td>
+                          <td
+                            onClick={() => {
+                              let allUsers = this.state.users;
+                              allUsers[index].waiting = !user.waiting;
+                              this.setState({ users: allUsers });
+                            }}
+                          >
+                            {user.waiting ? (
+                              <Tooltip title="Selected" aria-label="selected">
+                                <span
+                                  className="fa fa-check-square-o"
+                                  style={{ cursor: "pointer" }}
+                                  aria-hidden="true"
+                                ></span>
+                              </Tooltip>
+                            ) : (
+                              <Tooltip title="Selected" aria-label="selected">
+                                <span
+                                  className="fa fa-square-o"
+                                  style={{ cursor: "pointer" }}
+                                  aria-hidden="true"
+                                ></span>
+                              </Tooltip>
+                            )}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="15" className="text-center">
+                          {this.state.responseMessage}
                         </td>
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="15" className="text-center">
-                        {this.state.responseMessage}
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </ModalBody>
           <ModalFooter>
