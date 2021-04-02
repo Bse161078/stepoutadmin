@@ -57,6 +57,7 @@ import ReactHTMLTableToExcel from "react-html-table-to-excel";
 
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import TextField from "@material-ui/core/TextField";
+import { CSVLink } from "react-csv";
 
 var subtitle;
 
@@ -1210,6 +1211,11 @@ export default class EventDetails extends React.Component {
     const { match, history } = this.props;
     const isEdit = !!match.params.eventId;
 
+    var header = ["Sr. #", "Name", "Paid"];
+    var downloadData = [];
+    participantstList.map((item, index) => {
+      downloadData.push([index + 1, item.name, item.paid]);
+    });
     return (
       <div className="row animated fadeIn">
         {showSnackBar && (
@@ -1553,14 +1559,22 @@ export default class EventDetails extends React.Component {
                             </button>
                           </div>
                           <div className="col-sm-4 pull-right mobile-space">
-                            <ReactHTMLTableToExcel
+                            {/* <ReactHTMLTableToExcel
                               id="test-table-xls-button"
                               className="btn btn-success"
                               table="table-to-xls-paid"
                               filename="Users"
                               sheet="tablexls"
                               buttonText="Download as XLS"
-                            />
+                            /> */}
+                            <CSVLink
+                              className="btn btn-success"
+                              filename={"Participants.csv"}
+                              data={downloadData}
+                              headers={header}
+                            >
+                              Download CSV
+                            </CSVLink>
                           </div>
                         </div>
 
