@@ -331,7 +331,7 @@ export default class Users extends React.Component {
     } = this.state;
     console.log("This is", this.state.selected);
     const exportToCSV = () => {};
-    var header = [["Sr. #", "Name", "Phone", "Membership", "Blocked"]];
+    var header = ["Sr. #", "Name", "Phone", "Membership", "Blocked"];
     var data = [];
     this.state.allusers.map((user, index) => {
       data.push([
