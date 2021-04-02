@@ -259,7 +259,7 @@ export default class EventDetails extends React.Component {
         });
         users = users.sort(function (x, y) {
           console.log("This is time", y.fname[0] < x.fname[0]);
-          return y.fname[0] < x.fname[0];
+          return y.fname < x.fname;
         });
         console.log("These are sorted users", users);
         this.setState({
