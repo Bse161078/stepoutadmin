@@ -8,6 +8,7 @@ import {
   getUsers,
   deleteUser,
   blockUser,
+  updateMemberShipUser,
 } from "../backend/services/usersService";
 import SnackBar from "../components/SnackBar";
 import Swal from "sweetalert2";
@@ -193,6 +194,44 @@ export default class Users extends React.Component {
               this.setState({
                 showSnackBar: true,
                 snackBarMessage: "Error deleting user",
+                snackBarVariant: "error",
+              });
+            });
+        });
+      }
+    });
+  }
+
+  changeMembershipMultiple(e) {
+    console.log("This is it", e);
+    const users = this.state.users.slice();
+    Swal.fire({
+      title: "Are you sure?",
+      // text: users[index].isActive
+      //   ? "You want to Block these user!"
+      //   : "You want to Un-block this user!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Change",
+    }).then((result) => {
+      if (result.value) {
+        this.state.selected.map((userId, index) => {
+          updateMemberShipUser(userId, e)
+            .then((response) => {
+              this.setState({
+                users,
+                showSnackBar: true,
+                snackBarMessage: "Menbership changed successfully",
+                snackBarVariant: "success",
+              });
+              this.fetchUsers();
+            })
+            .catch(() => {
+              this.setState({
+                showSnackBar: true,
+                snackBarMessage: "Error ",
                 snackBarVariant: "error",
               });
             });
@@ -413,7 +452,7 @@ export default class Users extends React.Component {
           </div>
           {this.state.selected.length > 1 && (
             <div className="row space-1">
-              <div className="col-sm-8">
+              <div className="col-sm-6">
                 <h3>List of Users</h3>
               </div>
               {/* <div className="col-sm-4"></div> */}
@@ -432,8 +471,21 @@ export default class Users extends React.Component {
                   className="btn btn-danger"
                   onClick={() => this.blockUserMultiple()}
                 >
-                  Close Multiple
+                  Block Multiple
                 </button>
+              </div>
+              <div className="col-sm-2">
+                <select
+                  style={{ marginTop: 8 }}
+                  onChange={(e) =>
+                    this.changeMembershipMultiple(e.target.value)
+                  }
+                >
+                  <option name="unknown">Unknown</option>
+
+                  <option name="paid">Paid</option>
+                  <option name="unpaid">Unpaid</option>
+                </select>
               </div>
             </div>
           )}

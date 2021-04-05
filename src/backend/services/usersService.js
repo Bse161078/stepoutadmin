@@ -37,6 +37,12 @@ export const updateUser = async function (id, data) {
   await db.collection("Users").doc(id).set(data, { merge: true });
 };
 
+export const updateMemberShipUser = async function (id, data) {
+  await db.collection("Users").doc(id).update({
+    membership: data,
+  });
+};
+
 export const blockUser = async function (id, data) {
   await db.collection("Users").doc(id).update({
     isActive: data,
