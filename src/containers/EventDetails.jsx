@@ -261,7 +261,7 @@ export default class EventDetails extends React.Component {
           console.log("This is time", y.fname[0] < x.fname[0]);
           return y.fname < x.fname;
         });
-        console.log("These are sorted users", users);
+        console.log("These are sorted user", users);
         this.setState({
           users: users,
           allusers: users,
