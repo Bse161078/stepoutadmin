@@ -221,10 +221,16 @@ export default class EventDetails extends React.Component {
 
   fetchUsers = (participants) => {
     let users = [];
+    let tempUsers = [];
     let filteredUsers = [];
     getUsers()
       .then((response) => {
-        users = response;
+        tempUsers = response;
+        tempUsers.forEach((item) => {
+          let temp = item;
+          temp.waiting = item.waiting || false;
+          users.push(temp);
+        });
 
         participants.forEach((element) => {
           users.forEach((usetItem) => {
@@ -232,7 +238,7 @@ export default class EventDetails extends React.Component {
               let user = usetItem;
               user.paid = element.paid;
               user.withdrawn = element.withdrawn;
-              user.waiting = element.waiting;
+              user.waiting = element.waiting || false;
               filteredUsers.push(user);
             }
           });
@@ -258,7 +264,11 @@ export default class EventDetails extends React.Component {
           element.selected = false;
         });
         users = users.sort(function (x, y) {
-          console.log("This is time", y.fname[0] < x.fname[0]);
+          if (x.waiting === null) {
+            x.waiting = false;
+          }
+          console.log("This is  x. wating", x.waiting);
+          // console.log("This is time", y.fname[0] < x.fname[0]);
           return y.fname < x.fname;
         });
         console.log("These are sorted user", users);
@@ -840,6 +850,7 @@ export default class EventDetails extends React.Component {
           if (user.uuid == element.userId) {
             element.paid = user.paid ? user.paid : false;
             element.waiting = user.waiting ? user.waiting : false;
+            console.log("This is  user. wating", user.waiting);
             // element.registerNumber = updatedParticipants.length + 1;
           }
         });
@@ -1090,6 +1101,7 @@ export default class EventDetails extends React.Component {
     } else {
       updatedGroups.push(group);
     }
+    console.log("These are updated groups", updatedGroups);
 
     // updatedGroups.push(group);
 
