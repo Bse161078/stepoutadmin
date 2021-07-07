@@ -31,6 +31,7 @@ export default class EventForm extends React.Component {
         status: true,
         entry: true,
         uuid: "",
+        participants:[]
       },
       description: RichTextEditor.createEmptyValue(),
       startTime: null,
