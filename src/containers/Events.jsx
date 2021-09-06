@@ -579,6 +579,7 @@ class Events extends React.Component {
                         <th>Date</th>
                         <th>Time</th>
                         <th>About</th>
+                        <th>Food Item</th>
                         <th>Open</th>
                         {eventList != pastEvents ? <th>Entry</th> : null}
                       </tr>
@@ -723,6 +724,15 @@ class Events extends React.Component {
                               }
                               dangerouslySetInnerHTML={{ __html: event.about }}
                             ></td>
+                        <td
+                              onClick={() =>
+                                this.props.history.push(
+                                  `/events/event-details/${event.uuid}`
+                                )
+                              }
+                            >
+                              {event.foodItem}
+                            </td>
 
                             {event.status ? (
                               <td>

@@ -24,6 +24,7 @@ export const addEvent = async function (data) {
     .collection("Events")
     .add(data)
     .then(async function (docRef) {
+      console.log("THis is h")
       //   console.log("Document written with ID: ", docRef.id);
       data.uuid = docRef.id;
       await updateEvent(docRef.id, data);

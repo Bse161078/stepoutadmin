@@ -31,7 +31,9 @@ export default class EventForm extends React.Component {
         status: true,
         entry: true,
         uuid: "",
-        participants:[]
+        participants:[],
+        foodItem:"",
+        closeFoodEntry : false
       },
       description: RichTextEditor.createEmptyValue(),
       startTime: null,
@@ -42,6 +44,7 @@ export default class EventForm extends React.Component {
       time: ["", ""],
       image: "",
       file: "",
+      foodItem:"",
       showSnackBar: false,
       snackBarMessage: "",
       snackBarVariant: "success",
@@ -82,6 +85,15 @@ export default class EventForm extends React.Component {
     this.setState({
       appEvent,
       description,
+    });
+  }
+
+  setFoodItem(foodItem) {
+    const { appEvent } = this.state;
+    appEvent.foodItem =foodItem;
+    this.setState({
+      appEvent,
+      foodItem,
     });
   }
 
@@ -134,6 +146,7 @@ export default class EventForm extends React.Component {
 
       if (match.params.eventId) {
         let cloneObject = Object.assign({}, appEvent);
+        console.log("THis is the lcone object",cloneObject)
         updateEvent(match.params.eventId, cloneObject)
           .then((response) => {
             this.setState({
@@ -387,6 +400,34 @@ export default class EventForm extends React.Component {
                         />
                       </div>
                     </div>
+
+                    <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">
+                        Food Menu
+                      </label>
+                      <div className="col-md-6 col-sm-6">
+                        <select
+                          style={{ marginTop: 8 }}
+                          value={this.state.foodItem}
+                          onChange={
+                         
+                              (e)=>{
+                                console.log("THis is the value",e.target.value)
+                                this.setFoodItem(e.target.value)
+                              }
+                            
+                          }
+                        >
+                          <option name="popcorn">Popcorn</option>
+
+                          <option name="apples">Apples</option>
+                          <option name="bananas">Bananas</option>
+                          <option name="smoothie">Smoothie</option>
+                          <option name="fries">Fries</option>
+                        </select>
+                      </div>
+                    </div>
+
 
                     {/* <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">Workout Day</label>
