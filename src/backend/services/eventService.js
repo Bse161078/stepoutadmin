@@ -5,7 +5,7 @@ import firebase from "firebase";
 
 export const getEvents = async function () {
   const query = await db.collection("Events").get();
-
+  console.log("This is the query",query.docs)
   let events = [];
 
   query.docs.forEach((doc) => {

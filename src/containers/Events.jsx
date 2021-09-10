@@ -86,10 +86,10 @@ class Events extends React.Component {
         const past = response.filter((element) => {
           let date = moment(new Date(element.date.seconds * 1000));
           let curentDate = new Date();
-          console.log(
-            `${element.name} minutes past:`,
-            date.diff(curentDate, "minutes")
-          );
+          // console.log(
+          //   `${element.name} minutes past:`,
+          //   date.diff(curentDate, "minutes")
+          // );
 
           return date.diff(curentDate, "minutes") < 0 || !element.status;
         });

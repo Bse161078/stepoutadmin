@@ -2,6 +2,7 @@ export class Event {
   constructor(x) {
     this.uuid = x.uuid;
     this.name = x.name;
+    this.foodItem = x.foodItem;
     this.image = x.image;
     this.date = x.date;
     this.time = x.time;
@@ -35,6 +36,7 @@ export class Event {
     return new Event({
       uuid: doc.id,
       name: data["name"] ? data["name"] : "",
+      foodItem: data["foodItem"] ? data["foodItem"] : "",
       image: data["image"] ? data["image"] : [],
       date: data["date"] ? data["date"] : [],
       time: data["time"] ? data["time"] : [],
@@ -75,6 +77,7 @@ export class Event {
     return {
       uuid: x.uuid,
       name: x.name,
+      foodItem: x.foodItem,
       image: x.image,
       date: x.date,
       time: x.time,
