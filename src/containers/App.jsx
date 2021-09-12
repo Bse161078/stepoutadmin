@@ -27,6 +27,9 @@ import News from "./News";
 import NewsForm from "./NewsForm";
 
 import Events from "./Events";
+import Golfcourses from "./Golfcourses";
+import GolfcoursesForm from "./GolfcoursesForm";
+import GolfcoursesDetails from "./GolfcoursesDetails";
 import EventForm from "./EventForm";
 import EventDetails from "./EventDetails";
 
@@ -48,6 +51,7 @@ import * as types from "../static/_types";
 import { firebase } from "../backend/firebase";
 import { getSignedInUser } from "../backend/services/authService";
 import { RootContext } from "../../src/backend/Context";
+
 
 class App extends React.Component {
   constructor(props) {
@@ -167,10 +171,26 @@ class App extends React.Component {
                   />
 
                   <Route exact={true} path="/events" component={Events} />
+                  <Route exact={true} path="/golfcourses" component={Golfcourses} />
                   <Route
                     exact={true}
                     path="/events/event-form"
                     component={EventForm}
+                  />
+                    <Route
+                    exact={true}
+                    path="/golfcourses/golfcourses-form"
+                    component={GolfcoursesForm}
+                  />
+                      <Route
+                    exact={true}
+                    path="/golfcourses/edit-golfcourses/:golfCoursesId"
+                    component={GolfcoursesForm}
+                  />
+                  <Route
+                    exact={true}
+                    path="/golfcourses/golfcourses-details/:golfCoursesId"
+                    component={GolfcoursesDetails}
                   />
                   <Route
                     exact={true}

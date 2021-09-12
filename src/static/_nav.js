@@ -26,6 +26,11 @@ export default {
       icon: "icon-fire",
     },
     {
+      name: "Golf Courses",
+      url: "/golfcourses",
+      icon: "icon-fire",
+    },
+    {
       name: "Users",
       url: "/users",
       icon: "icon-user",
