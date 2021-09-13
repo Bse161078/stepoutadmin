@@ -335,9 +335,9 @@ export default class UserForm extends React.Component {
                           onChange={this.handleChange}
                         >
                           <option name="unknown">Unknown</option>
-
-                          <option name="paid">Paid</option>
-                          <option name="unpaid">Unpaid</option>
+        <option name="executive">Executive</option>
+        <option name="member">Member</option>
+        <option name="guest">Guest</option>
                         </select>
                       </div>
                     </div>
