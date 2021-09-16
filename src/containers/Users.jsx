@@ -435,9 +435,26 @@ export default class Users extends React.Component {
           (context)=>{
             globalContext = context;
             console.log("This is event tab",context.eventTab)
-            const userList =
-              context.eventTab == "1" ? this.state.executive : context.eventTab =="2"?this.state.members:context.eventTab =="3"?this.state.guests:this.state.unknown;
-             console.log("THis is the user list",userList)
+
+            var  userList =[]
+             
+             if( context.eventTab == 1 )
+             {
+              userList =  this.state.executive;
+             }
+             else if( context.eventTab == "2" )
+             {
+              userList =  this.state.members;
+             }
+             else if( context.eventTab == "3" )
+             {
+              userList =  this.state.guests;
+             }
+             else if( context.eventTab == "4" )
+             {
+              userList =  this.state.unknown;
+             }
+              console.log("THis is the user list",userList)
               return(
                 <div className="row animated fadeIn">
                 {showSnackBar && (
@@ -730,8 +747,8 @@ export default class Users extends React.Component {
                         </tr>
                       </thead>
                       <tbody>
-                        {this.state.users && this.state.users.length >= 1 ? (
-                          this.state.users.map((user, index) => {
+                        {userList && userList.length >= 1 ? (
+                          userList.map((user, index) => {
                             // console.log(
                             //   "THis is result ",
                             //   this.state.selected.includes(user.uuid),
