@@ -418,16 +418,9 @@ export default class Users extends React.Component {
     const exportToCSV = () => {};
     var header = ["Sr. #", "Name", "Phone", "Membership", "Blocked"];
     var data = [];
-    this.state.allusers.map((user, index) => {
-      data.push([
-        index + 1,
-        user.lname + "," + user.fname,
-        user.phone,
-        user.membership,
-        user.isActive ? "Block" : "Un Block",
-      ]);
-    });
-    
+
+
+   
 
     return (
       <RootConsumer>
@@ -435,9 +428,59 @@ export default class Users extends React.Component {
           (context)=>{
             globalContext = context;
             console.log("This is event tab",context.eventTab)
+            
 
             var  userList =[]
-             
+            if( context.eventTab == 1 )
+            {
+            this.state.executive.map((user, index) => {
+              data.push([
+                index + 1,
+                user.lname + "," + user.fname,
+                user.phone,
+                user.membership,
+                user.isActive ? "Block" : "Un Block",
+              ]);
+            });
+            
+            }
+            else if( context.eventTab == "2" )
+            {
+             this.state.members.map((user, index) => {
+              data.push([
+                index + 1,
+                user.lname + "," + user.fname,
+                user.phone,
+                user.membership,
+                user.isActive ? "Block" : "Un Block",
+              ]);
+            });
+            }
+            else if( context.eventTab == "3" )
+            {
+             this.state.guests.map((user, index) => {
+              data.push([
+                index + 1,
+                user.lname + "," + user.fname,
+                user.phone,
+                user.membership,
+                user.isActive ? "Block" : "Un Block",
+              ]);
+            });
+            }
+            else if( context.eventTab == "4" )
+            {
+              this.state.unknown.map((user, index) => {
+              data.push([
+                index + 1,
+                user.lname + "," + user.fname,
+                user.phone,
+                user.membership,
+                user.isActive ? "Block" : "Un Block",
+              ]);
+            });
+            }
+            
              if( context.eventTab == 1 )
              {
               userList =  this.state.executive;

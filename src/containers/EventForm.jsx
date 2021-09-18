@@ -24,6 +24,7 @@ export default class EventForm extends React.Component {
         name: "",
         date: "",
         time: {},
+        url:'',
         location: "",
         website: "",
         about: "",
@@ -314,6 +315,25 @@ export default class EventForm extends React.Component {
                         <input required type="number" name="fee" className="form-control" value={appEvent.fee} onChange={this.handleInputChange} />
                       </div>
                     </div>
+                    <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">Executives Entry Fee £</label>
+                      <div className="col-md-6 col-sm-6">
+                        <input required type="number" name="executive_fee" className="form-control" value={appEvent.executive_fee} onChange={this.handleInputChange} />
+                      </div>
+                    </div>
+                    <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">Golf Guests Entry Fee £</label>
+                      <div className="col-md-6 col-sm-6">
+                        <input required type="number" name="golf_guest_fee" className="form-control" value={appEvent.golf_guest_fee} onChange={this.handleInputChange} />
+                      </div>
+                    </div>
+                    <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">Social Guests Entry Fee £</label>
+                      <div className="col-md-6 col-sm-6">
+                        <input required type="number" name="social_guest_fee" className="form-control" value={appEvent.social_guest_fee} onChange={this.handleInputChange} />
+                      </div>
+                    </div>
+
 
                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">Guests Entry Fee £</label>
@@ -382,7 +402,7 @@ export default class EventForm extends React.Component {
 
                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">Website</label>
-                      <div className="col-md-6 col-sm-6">
+                     < div className="col-md-6 col-sm-6">
                         <input required type="text" name="website" className="form-control" value={appEvent.website} onChange={this.handleInputChange} />
                       </div>
                     </div>
@@ -428,32 +448,14 @@ export default class EventForm extends React.Component {
                       </div>
                     </div>
 
- {/* <div className="form-group row">
+ <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                        Food Menu
+                        Embedded Url
                       </label>
-                      <div className="col-md-6 col-sm-6">
-                        <select
-                          style={{ marginTop: 8 }}
-                          value={this.state.foodItem}
-                          onChange={
-                         
-                              (e)=>{
-                                console.log("THis is the value",e.target.value)
-                                this.setFoodItem(e.target.value)
-                              }
-                            
-                          }
-                        >
-                          <option name="popcorn">Popcorn</option>
-
-                          <option name="apples">Apples</option>
-                          <option name="bananas">Bananas</option>
-                          <option name="smoothie">Smoothie</option>
-                          <option name="fries">Fries</option>
-                        </select>
+                      < div className="col-md-6 col-sm-6">
+                        <input required type="text" name="url" className="form-control" value={appEvent.url} onChange={this.handleInputChange} />
                       </div>
-                    </div> */}
+                    </div>
 
                     {/* <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">Workout Day</label>

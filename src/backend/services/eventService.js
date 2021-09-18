@@ -11,6 +11,7 @@ export const getEvents = async function () {
   query.docs.forEach((doc) => {
     const event = Event.fromFirestore(doc);
     if (event) {
+      console.log('This is event',event)
       events.push(event);
     }
   });

@@ -133,6 +133,8 @@ export default class EventDetails extends React.Component {
       participants: [],
       paidParticipants: [],
       unPaidParticipants: [],
+      paidSocialParticipants: [],
+      unPaidSocialParticipants: [],
       withdrawnParticipants: [],
       paidWaitingParticipants: [],
       unPaidWaitingParticipants: [],
@@ -234,9 +236,12 @@ export default class EventDetails extends React.Component {
 
         participants.forEach((element) => {
           users.forEach((usetItem) => {
+            console.log("This is the usetItem",usetItem)
             if (element.userId == usetItem.uuid) {
               let user = usetItem;
               user.paid = element.paid;
+              user.paid_social = element.paid_social;
+              user.waiting_social = element.waiting_social;
               user.withdrawn = element.withdrawn;
               user.waiting = element.waiting || false;
               filteredUsers.push(user);
@@ -248,8 +253,17 @@ export default class EventDetails extends React.Component {
           return element.paid && !element.withdrawn && !element.waiting;
         });
         const unPaid = filteredUsers.filter((element) => {
-          return !element.paid && !element.withdrawn && !element.waiting;
+          return !element.paid && !element.waiting_social && !element.paid_social && !element.withdrawn && !element.waiting;
         });
+        const paidSocial = filteredUsers.filter((element) => {
+          return element.paid_social && !element.withdrawn && !element.waiting;
+        });
+        const waitingSocial = filteredUsers.filter((element) => {
+          console.log("Thsi is  watin social",element.waiting_social)
+          return element.waiting_social && !element.withdrawn && !element.waiting;
+        });
+        console.log("These are paid social",paidSocial)
+        console.log("These are waiting social",waitingSocial)
         const withdrawn = filteredUsers.filter((element) => {
           return element.withdrawn;
         });
@@ -282,7 +296,8 @@ export default class EventDetails extends React.Component {
           withdrawnParticipants: withdrawn,
           paidWaitingParticipants: paidWaiting,
           unPaidWaitingParticipants: unPaidWaiting,
-
+          paidSocialParticipants: paidSocial,
+          unPaidSocialParticipants: waitingSocial,
           // pages: Math.ceil(response.data.length/10),
           loading: false,
           responseMessage: "No Users Found",
@@ -757,9 +772,19 @@ export default class EventDetails extends React.Component {
 
   handleChange = (e) => {
     let user = this.state.selectedUser;
+    console.log("THs is the value on change",e.target.value)
     if (e.target.value == "Paid") {
       user.paid = true;
-    } else {
+    } 
+    else if (e.target.value==="Paid (Social)") {
+      user.paid_social = true;
+      user.waiting_social = false;
+    }
+    else if (e.target.value==="Waiting (Social)") {
+      user.waiting_social = true;
+      user.paid_social =false;
+    }
+    else if (e.target.value==="Un Paid") {
       user.paid = false;
     }
     this.setState({ selectedUser: user });
@@ -843,14 +868,17 @@ export default class EventDetails extends React.Component {
     } = this.state;
     event.preventDefault();
     const { match, history } = this.props;
-    console.log("THis is event entroy", appEvent);
+    console.log("THese are the updated participants", updatedParticipants);
     if (appEvent.entry) {
       updatedParticipants.forEach((element) => {
         users.forEach((user) => {
+          console.log("THis ist he element",element)
           if (user.uuid == element.userId) {
             element.paid = user.paid ? user.paid : false;
             element.waiting = user.waiting ? user.waiting : false;
-            console.log("This is  user. wating", user.waiting);
+            element.paid_social = user.paid_social ? user.paid_social : false;
+            element.waiting_social = user.waiting_social ? user.waiting_social : false;
+            console.log("This is  user. wating", user);
             // element.registerNumber = updatedParticipants.length + 1;
           }
         });
@@ -926,6 +954,8 @@ export default class EventDetails extends React.Component {
       if (element.userId === selectedUser.uuid) {
         element.paid = selectedUser.paid;
         element.waiting = selectedUser.waiting;
+        element.paid_social = selectedUser.paid_social;
+        element.waiting_social = selectedUser.waiting_social;
       }
     });
 
@@ -1208,6 +1238,8 @@ export default class EventDetails extends React.Component {
       withdrawnParticipants,
       paidWaitingParticipants,
       unPaidWaitingParticipants,
+      paidSocialParticipants,
+      unPaidSocialParticipants,
     } = this.state;
     const participantstList =
       activeTab == "1"
@@ -1218,7 +1250,11 @@ export default class EventDetails extends React.Component {
         ? withdrawnParticipants
         : activeTab == "4"
         ? paidWaitingParticipants
-        : unPaidWaitingParticipants;
+        :activeTab == "5"
+        ? unPaidWaitingParticipants
+        :activeTab == "6"
+        ? paidSocialParticipants
+        : unPaidSocialParticipants;
 
     const { match, history } = this.props;
     const isEdit = !!match.params.eventId;
@@ -1649,6 +1685,30 @@ export default class EventDetails extends React.Component {
                               }}
                             >
                               Waiting(Un Paid)
+                            </NavLink>
+                          </NavItem>
+                          <NavItem>
+                            <NavLink
+                              className={classnames({
+                                active: this.state.activeTab === "6",
+                              })}
+                              onClick={() => {
+                                this.toggle("6");
+                              }}
+                            >
+                              Social (Paid)
+                            </NavLink>
+                          </NavItem>
+                          <NavItem>
+                            <NavLink
+                              className={classnames({
+                                active: this.state.activeTab === "7",
+                              })}
+                              onClick={() => {
+                                this.toggle("7");
+                              }}
+                            >
+                              Social (Un Paid)
                             </NavLink>
                           </NavItem>
                         </Nav>
@@ -2088,6 +2148,8 @@ export default class EventDetails extends React.Component {
                       <th></th>
                       <th>Paid</th>
                       <th>Waiting</th>
+                      <th>Paid (Social)</th>
+                      <th>Waiting (Social)</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -2174,6 +2236,65 @@ export default class EventDetails extends React.Component {
                               </Tooltip>
                             )}
                           </td>
+                        
+
+                          <td
+                            onClick={() => {
+                              let allUsers = this.state.users;
+                              allUsers[index].paid_social = !user.paid_social;
+                              allUsers[index].waiting_social = false;
+                              this.setState({ users: allUsers });
+                              this.selectUser(index);
+                            }}
+                          >
+                            {user.paid_social ? (
+                              <Tooltip title="Selected" aria-label="selected">
+                                <span
+                                  className="fa fa-check-square-o"
+                                  style={{ cursor: "pointer" }}
+                                  aria-hidden="true"
+                                ></span>
+                              </Tooltip>
+                            ) : (
+                              <Tooltip title="Selected" aria-label="selected">
+                                <span
+                                  className="fa fa-square-o"
+                                  style={{ cursor: "pointer" }}
+                                  aria-hidden="true"
+                                ></span>
+                              </Tooltip>
+                            )}
+                          </td>
+                          <td
+                            onClick={() => {
+                              let allUsers = this.state.users;
+                              allUsers[index].waiting_social = !user.waiting_social;
+                              allUsers[index].paid_social = false;
+                              this.setState({ users: allUsers });
+                              this.selectUser(index);
+                            }}
+                          >
+                            {user.waiting_social ? (
+                              <Tooltip title="Selected" aria-label="selected">
+                                <span
+                                  className="fa fa-check-square-o"
+                                  style={{ cursor: "pointer" }}
+                                  aria-hidden="true"
+                                ></span>
+                              </Tooltip>
+                            ) : (
+                              <Tooltip title="Selected" aria-label="selected">
+                                <span
+                                  className="fa fa-square-o"
+                                  style={{ cursor: "pointer" }}
+                                  aria-hidden="true"
+                                ></span>
+                              </Tooltip>
+                            )}
+                          </td>
+                       
+
+
                         </tr>
                       ))
                     ) : (
@@ -2249,13 +2370,17 @@ export default class EventDetails extends React.Component {
                 <select
                   value={
                     this.state.selectedUser && this.state.selectedUser.paid
-                      ? "Paid"
+                      ? "Paid":this.state.selectedUser.paid_social
+                      ? "Paid  Social":this.state.selectedUser.waiting_social
+                      ? "Upaid Social"
                       : "Un Paid"
                   }
                   onChange={this.handleChange}
                 >
                   <option name="paid">Paid</option>
                   <option name="unpaid">Un Paid</option>
+                  <option name="paid_social">Paid (Social)</option>
+                  <option name="waiting_social">Waiting (Social)</option>
                 </select>
               </div>
             </div>

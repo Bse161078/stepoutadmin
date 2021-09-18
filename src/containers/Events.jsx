@@ -580,6 +580,7 @@ class Events extends React.Component {
                         <th>Time</th>
                         <th>About</th>
                         <th>Food Item</th>
+                        <th>Url</th>
                         <th>Open</th>
                         {eventList != pastEvents ? <th>Entry</th> : null}
                       </tr>
@@ -732,6 +733,10 @@ class Events extends React.Component {
                               }
                             >
                               {event.foodItem}
+                            </td>
+                            <td>
+                            {event.url}
+                            
                             </td>
 
                             {event.status ? (

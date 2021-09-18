@@ -1,6 +1,8 @@
 export class Event {
   constructor(x) {
+    console.log("This si the data url",x.url)
     this.uuid = x.uuid;
+    this.url = x.url;
     this.name = x.name;
     this.foodItem = x.foodItem;
     this.image = x.image;
@@ -13,6 +15,9 @@ export class Event {
     this.entry = x.entry;
     this.pairings = x.pairings;
     this.fee = x.fee;
+    this.executive_fee = x.executive_fee;
+    this.golf_guest_fee = x.golf_guest_fee;
+    this.social_guest_fee = x.social_guest_fee;
     this.guestfee = x.guestfee;
     this.limit = x.limit;
     this.timestampAdded = x.timestampAdded;
@@ -32,11 +37,14 @@ export class Event {
     const data = doc.data();
 
     if (!data) return null;
-
     return new Event({
       uuid: doc.id,
       name: data["name"] ? data["name"] : "",
       foodItem: data["foodItem"] ? data["foodItem"] : "",
+      url: data["url"] ? data["url"] : "",
+
+      
+      
       image: data["image"] ? data["image"] : [],
       date: data["date"] ? data["date"] : [],
       time: data["time"] ? data["time"] : [],
@@ -44,6 +52,9 @@ export class Event {
       website: data["website"] ? data["website"] : [],
 
       fee: data["fee"] ? data["fee"] : [],
+      executive_fee: data["executive_fee"] ? data["executive_fee"] : [],
+      golf_guest_fee: data["golf_guest_fee"] ? data["golf_guest_fee"] : [],
+      social_guest_fee: data["social_guest_fee"] ? data["social_guest_fee"] : [],
       guestfee: data["guestfee"] ? data["guestfee"] : [],
       limit: data["limit"] ? data["limit"] : [],
 
@@ -78,10 +89,14 @@ export class Event {
       uuid: x.uuid,
       name: x.name,
       foodItem: x.foodItem,
+      url : x.url,
       image: x.image,
       date: x.date,
       time: x.time,
       fee: x.fee,
+      executive_fee : x.executive_fee,
+      golf_guest_fee : x.golf_guest_fee,
+      social_guest_fee : x.social_guest_fee,
       guestfee: x.guestfee,
       limit: x.limit,
 

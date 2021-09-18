@@ -12,34 +12,34 @@ import firebase from "firebase";
 
 
 
-const config = {
-  apiKey: "AIzaSyC_Xf1be_jymwZlf9sFnsGgyOqxlsnlHBs",
-  authDomain: "nuga-1a565.firebaseapp.com",
-  databaseURL: "https://nuga-1a565.firebaseio.com",
-  projectId: "nuga-1a565",
-  storageBucket: "nuga-1a565.appspot.com",
-  messagingSenderId: "593325834593",
-  appId: "1:593325834593:web:3b703bef2edb92477d0520",
-};
-
-
 // const config = {
-
-//   apiKey: "AIzaSyAzpJWqF1QM-ky4jYGs9qXbl9qLZLgAw1U",
-
-//   authDomain: "nuga-test.firebaseapp.com",
-
-//   projectId: "nuga-test",
-
-//   storageBucket: "nuga-test.appspot.com",
-
-//   messagingSenderId: "648610325258",
-
-//   appId: "1:648610325258:web:8a6a2b0b92f2033b2a90f3",
-
-//   measurementId: "G-77SK58XF0T"
-
+//   apiKey: "AIzaSyC_Xf1be_jymwZlf9sFnsGgyOqxlsnlHBs",
+//   authDomain: "nuga-1a565.firebaseapp.com",
+//   databaseURL: "https://nuga-1a565.firebaseio.com",
+//   projectId: "nuga-1a565",
+//   storageBucket: "nuga-1a565.appspot.com",
+//   messagingSenderId: "593325834593",
+//   appId: "1:593325834593:web:3b703bef2edb92477d0520",
 // };
+
+
+const config = {
+
+  apiKey: "AIzaSyAzpJWqF1QM-ky4jYGs9qXbl9qLZLgAw1U",
+
+  authDomain: "nuga-test.firebaseapp.com",
+
+  projectId: "nuga-test",
+
+  storageBucket: "nuga-test.appspot.com",
+
+  messagingSenderId: "648610325258",
+
+  appId: "1:648610325258:web:8a6a2b0b92f2033b2a90f3",
+
+  measurementId: "G-77SK58XF0T"
+
+};
 
 
 firebase.initializeApp(config);
