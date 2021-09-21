@@ -44,6 +44,7 @@ export default class Notifications extends React.Component {
 
     const { notification } = this.state;
     notification[name] = value;
+    console.log("this is the",notification)
     this.setState({ notification });
   }
 
@@ -85,12 +86,8 @@ export default class Notifications extends React.Component {
 
   render() {
     console.log(this.state);
-    const {
-      notification,
-      showSnackBar,
-      snackBarMessage,
-      snackBarVariant,
-    } = this.state;
+    const { notification, showSnackBar, snackBarMessage, snackBarVariant } =
+      this.state;
 
     const { match, history } = this.props;
     const isEdit = !!match.params.eventId;
@@ -150,6 +147,25 @@ export default class Notifications extends React.Component {
                           value={notification.message}
                           onChange={this.handleInputChange}
                         />
+                      </div>
+                    </div>
+                    <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">
+                        User Type
+                      </label>
+                      <div className="col-sm-2">
+                        <select
+                          style={{ marginTop: 8 }}
+                          onChange={this.handleInputChange}
+                          name="type"
+                          required
+                        >
+                          <option name="unknown">Unknown</option>
+
+                          <option name="executive">Executive</option>
+                          <option name="member">Member</option>
+                          <option name="guest">Guest</option>
+                        </select>
                       </div>
                     </div>
 
