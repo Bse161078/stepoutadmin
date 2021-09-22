@@ -2,7 +2,12 @@ import React from "react";
 import axios from "axios";
 import RichTextEditor from "react-rte";
 import { Button } from "reactstrap";
-import { addEvent, updateEvent, getEventById } from "../backend/services/eventService";
+import { getGolfcourses } from "../backend/services/GolfcoursesService";
+import {
+  addEvent,
+  updateEvent,
+  getEventById,
+} from "../backend/services/eventService";
 import { toolbarConfig } from "../static/_textEditor";
 import { firebase } from "../backend/firebase";
 import { imageResizeFileUri } from "../static/_imageUtils";
@@ -24,7 +29,9 @@ export default class EventForm extends React.Component {
         name: "",
         date: "",
         time: {},
-        url:'',
+        url: "",
+        score_board_url: "",
+        golf_course: "",
         location: "",
         website: "",
         about: "",
@@ -32,10 +39,11 @@ export default class EventForm extends React.Component {
         status: true,
         entry: true,
         uuid: "",
-        participants:[],
-        foodItem:"",
-        closeFoodEntry : false
+        participants: [],
+        foodItem: "",
+        closeFoodEntry: false,
       },
+      all_golf_courses: [],
       description: RichTextEditor.createEmptyValue(),
       startTime: null,
       endTime: null,
@@ -45,7 +53,7 @@ export default class EventForm extends React.Component {
       time: ["", ""],
       image: "",
       file: "",
-      foodItem:"",
+      foodItem: "",
       showSnackBar: false,
       snackBarMessage: "",
       snackBarVariant: "success",
@@ -57,6 +65,7 @@ export default class EventForm extends React.Component {
 
   componentDidMount() {
     const { match } = this.props;
+    this.fetchGolfCourses()
     if (match.params.eventId) {
       getEventById(match.params.eventId).then((response) => {
         this.setState({
@@ -65,7 +74,10 @@ export default class EventForm extends React.Component {
           time: response.time,
           startTime: new Date(response.time.startTime * 1000),
           endTime: new Date(response.time.endTime * 1000),
-          description: RichTextEditor.createValueFromString(response.about, "html"),
+          description: RichTextEditor.createValueFromString(
+            response.about,
+            "html"
+          ),
         });
       });
     }
@@ -91,10 +103,18 @@ export default class EventForm extends React.Component {
 
   setFoodItem(foodItem) {
     const { appEvent } = this.state;
-    appEvent.foodItem =foodItem;
+    appEvent.foodItem = foodItem;
     this.setState({
       appEvent,
       foodItem,
+    });
+  }
+  setGolfCourse(golf_course) {
+    const { appEvent } = this.state;
+    appEvent.golf_course = golf_course;
+    this.setState({
+      appEvent,
+      golf_course,
     });
   }
 
@@ -136,7 +156,11 @@ export default class EventForm extends React.Component {
       if (imageFile) {
         imageUri = await imageResizeFileUri({ file: imageFile });
 
-        const storageRef = firebase.storage().ref().child("Events").child(`${uuidv4()}.jpeg`);
+        const storageRef = firebase
+          .storage()
+          .ref()
+          .child("Events")
+          .child(`${uuidv4()}.jpeg`);
 
         if (imageUri) {
           await storageRef.putString(imageUri, "data_url");
@@ -147,7 +171,7 @@ export default class EventForm extends React.Component {
 
       if (match.params.eventId) {
         let cloneObject = Object.assign({}, appEvent);
-        console.log("THis is the lcone object",cloneObject)
+        console.log("THis is the lcone object", cloneObject);
         updateEvent(match.params.eventId, cloneObject)
           .then((response) => {
             this.setState({
@@ -221,6 +245,21 @@ export default class EventForm extends React.Component {
   //   })
   // }
 
+  fetchGolfCourses = () => {
+    this.setState({ loading: true });
+    getGolfcourses()
+      .then((response) => {
+        console.log("this is response golf coures", response);
+        this.setState({ all_golf_courses: response,  loading: false, });
+      })
+      .catch(() => {
+        this.setState({
+          loading: false,
+          responseMessage: "No Events Found...",
+        });
+      });
+  };
+
   handleTimePicker = (label, value) => {
     const { appEvent } = this.state;
 
@@ -253,14 +292,33 @@ export default class EventForm extends React.Component {
 
   render() {
     console.log(this.state);
-    const { appEvent, description, startTime, endTime, focusedInput, selectedDate, showSnackBar, snackBarMessage, snackBarVariant, image, file } = this.state;
+    const {
+      appEvent,
+      description,
+      startTime,
+      endTime,
+      focusedInput,
+      selectedDate,
+      showSnackBar,
+      snackBarMessage,
+      snackBarVariant,
+      image,
+      file,
+    } = this.state;
 
     const { match, history } = this.props;
     const isEdit = !!match.params.eventId;
 
     return (
       <div className="row animated fadeIn">
-        {showSnackBar && <SnackBar open={showSnackBar} message={snackBarMessage} variant={snackBarVariant} onClose={() => this.closeSnackBar()} />}
+        {showSnackBar && (
+          <SnackBar
+            open={showSnackBar}
+            message={snackBarMessage}
+            variant={snackBarVariant}
+            onClose={() => this.closeSnackBar()}
+          />
+        )}
         <div className="col-12">
           <div className="row">
             <div className="col-md-12 col-sm-12">
@@ -270,9 +328,16 @@ export default class EventForm extends React.Component {
                 </div>
                 <div className="x_content">
                   <br />
-                  <form id="demo-form2" data-parsley-validate className="form-horizontal form-label-left" onSubmit={this.postEvent}>
+                  <form
+                    id="demo-form2"
+                    data-parsley-validate
+                    className="form-horizontal form-label-left"
+                    onSubmit={this.postEvent}
+                  >
                     <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">Image</label>
+                      <label className="control-label col-md-3 col-sm-3">
+                        Image
+                      </label>
                       <div className="col-md-6 col-sm-6">
                         <input
                           type="file"
@@ -290,73 +355,151 @@ export default class EventForm extends React.Component {
                       <div className="form-group row">
                         <label className="control-label col-md-3 col-sm-3"></label>
                         <div className="col-md-6 col-sm-6">
-                          <img style={{ marginRight: "5px" }} width="100" className="img-fluid" src={file} alt="profileImage" />
+                          <img
+                            style={{ marginRight: "5px" }}
+                            width="100"
+                            className="img-fluid"
+                            src={file}
+                            alt="profileImage"
+                          />
                         </div>
                       </div>
                     ) : appEvent.image && appEvent.image.length ? (
                       <div className="form-group row">
                         <label className="control-label col-md-3 col-sm-3"></label>
                         <div className="col-md-6 col-sm-6">
-                          <img style={{ marginRight: "5px" }} width="100" className="img-fluid" src={`${appEvent.image}`} alt="profileImage" />
+                          <img
+                            style={{ marginRight: "5px" }}
+                            width="100"
+                            className="img-fluid"
+                            src={`${appEvent.image}`}
+                            alt="profileImage"
+                          />
                         </div>
                       </div>
                     ) : null}
 
                     <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">Name of Event</label>
+                      <label className="control-label col-md-3 col-sm-3">
+                        Name of Event
+                      </label>
                       <div className="col-md-6 col-sm-6">
-                        <input required type="text" name="name" className="form-control" value={appEvent.name} onChange={this.handleInputChange} />
+                        <input
+                          required
+                          type="text"
+                          name="name"
+                          className="form-control"
+                          value={appEvent.name}
+                          onChange={this.handleInputChange}
+                        />
                       </div>
                     </div>
 
                     <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">Members Entry Fee £</label>
+                      <label className="control-label col-md-3 col-sm-3">
+                        Members Entry Fee £
+                      </label>
                       <div className="col-md-6 col-sm-6">
-                        <input required type="number" name="fee" className="form-control" value={appEvent.fee} onChange={this.handleInputChange} />
+                        <input
+                          required
+                          type="number"
+                          name="fee"
+                          className="form-control"
+                          value={appEvent.fee}
+                          onChange={this.handleInputChange}
+                        />
                       </div>
                     </div>
                     <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">Executives Entry Fee £</label>
+                      <label className="control-label col-md-3 col-sm-3">
+                        Executives Entry Fee £
+                      </label>
                       <div className="col-md-6 col-sm-6">
-                        <input required type="number" name="executive_fee" className="form-control" value={appEvent.executive_fee} onChange={this.handleInputChange} />
+                        <input
+                          required
+                          type="number"
+                          name="executive_fee"
+                          className="form-control"
+                          value={appEvent.executive_fee}
+                          onChange={this.handleInputChange}
+                        />
                       </div>
                     </div>
                     <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">Golf Guests Entry Fee £</label>
+                      <label className="control-label col-md-3 col-sm-3">
+                        Golf Guests Entry Fee £
+                      </label>
                       <div className="col-md-6 col-sm-6">
-                        <input required type="number" name="golf_guest_fee" className="form-control" value={appEvent.golf_guest_fee} onChange={this.handleInputChange} />
+                        <input
+                          required
+                          type="number"
+                          name="golf_guest_fee"
+                          className="form-control"
+                          value={appEvent.golf_guest_fee}
+                          onChange={this.handleInputChange}
+                        />
                       </div>
                     </div>
                     <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">Social Guests Entry Fee £</label>
+                      <label className="control-label col-md-3 col-sm-3">
+                        Social Guests Entry Fee £
+                      </label>
                       <div className="col-md-6 col-sm-6">
-                        <input required type="number" name="social_guest_fee" className="form-control" value={appEvent.social_guest_fee} onChange={this.handleInputChange} />
+                        <input
+                          required
+                          type="number"
+                          name="social_guest_fee"
+                          className="form-control"
+                          value={appEvent.social_guest_fee}
+                          onChange={this.handleInputChange}
+                        />
                       </div>
                     </div>
 
-
                     <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">Guests Entry Fee £</label>
+                      <label className="control-label col-md-3 col-sm-3">
+                        Guests Entry Fee £
+                      </label>
                       <div className="col-md-6 col-sm-6">
-                        <input required type="number" name="guestfee" className="form-control" value={appEvent.guestfee} onChange={this.handleInputChange} />
+                        <input
+                          required
+                          type="number"
+                          name="guestfee"
+                          className="form-control"
+                          value={appEvent.guestfee}
+                          onChange={this.handleInputChange}
+                        />
                       </div>
                     </div>
 
                     <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">Participants Limit</label>
+                      <label className="control-label col-md-3 col-sm-3">
+                        Participants Limit
+                      </label>
                       <div className="col-md-6 col-sm-6">
-                        <input required type="number" name="limit" className="form-control" value={appEvent.limit} onChange={this.handleInputChange} />
+                        <input
+                          required
+                          type="number"
+                          name="limit"
+                          className="form-control"
+                          value={appEvent.limit}
+                          onChange={this.handleInputChange}
+                        />
                       </div>
                     </div>
 
                     <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">Date</label>
+                      <label className="control-label col-md-3 col-sm-3">
+                        Date
+                      </label>
                       <div className="col-md-6 col-sm-6">
                         <SingleDatePicker
                           date={this.state.startDate} // momentPropTypes.momentObj or null
                           onDateChange={(date) => this.handleDateChange(date)} // PropTypes.func.isRequired
                           focused={this.state.focused} // PropTypes.bool
-                          onFocusChange={({ focused }) => this.setState({ focused })} // PropTypes.func.isRequired
+                          onFocusChange={({ focused }) =>
+                            this.setState({ focused })
+                          } // PropTypes.func.isRequired
                           id="date-picker" // PropTypes.string.isRequired,
                           displayFormat={"DD-MMM-YYYY"}
                           placeholder="Select date"
@@ -383,32 +526,66 @@ export default class EventForm extends React.Component {
                     </div> */}
 
                     <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3 d-flex align-items-center">Time</label>
+                      <label className="control-label col-md-3 col-sm-3 d-flex align-items-center">
+                        Time
+                      </label>
                       <div className="col-md-6 col-sm-6">
                         <div className="row justify-content-around">
-                          <TimePicker required={true} open={false} label={"Start Time"} value={startTime} onTimePickerClose={this.handleTimePicker} />
+                          <TimePicker
+                            required={true}
+                            open={false}
+                            label={"Start Time"}
+                            value={startTime}
+                            onTimePickerClose={this.handleTimePicker}
+                          />
 
-                          <TimePicker required={true} open={false} label={"End Time"} value={endTime} onTimePickerClose={this.handleTimePicker} />
+                          <TimePicker
+                            required={true}
+                            open={false}
+                            label={"End Time"}
+                            value={endTime}
+                            onTimePickerClose={this.handleTimePicker}
+                          />
                         </div>
                       </div>
                     </div>
 
                     <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">Location</label>
+                      <label className="control-label col-md-3 col-sm-3">
+                        Location
+                      </label>
                       <div className="col-md-6 col-sm-6">
-                        <input required type="text" name="location" className="form-control" value={appEvent.location} onChange={this.handleInputChange} />
+                        <input
+                          required
+                          type="text"
+                          name="location"
+                          className="form-control"
+                          value={appEvent.location}
+                          onChange={this.handleInputChange}
+                        />
                       </div>
                     </div>
 
                     <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">Website</label>
-                     < div className="col-md-6 col-sm-6">
-                        <input required type="text" name="website" className="form-control" value={appEvent.website} onChange={this.handleInputChange} />
+                      <label className="control-label col-md-3 col-sm-3">
+                        Website
+                      </label>
+                      <div className="col-md-6 col-sm-6">
+                        <input
+                          required
+                          type="text"
+                          name="website"
+                          className="form-control"
+                          value={appEvent.website}
+                          onChange={this.handleInputChange}
+                        />
                       </div>
                     </div>
 
                     <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">About</label>
+                      <label className="control-label col-md-3 col-sm-3">
+                        About
+                      </label>
                       <div className="col-md-6 col-sm-6">
                         <RichTextEditor
                           className="text-editor"
@@ -429,14 +606,10 @@ export default class EventForm extends React.Component {
                         <select
                           style={{ marginTop: 8 }}
                           value={this.state.foodItem}
-                          onChange={
-                         
-                              (e)=>{
-                                console.log("THis is the value",e.target.value)
-                                this.setFoodItem(e.target.value)
-                              }
-                            
-                          }
+                          onChange={(e) => {
+                            console.log("THis is the value", e.target.value);
+                            this.setFoodItem(e.target.value);
+                          }}
                         >
                           <option name="popcorn">Popcorn</option>
 
@@ -448,12 +621,61 @@ export default class EventForm extends React.Component {
                       </div>
                     </div>
 
- <div className="form-group row">
+                    <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                        Embedded Url
+                        Golf Courses
                       </label>
-                      < div className="col-md-6 col-sm-6">
-                        <input required type="text" name="url" className="form-control" value={appEvent.url} onChange={this.handleInputChange} />
+                      <div className="col-md-6 col-sm-6">
+                        <select
+                        name="golf_course"
+                          style={{ marginTop: 8 }}
+                          value={this.state.golf_course}
+                          onChange={(e) => {
+                            console.log("THis is the value", e.target.value);
+                            this.setGolfCourse(e.target.value);
+                          }}
+                        >
+                          {this.state.all_golf_courses &&
+                            this.state.all_golf_courses.map((item) => {
+                              return (
+                                <option onClick={()=>{
+                                  this.setGolfCourse(item.name);
+                                }} name={item.name}>{item.name}</option>
+                              );
+                            })}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">
+                        Start Sheet Url
+                      </label>
+                      <div className="col-md-6 col-sm-6">
+                        <input
+                          required
+                          type="text"
+                          name="url"
+                          className="form-control"
+                          value={appEvent.url}
+                          onChange={this.handleInputChange}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">
+                        Score Board Url
+                      </label>
+                      <div className="col-md-6 col-sm-6">
+                        <input
+                          required
+                          type="text"
+                          name="score_board_url"
+                          className="form-control"
+                          value={appEvent.score_board_url}
+                          onChange={this.handleInputChange}
+                        />
                       </div>
                     </div>
 
@@ -476,11 +698,22 @@ export default class EventForm extends React.Component {
                     <div className="ln_solid" />
                     <div className="form-group row">
                       <div className="col-md-6 col-sm-6 offset-md-3">
-                        <Button className={`btn btn-success btn-lg ${this.state.loading ? "disabled" : ""}`}>
-                          <i className={`fa fa-spinner fa-pulse ${this.state.loading ? "" : "d-none"}`} />
+                        <Button
+                          className={`btn btn-success btn-lg ${
+                            this.state.loading ? "disabled" : ""
+                          }`}
+                        >
+                          <i
+                            className={`fa fa-spinner fa-pulse ${
+                              this.state.loading ? "" : "d-none"
+                            }`}
+                          />
                           {isEdit ? " Update" : " Submit"}
                         </Button>
-                        <Button onClick={() => history.goBack()} className={`mx-3 btn btn-danger btn-lg`}>
+                        <Button
+                          onClick={() => history.goBack()}
+                          className={`mx-3 btn btn-danger btn-lg`}
+                        >
                           Cancel
                         </Button>
                       </div>

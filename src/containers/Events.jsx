@@ -575,12 +575,14 @@ class Events extends React.Component {
                         <th>Title</th>
                         <th>Image</th>
                         <th>Location</th>
+                        <th>Golf Course</th>
                         <th>Fee</th>
                         <th>Date</th>
                         <th>Time</th>
                         <th>About</th>
                         <th>Food Item</th>
-                        <th>Url</th>
+                        <th>Start Sheet Url</th>
+                        <th>Result Page Url</th>
                         <th>Open</th>
                         {eventList != pastEvents ? <th>Entry</th> : null}
                       </tr>
@@ -680,6 +682,16 @@ class Events extends React.Component {
                             >
                               {event.location}
                             </td>
+
+                            <td
+                              onClick={() =>
+                                this.props.history.push(
+                                  `/events/event-details/${event.uuid}`
+                                )
+                              }
+                            >
+                              {event.golf_course}
+                            </td>                            
                             <td
                               onClick={() =>
                                 this.props.history.push(
@@ -736,6 +748,10 @@ class Events extends React.Component {
                             </td>
                             <td>
                             {event.url}
+                            
+                            </td>
+                            <td>
+                            {event.score_board_url}
                             
                             </td>
 

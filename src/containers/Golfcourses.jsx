@@ -50,7 +50,7 @@ class Events extends React.Component {
   }
 
   componentWillMount() {
-    this.fetchEvent();
+    this.fetchGolfCourses();
     // const EventTab = localStorage.getItem("EventTab");
     // if (EventTab) {
     // 	this.setState({ activeTab: EventTab });
@@ -64,7 +64,7 @@ class Events extends React.Component {
     globalContext.handleSetEventTab(tab);
   };
 
-  fetchEvent = () => {
+  fetchGolfCourses = () => {
     this.setState({ loading: true });
     getGolfcourses()
       .then((response) => {
@@ -152,7 +152,7 @@ class Events extends React.Component {
                 : "Golf Course closed successfully",
               snackBarVariant: "success",
             });
-            this.fetchEvent();
+            this.fetchGolfCourses();
           })
           .catch(() => {
             this.setState({
@@ -225,7 +225,7 @@ class Events extends React.Component {
   //               snackBarMessage: "Golf Course closed successfully",
   //               snackBarVariant: "success",
   //             });
-  //             this.fetchEvent();
+  //             this.fetchGolfCourses();
   //           })
   //           .catch(() => {
   //             this.setState({
@@ -262,7 +262,7 @@ class Events extends React.Component {
   //               snackBarMessage: "Golf Course entries closed successfully",
   //               snackBarVariant: "success",
   //             });
-  //             this.fetchEvent();
+  //             this.fetchGolfCourses();
   //           })
   //           .catch(() => {
   //             this.setState({
@@ -304,7 +304,7 @@ class Events extends React.Component {
   //               : "Golf Course entries closed successfully",
   //             snackBarVariant: "success",
   //           });
-  //           this.fetchEvent();
+  //           this.fetchGolfCourses();
   //         })
   //         .catch(() => {
   //           this.setState({
@@ -335,7 +335,7 @@ class Events extends React.Component {
         responseMessage: "Loading Golfcourses...",
       });
       // if(q === "") {
-      //   this.fetchEvent();
+      //   this.fetchGolfCourses();
       // } else {
       axios
         .get(`${API_END_POINT}/api/items/event/search`, {
@@ -407,7 +407,7 @@ class Events extends React.Component {
                   value={this.state.q}
                   onChange={(event) => this.setState({q: event.target.value}, () => {
                     if(this.state.q === "") {
-                      this.fetchEvent();
+                      this.fetchGolfCourses();
                     }
                   })}
                   onKeyPress={(event) => {

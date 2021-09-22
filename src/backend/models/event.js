@@ -3,6 +3,8 @@ export class Event {
     console.log("This si the data url",x.url)
     this.uuid = x.uuid;
     this.url = x.url;
+    this.score_board_url = x.score_board_url;
+    this.golf_course = x.golf_course;
     this.name = x.name;
     this.foodItem = x.foodItem;
     this.image = x.image;
@@ -42,9 +44,8 @@ export class Event {
       name: data["name"] ? data["name"] : "",
       foodItem: data["foodItem"] ? data["foodItem"] : "",
       url: data["url"] ? data["url"] : "",
-
-      
-      
+      score_board_url: data["score_board_url"] ? data["score_board_url"] : "",
+      golf_course: data["golf_course"] ? data["golf_course"] : "",
       image: data["image"] ? data["image"] : [],
       date: data["date"] ? data["date"] : [],
       time: data["time"] ? data["time"] : [],
@@ -90,6 +91,8 @@ export class Event {
       name: x.name,
       foodItem: x.foodItem,
       url : x.url,
+      score_board_url : x.score_board_url,
+      golf_course : x.golf_course,
       image: x.image,
       date: x.date,
       time: x.time,
