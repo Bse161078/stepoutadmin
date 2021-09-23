@@ -24,6 +24,7 @@ export default class EventForm extends React.Component {
         name: "",
         location: "",
         phone: "",
+        website:"",
         image: "",
        
       },
@@ -328,11 +329,18 @@ export default class EventForm extends React.Component {
                     </div>
 
                     <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">Phone</label>
+                     <label className="control-label col-md-3 col-sm-3">Phone</label>
                       <div className="col-md-6 col-sm-6">
-                        <input required type="text" name="phone" className="form-control" value={appGolfCourse.phone} onChange={this.handleInputChange} />
+                        < input required type="text" name="phone" className="form-control" value={appGolfCourse.phone} onChange={this.handleInputChange} />
                       </div>
                     </div>
+                    <div className="form-group row">
+                     <label className="control-label col-md-3 col-sm-3">Website</label>
+                      <div className="col-md-6 col-sm-6">
+                        < input required type="text" name="website" className="form-control" value={appGolfCourse.website} onChange={this.handleInputChange} />
+                      </div>
+                    </div>
+
 
                     
 

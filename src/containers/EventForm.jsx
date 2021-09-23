@@ -109,9 +109,11 @@ export default class EventForm extends React.Component {
       foodItem,
     });
   }
-  setGolfCourse(golf_course) {
+  setGolfCourse(golf_course,item) {
     const { appEvent } = this.state;
     appEvent.golf_course = golf_course;
+    appEvent.location  = item.location
+    appEvent.website  = item.website
     this.setState({
       appEvent,
       golf_course,
@@ -639,7 +641,7 @@ export default class EventForm extends React.Component {
                             this.state.all_golf_courses.map((item) => {
                               return (
                                 <option onClick={()=>{
-                                  this.setGolfCourse(item.name);
+                                  this.setGolfCourse(item.name,item);
                                 }} name={item.name}>{item.name}</option>
                               );
                             })}

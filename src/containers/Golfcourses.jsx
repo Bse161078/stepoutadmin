@@ -508,7 +508,7 @@ class Events extends React.Component {
                         <th>Image</th>
                         <th>Location</th>
                         <th>Phone</th>
-                        
+                         <th>Website</th>
                        
                         
                        
@@ -617,6 +617,15 @@ class Events extends React.Component {
                               }
                             >
                               {event.phone}
+                            </td>
+                            <td
+                              onClick={() =>
+                                this.props.history.push(
+                                  // `/golfcourses/golfcourses-details/${event.uuid}`
+                                )
+                              }
+                            >
+                              {event.website}
                             </td>
                            
                            
