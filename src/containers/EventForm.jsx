@@ -112,8 +112,9 @@ export default class EventForm extends React.Component {
   setGolfCourse(golf_course,item) {
     const { appEvent } = this.state;
     appEvent.golf_course = golf_course;
-    appEvent.location  = item.location
-    appEvent.website  = item.website
+    appEvent.location  = item.name;
+    appEvent.image = item.image;
+    appEvent.website  = item.website;
     this.setState({
       appEvent,
       golf_course,
@@ -458,7 +459,7 @@ export default class EventForm extends React.Component {
                       </div>
                     </div>
 
-                    <div className="form-group row">
+                    {/* <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
                         Guests Entry Fee £
                       </label>
@@ -472,7 +473,7 @@ export default class EventForm extends React.Component {
                           onChange={this.handleInputChange}
                         />
                       </div>
-                    </div>
+                    </div> */}
 
                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
@@ -625,7 +626,7 @@ export default class EventForm extends React.Component {
 
                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                        Golf Courses
+                        Golf Course
                       </label>
                       <div className="col-md-6 col-sm-6">
                         <select
@@ -655,7 +656,7 @@ export default class EventForm extends React.Component {
                       </label>
                       <div className="col-md-6 col-sm-6">
                         <input
-                          required
+                          // required
                           type="text"
                           name="url"
                           className="form-control"
@@ -671,7 +672,7 @@ export default class EventForm extends React.Component {
                       </label>
                       <div className="col-md-6 col-sm-6">
                         <input
-                          required
+                          // required
                           type="text"
                           name="score_board_url"
                           className="form-control"

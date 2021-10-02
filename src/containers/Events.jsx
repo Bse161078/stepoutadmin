@@ -576,7 +576,10 @@ class Events extends React.Component {
                         <th>Image</th>
                         <th>Location</th>
                         <th>Golf Course</th>
-                        <th>Fee</th>
+                        <th>Members Fee</th>
+                        <th>Executive Fee</th>
+                        <th>Golf Guest Fee</th>
+                        <th>Social Guest Fee</th>
                         <th>Date</th>
                         <th>Time</th>
                         <th>About</th>
@@ -701,6 +704,37 @@ class Events extends React.Component {
                             >
                               £{event.fee ? event.fee : 0}
                             </td>
+
+
+                            <td
+                              onClick={() =>
+                                this.props.history.push(
+                                  `/events/event-details/${event.uuid}`
+                                )
+                              }
+                            >
+                              £{event.executive_fee ? event.executive_fee : 0}
+                            </td>
+                            <td
+                              onClick={() =>
+                                this.props.history.push(
+                                  `/events/event-details/${event.uuid}`
+                                )
+                              }
+                            >
+                              £{event.golf_guest_fee ? event.golf_guest_fee : 0}
+                            </td>
+                            <td
+                              onClick={() =>
+                                this.props.history.push(
+                                  `/events/event-details/${event.uuid}`
+                                )
+                              }
+                            >
+                              £{event.social_guest_fee ? event.social_guest_fee : 0}
+                            </td>
+
+
                             <td
                               onClick={() =>
                                 this.props.history.push(

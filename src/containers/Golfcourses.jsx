@@ -395,7 +395,7 @@ class Events extends React.Component {
               <div className="col-12">
                 <div className="row space-1">
                   <div className="col-sm-4">
-                    <h3>List of Golfcourses</h3>
+                    <h3>List of Golf Courses</h3>
                   </div>
                   <div className="col-sm-4">
                     {/* <div className='input-group'>
@@ -425,7 +425,7 @@ class Events extends React.Component {
                   <div className="col-sm-4 pull-right mobile-space">
                     <Link to="/golfcourses/golfcourses-form">
                       <button type="button" className="btn btn-success">
-                        Add New Golfcourses
+                        Add New Golf Courses
                       </button>
                     </Link>
                   </div>
@@ -504,9 +504,9 @@ class Events extends React.Component {
                           ></input>
                         </th>
                         <th>Sr. #</th>
-                        <th>Title</th>
+                        <th>Name / Location</th>
                         <th>Image</th>
-                        <th>Location</th>
+                        {/* <th>Location</th> */}
                         <th>Phone</th>
                          <th>Website</th>
                        
@@ -600,7 +600,7 @@ class Events extends React.Component {
                                 />
                               }
                             </td>
-                            <td
+                            {/* <td
                               onClick={() =>
                                 this.props.history.push(
                                   // `/golfcourses/golfcourses-details/${event.uuid}`
@@ -608,7 +608,7 @@ class Events extends React.Component {
                               }
                             >
                               {event.location}
-                            </td>
+                            </td> */}
                             <td
                               onClick={() =>
                                 this.props.history.push(
