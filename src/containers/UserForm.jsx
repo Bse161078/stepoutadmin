@@ -30,6 +30,10 @@ export default class UserForm extends React.Component {
         phone: "",
         handicap: "",
         profileImage: "",
+        card_number: "",
+        user_card_cvv:"",
+        user_card_month:'',
+        user_card_year:'',
         timestampRegister: new Date(),
         isActive: true,
         membership: "Unknown",
@@ -310,6 +314,66 @@ export default class UserForm extends React.Component {
 
                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
+                        Credit Card
+                      </label>
+                      <div className="col-md-6 col-sm-6">
+                        <input
+                          type="number"
+                          name="card_number"
+                          className="form-control"
+                          value={user.card_number}
+                          onChange={this.handleInputChange}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">
+                        Credit Card CVV
+                      </label>
+                      <div className="col-md-6 col-sm-6">
+                        <input
+                          type="number"
+                          name="user_card_cvv"
+                          className="form-control"
+                          value={user.user_card_cvv}
+                          onChange={this.handleInputChange}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">
+                        Credit Card Exp Month
+                      </label>
+                      <div className="col-md-6 col-sm-6">
+                        <input
+                          type="number"
+                          name="user_card_month"
+                          className="form-control"
+                          value={user.user_card_month}
+                          onChange={this.handleInputChange}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">
+                        Credit Card Exp Year
+                      </label>
+                      <div className="col-md-6 col-sm-6">
+                        <input
+                          type="number"
+                          name="user_card_year"
+                          className="form-control"
+                          value={user.user_card_year}
+                          onChange={this.handleInputChange}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">
                         Handicap
                       </label>
                       <div className="col-md-6 col-sm-6">
@@ -335,9 +399,10 @@ export default class UserForm extends React.Component {
                           onChange={this.handleChange}
                         >
                           <option name="unknown">Unknown</option>
-        <option name="executive">Executive</option>
-        <option name="member">Member</option>
-        <option name="guest">Guest</option>
+                          <option name="executive">Executive</option>
+                          <option name="member">Member</option>
+                          <option name="Social Guest">Social Guest</option>
+                          <option name="Golf Guest">Golf Guest</option>
                         </select>
                       </div>
                     </div>

@@ -102,7 +102,9 @@ export default class Users extends React.Component {
             item.membership.toLowerCase() == "unpaid"
           ) {
             members.push(item);
-          } else if (item.membership.toLowerCase() == "guest") {
+          } else if (
+            item.membership.toLowerCase() == "Social Guest".toLowerCase() ||  item.membership.toLowerCase() == "Golf Guest".toLowerCase()
+          ) {
             guests.push(item);
           } else {
             unknown.push(item);
@@ -592,7 +594,8 @@ export default class Users extends React.Component {
 
                         <option name="executive">Executive</option>
                         <option name="member">Member</option>
-                        <option name="guest">Guest</option>
+                        <option name="Social Guest">Social Guest</option>
+                        <option name="Golf Guest">Golf Guest</option>
                       </select>
                     </div>
                   </div>
