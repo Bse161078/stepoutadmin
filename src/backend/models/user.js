@@ -13,6 +13,7 @@ export class User {
     // this.sneakerSize = x.sneakerSize;
     this.handicap = x.handicap;
     this.membership = x.membership;
+    this.membership_fee_status = x.membership_fee_status;
     // this.sneakerCount = x.sneakerCount;
     // this.sneakerScans = x.sneakerScans;
     this.timestampRegister = x.timestampRegister;
@@ -37,6 +38,8 @@ export class User {
       // sneakerSize: data['sneakerSize'] ? data['sneakerSize'] : '',
       handicap: data["handicap"] ? data["handicap"] : "",
       membership: data["membership"] ? data["membership"] : "Unknown",
+      membership_fee_status: data["membership_fee_status"] ? data["membership_fee_status"] : "Unknown",
+      
 
       // sneakerCount: data['sneakerCount'] ? data['sneakerCount'] : '',
       // sneakerScans: data['sneakerScans'] ? data['sneakerScans'] : '',
@@ -60,6 +63,7 @@ export class User {
       // sneakerSize: x.sneakerSize,
       handicap: x.handicap,
       membership: x.membership,
+      membership_fee_status:x.membership_fee_status,
       // sneakerCount: x.sneakerCount,
       // sneakerScans: x.sneakerScans,
       timestampRegister: x.timestampRegister,

@@ -9,6 +9,7 @@ import {
   deleteUser,
   blockUser,
   updateMemberShipUser,
+  updateMemberShipPaymentStatusUser
 } from "../backend/services/usersService";
 import SnackBar from "../components/SnackBar";
 import { RootConsumer } from "../backend/Context";
@@ -280,6 +281,45 @@ export default class Users extends React.Component {
     });
   }
 
+  changeMembershipStatusMultiple(e) {
+    console.log("This is it", e);
+    const users = this.state.users.slice();
+    Swal.fire({
+      title: "Are you sure?",
+      // text: users[index].isActive
+      //   ? "You want to Block these user!"
+      //   : "You want to Un-block this user!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Change",
+    }).then((result) => {
+      if (result.value) {
+        this.state.selected.map((userId, index) => {
+          updateMemberShipPaymentStatusUser(userId, e)
+            .then((response) => {
+              this.setState({
+                users,
+                showSnackBar: true,
+                snackBarMessage: "Menbership Stats changed successfully",
+                snackBarVariant: "success",
+              });
+              this.fetchUsers();
+            })
+            .catch(() => {
+              this.setState({
+                showSnackBar: true,
+                snackBarMessage: "Error ",
+                snackBarVariant: "error",
+              });
+            });
+        });
+      }
+    });
+  }
+
+
   blockUser(userId, index) {
     const users = this.state.users.slice();
     console.log(index);
@@ -393,8 +433,8 @@ export default class Users extends React.Component {
   };
   toggle = (tab) => {
     if (this.state.activeTab !== tab) this.setState({ activeTab: tab });
-    // localStorage.setItem("EventTab", tab);
-    globalContext.handleSetEventTab(tab);
+    // localStorage.setItem("userTab", tab);
+    globalContext.handleSetuserTab(tab);
   };
   handleInputChange = (event) => {
     const { value } = event.target;
@@ -422,71 +462,76 @@ export default class Users extends React.Component {
       <RootConsumer>
         {(context) => {
           globalContext = context;
-          console.log("This is event tab", context.eventTab);
+          console.log("This is event tab", context.userTab);
 
           var userList = [];
-          if (context.eventTab == "1") {
+          if (context.userTab == "1") {
             this.state.allusers.map((user, index) => {
               data.push([
                 index + 1,
                 user.lname + "," + user.fname,
                 user.phone,
                 user.membership,
+                user.membership_fee_status,
                 user.isActive ? "Block" : "Un Block",
               ]);
             });
-          } else if (context.eventTab == "2") {
+          } else if (context.userTab == "2") {
             this.state.executive.map((user, index) => {
               data.push([
                 index + 1,
                 user.lname + "," + user.fname,
                 user.phone,
                 user.membership,
+                user.membership_fee_status,
                 user.isActive ? "Block" : "Un Block",
               ]);
             });
-          } else if (context.eventTab == "3") {
+          } else if (context.userTab == "3") {
             this.state.members.map((user, index) => {
               data.push([
                 index + 1,
                 user.lname + "," + user.fname,
                 user.phone,
                 user.membership,
+                user.membership_fee_status,
                 user.isActive ? "Block" : "Un Block",
               ]);
             });
-          } else if (context.eventTab == "4") {
+          } else if (context.userTab == "4") {
             this.state.guests.map((user, index) => {
               data.push([
                 index + 1,
                 user.lname + "," + user.fname,
                 user.phone,
                 user.membership,
+                user.membership_fee_status,
                 user.isActive ? "Block" : "Un Block",
               ]);
             });
-          } else if (context.eventTab == "5") {
+          } else if (context.userTab == "5") {
             this.state.unknown.map((user, index) => {
               data.push([
                 index + 1,
                 user.lname + "," + user.fname,
                 user.phone,
                 user.membership,
+                user.membership_fee_status,
                 user.isActive ? "Block" : "Un Block",
               ]);
             });
           }
 
-          if (context.eventTab == 1) {
+          if (context.userTab == 1) {
             userList = this.state.allusers;
           }
-          if (context.eventTab == "2") {
+          if (context.userTab == "2") {
             userList = this.state.executive;
-          } else if (context.eventTab == "3") {
+          } else if (context.userTab == "3") {
             userList = this.state.members;
-          } else if (context.eventTab == "4") {
+          } else if (context.userTab == "4") {
             userList = this.state.guests;
-          } else if (context.eventTab == "5") {
+          } else if (context.userTab == "5") {
             userList = this.state.unknown;
           }
           console.log("THis is the user list", userList);
@@ -561,7 +606,7 @@ export default class Users extends React.Component {
                 </div>
                 {this.state.selected.length > 1 && (
                   <div className="row space-1">
-                    <div className="col-sm-6">
+                    <div className="col-sm-4">
                       <h3>List of Users</h3>
                     </div>
                     {/* <div className="col-sm-4"></div> */}
@@ -584,6 +629,7 @@ export default class Users extends React.Component {
                       </button>
                     </div>
                     <div className="col-sm-2">
+                      <p>Membership</p>
                       <select
                         style={{ marginTop: 8 }}
                         onChange={(e) =>
@@ -598,13 +644,28 @@ export default class Users extends React.Component {
                         <option name="Golf Guest">Golf Guest</option>
                       </select>
                     </div>
+
+                    <div className="col-sm-2">
+                    <p>Membership Payment</p>
+                      <select
+                        style={{ marginTop: 8 }}
+                        onChange={(e) =>
+                          this.changeMembershipStatusMultiple(e.target.value)
+                        }
+                      >
+                        <option name="unknown">Unknown</option>
+
+                        <option name="paid">Paid</option>
+                        <option name="unpaid">Unpaid</option>
+                      </select>
+                    </div>
                   </div>
                 )}
                 <Nav tabs>
                   <NavItem>
                     <NavLink
                       className={classnames({
-                        active: context.eventTab === "1",
+                        active: context.userTab === "1",
                       })}
                       onClick={() => {
                         this.toggle("1");
@@ -616,7 +677,7 @@ export default class Users extends React.Component {
                   <NavItem>
                     <NavLink
                       className={classnames({
-                        active: context.eventTab === "2",
+                        active: context.userTab === "2",
                       })}
                       onClick={() => {
                         this.toggle("2");
@@ -628,7 +689,7 @@ export default class Users extends React.Component {
                   <NavItem>
                     <NavLink
                       className={classnames({
-                        active: context.eventTab === "3",
+                        active: context.userTab === "3",
                       })}
                       onClick={() => {
                         this.toggle("3");
@@ -640,7 +701,7 @@ export default class Users extends React.Component {
                   <NavItem>
                     <NavLink
                       className={classnames({
-                        active: context.eventTab === "4",
+                        active: context.userTab === "4",
                       })}
                       onClick={() => {
                         this.toggle("4");
@@ -652,7 +713,7 @@ export default class Users extends React.Component {
                   <NavItem>
                     <NavLink
                       className={classnames({
-                        active: context.eventTab === "5",
+                        active: context.userTab === "5",
                       })}
                       onClick={() => {
                         this.toggle("5");
@@ -675,6 +736,7 @@ export default class Users extends React.Component {
                       <th>Name</th>
                       <th>Phone</th>
                       <th>Membership</th>
+                      <th>Membership Fee Status</th>
 
                       <th>Blocked</th>
                     </tr>
@@ -697,6 +759,7 @@ export default class Users extends React.Component {
                           </td>
                           <td>{user.phone}</td>
                           <td>{user.membership}</td>
+                          <td>{user.membership_fee_status}</td>
 
                           <td>
                             <div className="app-body-row">
@@ -795,6 +858,7 @@ export default class Users extends React.Component {
                         <th>Name</th>
                         <th>Phone</th>
                         <th>Membership</th>
+                        <th>Membership Fee Status</th>
 
                         <th>Blocked</th>
                       </tr>
@@ -802,11 +866,10 @@ export default class Users extends React.Component {
                     <tbody>
                       {userList && userList.length >= 1 ? (
                         userList.map((user, index) => {
-                          // console.log(
-                          //   "THis is result ",
-                          //   this.state.selected.includes(user.uuid),
-                          //   user.uuid
-                          // );
+                          console.log(
+                            "THis is result ",
+                            user
+                          );
                           return (
                             <tr key={index}>
                               <td>
@@ -872,6 +935,7 @@ export default class Users extends React.Component {
                               </td>
                               <td>{user.phone}</td>
                               <td>{user.membership}</td>
+                              <td>{user.membership_fee_status}</td>
 
                               <td>
                                 <div className="app-body-row">

@@ -603,24 +603,17 @@ export default class EventForm extends React.Component {
 
                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                        Food Menu
+                        Food Menu (Comma Separated)
                       </label>
                       <div className="col-md-6 col-sm-6">
-                        <select
-                          style={{ marginTop: 8 }}
-                          value={this.state.foodItem}
-                          onChange={(e) => {
-                            console.log("THis is the value", e.target.value);
-                            this.setFoodItem(e.target.value);
-                          }}
-                        >
-                          <option name="popcorn">Popcorn</option>
-
-                          <option name="apples">Apples</option>
-                          <option name="bananas">Bananas</option>
-                          <option name="smoothie">Smoothie</option>
-                          <option name="fries">Fries</option>
-                        </select>
+                      <input
+                          required
+                          type="text"
+                          name="foodItem"
+                          className="form-control"
+                          value={appEvent.foodItem}
+                          onChange={this.handleInputChange}
+                        />
                       </div>
                     </div>
 

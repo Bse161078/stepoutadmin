@@ -43,6 +43,12 @@ export const updateMemberShipUser = async function (id, data) {
   });
 };
 
+export const updateMemberShipPaymentStatusUser = async function (id, data) {
+  await db.collection("Users").doc(id).update({
+    membership_fee_status: data,
+  });
+};
+
 export const blockUser = async function (id, data) {
   await db.collection("Users").doc(id).update({
     isActive: data,

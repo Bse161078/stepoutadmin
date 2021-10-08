@@ -4,7 +4,7 @@ const { Provider, Consumer } = React.createContext();
 // Note: You could also use hooks to provide state and convert this into a functional component.
 class RootContext extends Component {
 	state = {
-		userTab: "1",
+		userTab: "3",
 		eventTab: "1",
 	};
 

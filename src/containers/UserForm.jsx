@@ -37,6 +37,7 @@ export default class UserForm extends React.Component {
         timestampRegister: new Date(),
         isActive: true,
         membership: "Unknown",
+        membership_fee_status:""
       },
       image: "",
       file: "",
@@ -167,6 +168,13 @@ export default class UserForm extends React.Component {
     user.membership = e.target.value;
     this.setState({ user });
   };
+
+  handleChangeStatus = (e) => {
+    let user = this.state.user;
+    user.membership_fee_status = e.target.value;
+    this.setState({ user });
+  };
+
 
   render() {
     console.log(this.state);
@@ -406,6 +414,25 @@ export default class UserForm extends React.Component {
                         </select>
                       </div>
                     </div>
+
+                    <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">
+                        Membership Fee Status
+                      </label>
+                      <div className="col-md-6 col-sm-6">
+                        <select
+                          style={{ marginTop: 8 }}
+                          value={user.membership_fee_status}
+                          onChange={this.handleChangeStatus}
+                        >
+                          <option name="unknown">Unknown</option>
+                          <option name="paid">Paid</option>
+                          <option name="unpaid">Unpaid</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    
 
                     <div className="ln_solid"></div>
                     <div className="form-group row">
