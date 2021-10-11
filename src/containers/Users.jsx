@@ -434,7 +434,7 @@ export default class Users extends React.Component {
   toggle = (tab) => {
     if (this.state.activeTab !== tab) this.setState({ activeTab: tab });
     // localStorage.setItem("userTab", tab);
-    globalContext.handleSetuserTab(tab);
+    globalContext.handleSetUserTab(tab);
   };
   handleInputChange = (event) => {
     const { value } = event.target;
