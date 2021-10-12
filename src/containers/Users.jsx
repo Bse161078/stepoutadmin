@@ -737,6 +737,7 @@ export default class Users extends React.Component {
                       <th>Phone</th>
                       <th>Membership</th>
                       <th>Membership Fee Status</th>
+                      <th>Credit</th>
 
                       <th>Blocked</th>
                     </tr>
@@ -760,7 +761,7 @@ export default class Users extends React.Component {
                           <td>{user.phone}</td>
                           <td>{user.membership}</td>
                           <td>{user.membership_fee_status}</td>
-
+                          <th>{user.credit}</th>
                           <td>
                             <div className="app-body-row">
                               <div style={{ marginRight: "10px" }}>
@@ -859,6 +860,7 @@ export default class Users extends React.Component {
                         <th>Phone</th>
                         <th>Membership</th>
                         <th>Membership Fee Status</th>
+                        <th>Credit</th>
 
                         <th>Blocked</th>
                       </tr>
@@ -936,7 +938,7 @@ export default class Users extends React.Component {
                               <td>{user.phone}</td>
                               <td>{user.membership}</td>
                               <td>{user.membership_fee_status}</td>
-
+                              <th>{user.credit || 0}</th>
                               <td>
                                 <div className="app-body-row">
                                   <div style={{ marginRight: "10px" }}>

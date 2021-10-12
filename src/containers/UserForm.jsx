@@ -322,59 +322,14 @@ export default class UserForm extends React.Component {
 
                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                        Credit Card
+                        Credit 
                       </label>
                       <div className="col-md-6 col-sm-6">
                         <input
                           type="number"
-                          name="card_number"
+                          name="credit"
                           className="form-control"
-                          value={user.card_number}
-                          onChange={this.handleInputChange}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">
-                        Credit Card CVV
-                      </label>
-                      <div className="col-md-6 col-sm-6">
-                        <input
-                          type="number"
-                          name="user_card_cvv"
-                          className="form-control"
-                          value={user.user_card_cvv}
-                          onChange={this.handleInputChange}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">
-                        Credit Card Exp Month
-                      </label>
-                      <div className="col-md-6 col-sm-6">
-                        <input
-                          type="number"
-                          name="user_card_month"
-                          className="form-control"
-                          value={user.user_card_month}
-                          onChange={this.handleInputChange}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">
-                        Credit Card Exp Year
-                      </label>
-                      <div className="col-md-6 col-sm-6">
-                        <input
-                          type="number"
-                          name="user_card_year"
-                          className="form-control"
-                          value={user.user_card_year}
+                          value={user.credit}
                           onChange={this.handleInputChange}
                         />
                       </div>
