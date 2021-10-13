@@ -30,6 +30,7 @@ export default class UserForm extends React.Component {
         phone: "",
         handicap: "",
         profileImage: "",
+        credit:"",
         card_number: "",
         user_card_cvv:"",
         user_card_month:'',
@@ -107,6 +108,14 @@ export default class UserForm extends React.Component {
 
       if (match.params.userId) {
         let cloneObject = Object.assign({}, user);
+        if(cloneObject.credit)
+        {
+         
+        }
+        else
+        { cloneObject.credit = 0;
+
+        }
         updateUser(match.params.userId, cloneObject)
           .then((response) => {
             this.setState({
