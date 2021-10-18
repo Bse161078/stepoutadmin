@@ -8,11 +8,15 @@ import {
   updateUser,
   getUserById,
 } from "../backend/services/usersService";
+import moment from "moment";
 import { firebase } from "../backend/firebase";
 import { imageResizeFileUri } from "../static/_imageUtils";
 import { v4 as uuidv4 } from "uuid";
 import SnackBar from "../components/SnackBar";
 
+import {
+  getEvents,
+} from "../backend/services/eventService";
 import Select from "react-select";
 import "react-select/dist/react-select.css";
 import { TextField } from "@material-ui/core";
@@ -40,6 +44,8 @@ export default class UserForm extends React.Component {
         membership: "Unknown",
         membership_fee_status:""
       },
+      upcomingEvents: [],
+      pastEvents: [],
       image: "",
       file: "",
       userId: "",
@@ -53,11 +59,67 @@ export default class UserForm extends React.Component {
     this.postUser = this.postUser.bind(this);
   }
 
-  componentDidMount() {
-    const { match } = this.props;
-    console.log("this.props", this.props);
-    if (match.params.userId)
-      getUserById(match.params.userId)
+  fetchEvent = () => {
+    this.setState({ loading: true });
+    getEvents()
+      .then((response) => {
+        this.setState({
+          events: response,
+          loading: false,
+          responseMessage: "No Events Found",
+        });
+
+        const upcoming = response.filter((element) => {
+          let date = moment(new Date(element.date.seconds * 1000));
+          let curentDate = new Date();
+          console.log(
+            `${element.name} minutes up:`,
+            date.diff(curentDate, "minutes")
+          );
+          return date.diff(curentDate, "minutes") > 0 && element.status == true;
+        });
+        const past = response.filter((element) => {
+          let date = moment(new Date(element.date.seconds * 1000));
+          let curentDate = new Date();
+          // console.log(
+          //   `${element.name} minutes past:`,
+          //   date.diff(curentDate, "minutes")
+          // );
+
+          return date.diff(curentDate, "minutes") < 0 || !element.status;
+        });
+
+        upcoming.sort((a, b) => {
+          var nameA = moment(new Date(a.date.seconds * 1000));
+          // var nameA = a.item_name.charAt(0).toUpperCase();
+          var nameB = moment(new Date(b.date.seconds * 1000));
+          if (nameA.diff(nameB, "minutes") < 0) {
+            return -1;
+          }
+          if (nameA.diff(nameB, "minutes") > 0) {
+            return 1;
+          }
+          // names must be equal
+          return 0;
+        });
+
+        past.sort((a, b) => {
+          var nameA = moment(new Date(a.date.seconds * 1000));
+          // var nameA = a.item_name.charAt(0).toUpperCase();
+          var nameB = moment(new Date(b.date.seconds * 1000));
+
+          if (nameA.diff(nameB, "minutes") > 0) {
+            return -1;
+          }
+          if (nameA.diff(nameB, "minutes") < 0) {
+            return 1;
+          }
+          // names must be equal
+          return 0;
+        });
+
+        this.setState({ upcomingEvents: upcoming, pastEvents: past });
+           getUserById(this.props.match.params.userId)
         .then((response) => {
           console.log("user:", response);
           this.setState({
@@ -67,6 +129,21 @@ export default class UserForm extends React.Component {
         .catch((err) => {
           window.alert("ERROR!");
         });
+      })
+      .catch(() => {
+        this.setState({
+          loading: false,
+          responseMessage: "No Events Found...",
+        });
+      });
+  };
+
+  componentDidMount() {
+    const { match } = this.props;
+    console.log("this.props", this.props);
+    if (match.params.userId)
+   
+        this.fetchEvent()
   }
 
   handleInputChange(event) {
@@ -172,10 +249,34 @@ export default class UserForm extends React.Component {
     }
   };
 
+  isRegisteredForFutureEvent= (user)=>{
+    if(this.state.upcomingEvents)
+    {
+      console.log("THese are upcoming events",this.state.upcomingEvents)
+      this.state.upcomingEvents.map(
+        (event)=>{
+          event.participants.map(
+            (participants)=>{
+              if(participants.userId===user.uuid){
+                var message = "Membership of "+user.name+" can not be changed he is participant of future events";
+                alert(message)
+                return false;
+              }
+            }
+          )
+        }
+      )
+    }
+    return true
+  }
+
   handleChange = (e) => {
+    if(this.isRegisteredForFutureEvent(this.state.user)===false)
+    {
     let user = this.state.user;
     user.membership = e.target.value;
     this.setState({ user });
+    }
   };
 
   handleChangeStatus = (e) => {

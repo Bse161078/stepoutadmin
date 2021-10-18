@@ -11,6 +11,10 @@ import {
   updateMemberShipUser,
   updateMemberShipPaymentStatusUser
 } from "../backend/services/usersService";
+import moment from "moment";
+import {
+  getEvents,
+} from "../backend/services/eventService";
 import SnackBar from "../components/SnackBar";
 import { RootConsumer } from "../backend/Context";
 import Swal from "sweetalert2";
@@ -39,6 +43,8 @@ export default class Users extends React.Component {
       activePage: 1,
       selected: [],
       selectedIndex: [],
+      upcomingEvents: [],
+      pastEvents: [],
       pages: 1,
       q: "",
       loading: false,
@@ -61,7 +67,77 @@ export default class Users extends React.Component {
 
   componentWillMount() {
     this.fetchUsers();
+    this.fetchEvent();
   }
+
+  fetchEvent = () => {
+    this.setState({ loading: true });
+    getEvents()
+      .then((response) => {
+        this.setState({
+          events: response,
+          loading: false,
+          responseMessage: "No Events Found",
+        });
+
+        const upcoming = response.filter((element) => {
+          let date = moment(new Date(element.date.seconds * 1000));
+          let curentDate = new Date();
+          console.log(
+            `${element.name} minutes up:`,
+            date.diff(curentDate, "minutes")
+          );
+          return date.diff(curentDate, "minutes") > 0 && element.status == true;
+        });
+        const past = response.filter((element) => {
+          let date = moment(new Date(element.date.seconds * 1000));
+          let curentDate = new Date();
+          // console.log(
+          //   `${element.name} minutes past:`,
+          //   date.diff(curentDate, "minutes")
+          // );
+
+          return date.diff(curentDate, "minutes") < 0 || !element.status;
+        });
+
+        upcoming.sort((a, b) => {
+          var nameA = moment(new Date(a.date.seconds * 1000));
+          // var nameA = a.item_name.charAt(0).toUpperCase();
+          var nameB = moment(new Date(b.date.seconds * 1000));
+          if (nameA.diff(nameB, "minutes") < 0) {
+            return -1;
+          }
+          if (nameA.diff(nameB, "minutes") > 0) {
+            return 1;
+          }
+          // names must be equal
+          return 0;
+        });
+
+        past.sort((a, b) => {
+          var nameA = moment(new Date(a.date.seconds * 1000));
+          // var nameA = a.item_name.charAt(0).toUpperCase();
+          var nameB = moment(new Date(b.date.seconds * 1000));
+
+          if (nameA.diff(nameB, "minutes") > 0) {
+            return -1;
+          }
+          if (nameA.diff(nameB, "minutes") < 0) {
+            return 1;
+          }
+          // names must be equal
+          return 0;
+        });
+
+        this.setState({ upcomingEvents: upcoming, pastEvents: past });
+      })
+      .catch(() => {
+        this.setState({
+          loading: false,
+          responseMessage: "No Events Found...",
+        });
+      });
+  };
 
   fetchUsers = () => {
     getUsers()
@@ -203,6 +279,10 @@ export default class Users extends React.Component {
         });
       }
     });
+  }
+
+  isRegisteredForFutureEvent= (id)=>{
+
   }
 
   blockUserMultiple() {

@@ -109,12 +109,24 @@ export default class EventForm extends React.Component {
       foodItem,
     });
   }
-  setGolfCourse(golf_course,item) {
-    const { appEvent } = this.state;
+  setGolfCourse(golf_course) {
+    const { appEvent } = this.state
+    debugger;
+    console.log("THis is the golfcourse",golf_course)
     appEvent.golf_course = golf_course;
-    appEvent.location  = item.name;
-    appEvent.image = item.image;
+    
+    this.state.all_golf_courses.map(
+      (item)=>{
+        if(item.name===golf_course)
+        {
+          appEvent.location  = item.name;
+           appEvent.image = item.image;
     appEvent.website  = item.website;
+        }
+      }
+    )
+    // appEvent.image = item.image;
+    // appEvent.website  = item.website;
     this.setState({
       appEvent,
       golf_course,
@@ -632,11 +644,11 @@ export default class EventForm extends React.Component {
                           }}
                         >
                           {this.state.all_golf_courses &&
-                            this.state.all_golf_courses.map((item) => {
+                            this.state.all_golf_courses.map((item,index) => {
                               return (
                                 <option onClick={()=>{
                                   this.setGolfCourse(item.name,item);
-                                }} name={item.name}>{item.name}</option>
+                                }} name={item.name} value={item.name}>{item.name}</option>
                               );
                             })}
                         </select>
