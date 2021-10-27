@@ -276,7 +276,7 @@ export default class UserForm extends React.Component {
     let user = this.state.user;
     user.membership = e.target.value;
     this.setState({ user });
-    }
+    }z
   };
 
   handleChangeStatus = (e) => {
@@ -471,11 +471,11 @@ export default class UserForm extends React.Component {
                           value={user.membership}
                           onChange={this.handleChange}
                         >
-                          <option name="unknown">Unknown</option>
-                          <option name="executive">Executive</option>
-                          <option name="member">Member</option>
-                          <option name="Social Guest">Social Guest</option>
-                          <option name="Golf Guest">Golf Guest</option>
+                          <option name="unknown" value="unknown">Unknown</option>
+                          <option name="executive" value="unknown">Executive</option>
+                          <option name="member" value="unknown">Member</option>
+                          <option name="Social Guest" value="unknown">Social Guest</option>
+                          <option name="Golf Guest" value="unknown">Golf Guest</option>
                         </select>
                       </div>
                     </div>
