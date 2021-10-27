@@ -260,20 +260,22 @@ export default class UserForm extends React.Component {
               if(participants.userId===user.uuid){
                 var message = "Membership of "+user.name+" can not be changed he is participant of future events";
                 alert(message)
-                return false;
+                return true;
               }
             }
           )
         }
       )
     }
-    return true
+    return false
   }
 
   handleChange = (e) => {
+    console.log("This is the value",e.target.value)
     if(this.isRegisteredForFutureEvent(this.state.user)===false)
     {
     let user = this.state.user;
+ 
     user.membership = e.target.value;
     this.setState({ user });
     }
@@ -468,14 +470,14 @@ export default class UserForm extends React.Component {
                       <div className="col-md-6 col-sm-6">
                         <select
                           style={{ marginTop: 8 }}
-                          // value={user.membership}
+                          value={user.membership}
                           onChange={this.handleChange}
                         >
-                          <option name="unknown" value="unknown">Unknown</option>
-                          <option name="executive" value="executive">Executive</option>
-                          <option name="member" value="member">Member</option>
-                          <option name="Social Guest" value="Social Guest">Social Guest</option>
-                          <option name="Golf Guest" value="Golf Guest">Golf Guest</option>
+                          <option name="unknown" >Unknown</option>
+                          <option name="executive" >Executive</option>
+                          <option name="member" >Member</option>
+                          <option name="Social Guest">Social Guest</option>
+                          <option name="Golf Guest">Golf Guest</option>
                         </select>
                       </div>
                     </div>
