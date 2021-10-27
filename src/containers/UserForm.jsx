@@ -276,7 +276,7 @@ export default class UserForm extends React.Component {
     let user = this.state.user;
     user.membership = e.target.value;
     this.setState({ user });
-    }z
+    }
   };
 
   handleChangeStatus = (e) => {

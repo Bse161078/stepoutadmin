@@ -619,7 +619,7 @@ export default class EventForm extends React.Component {
                       </label>
                       <div className="col-md-6 col-sm-6">
                       <input
-                          required
+                          // required
                           type="text"
                           name="foodItem"
                           className="form-control"
