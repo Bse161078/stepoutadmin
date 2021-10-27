@@ -468,7 +468,7 @@ export default class UserForm extends React.Component {
                       <div className="col-md-6 col-sm-6">
                         <select
                           style={{ marginTop: 8 }}
-                          value={user.membership}
+                          // value={user.membership}
                           onChange={this.handleChange}
                         >
                           <option name="unknown" value="unknown">Unknown</option>
