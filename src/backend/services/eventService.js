@@ -47,6 +47,11 @@ export const closeEntry = async function (id, data) {
     entry: data,
   });
 };
+export const closeFoodEntry = async function (id, data) {
+  await db.collection("Events").doc(id).update({
+    closeFoodEntry: data,
+  });
+};
 
 export const updateEvent = async function (id, data) {
   await db.collection("Events").doc(id).set(data, { merge: true });

@@ -17,6 +17,9 @@ export class Event {
     this.entry = x.entry;
     this.pairings = x.pairings;
     this.fee = x.fee;
+    this.closeFoodEntry = x.closeFoodEntry;
+
+    
     this.executive_fee = x.executive_fee;
     this.golf_guest_fee = x.golf_guest_fee;
     this.social_guest_fee = x.social_guest_fee;
@@ -51,6 +54,9 @@ export class Event {
       time: data["time"] ? data["time"] : [],
       location: data["location"] ? data["location"] : [],
       website: data["website"] ? data["website"] : [],
+      closeFoodEntry: data["closeFoodEntry"],
+
+      
 
       fee: data["fee"] ? data["fee"] : [],
       executive_fee: data["executive_fee"] ? data["executive_fee"] : [],
@@ -102,7 +108,8 @@ export class Event {
       social_guest_fee : x.social_guest_fee,
       guestfee: x.guestfee,
       limit: x.limit,
-
+      closeFoodEntry: x.closeFoodEntry,
+      
       location: x.location,
       website: x.website,
       about: x.about,

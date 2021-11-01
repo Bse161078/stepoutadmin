@@ -236,13 +236,14 @@ export default class EventDetails extends React.Component {
 
         participants.forEach((element) => {
           users.forEach((usetItem) => {
-            console.log("This is the usetItem",usetItem)
+            console.log("This is the usetItem",element)
             if (element.userId == usetItem.uuid) {
               let user = usetItem;
               user.paid = element.paid;
               user.paid_social = element.paid_social;
               user.waiting_social = element.waiting_social;
               user.withdrawn = element.withdrawn;
+              user.selectedFood = element.selectedFood;
               user.waiting = element.waiting || false;
               filteredUsers.push(user);
             }
@@ -1259,10 +1260,10 @@ export default class EventDetails extends React.Component {
     const { match, history } = this.props;
     const isEdit = !!match.params.eventId;
 
-    var header = ["Sr. #", "Name", "Paid"];
+    var header = ["Sr. #", "Name", "Paid","Food Item"];
     var downloadData = [];
     participantstList.map((item, index) => {
-      downloadData.push([index + 1, item.name, item.paid]);
+      downloadData.push([index + 1, item.name, item.paid,item.selectedFood]);
     });
     return (
       <div className="row animated fadeIn">
@@ -1724,6 +1725,7 @@ export default class EventDetails extends React.Component {
                                 <th>Name</th>
                                 <th>Image</th>
                                 <th>Paid</th>
+                                <th>Selected Food</th>
                               </tr>
                             </thead>
 
@@ -1745,6 +1747,9 @@ export default class EventDetails extends React.Component {
                                       }
                                     </td>
                                     <td>{user.paid ? "Yes" : "No"}</td>
+                                    <td>{user.selectedFood}</td>
+
+                                    
 
                                     <td>
                                       <Tooltip

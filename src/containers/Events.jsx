@@ -6,6 +6,7 @@ import {
   deleteEvent,
   closeEvent,
   closeEntry,
+  closeFoodEntry
 } from "../backend/services/eventService";
 // import {Pagination} from 'react-bootstrap';
 import SnackBar from "../components/SnackBar";
@@ -353,6 +354,46 @@ class Events extends React.Component {
             this.setState({
               showSnackBar: true,
               snackBarMessage: "Error deleting event",
+              snackBarVariant: "error",
+            });
+          });
+      }
+    });
+  }
+  CloseEntryFood(eventId, selectedEvent) {
+    const events = this.state.events;
+
+    const index = events.indexOf(selectedEvent);
+    Swal.fire({
+      title: "Are you sure?",
+      text: events[index].closeFoodEntry
+        ? "You want to close food entries for this event!"
+        : "You want to open food entries of this event!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: events[index].closeFoodEntry ? "Close":"Open" ,
+    }).then((result) => {
+      if (result.value) {
+        closeFoodEntry(eventId, !events[index].closeFoodEntry)
+          .then((response) => {
+            // const events = this.state.events.slice();
+            events[index].closeFoodEntry = !events[index].closeFoodEntry;
+            this.setState({
+              events,
+              showSnackBar: true,
+              snackBarMessage: events[index].closeFoodEntry
+                ? "Event food entries closed successfully"
+                : "Event food entries opened successfully",
+              snackBarVariant: "success",
+            });
+            this.fetchEvent();
+          })
+          .catch(() => {
+            this.setState({
+              showSnackBar: true,
+              snackBarMessage: "Error updating food entry for event",
               snackBarVariant: "error",
             });
           });
@@ -855,6 +896,48 @@ class Events extends React.Component {
                                       aria-hidden="true"
                                       onClick={() =>
                                         this.CloseEntry(event.uuid, event)
+                                      }
+                                    ></span>
+                                  </Tooltip>
+                                </td>
+                              )
+                            ) : null}
+                            
+                            {eventList != pastEvents ? (
+                              event.closeFoodEntry == true? (
+                                <td>
+                                  <Tooltip
+                                    title="Close Food Entry"
+                                    aria-label="open"
+                                  >
+                                    <span
+                                      className="fa fa-lock"
+                                      style={{
+                                        cursor: "pointer",
+                                        color: "red",
+                                      }}
+                                      aria-hidden="true"
+                                      onClick={() =>
+                                        this.CloseEntryFood(event.uuid, event)
+                                      }
+                                    ></span>
+                                  </Tooltip>
+                                </td>
+                              ) : (
+                                <td>
+                                  <Tooltip
+                                    title="Close Entry"
+                                    aria-label="close"
+                                  >
+                                    <span
+                                      className="fa fa-unlock"
+                                      style={{
+                                        cursor: "pointer",
+                                        color: "green",
+                                      }}
+                                      aria-hidden="true"
+                                      onClick={() =>
+                                        this.CloseEntryFood(event.uuid, event)
                                       }
                                     ></span>
                                   </Tooltip>
