@@ -246,11 +246,11 @@ export default class EventDetails extends React.Component {
             console.log("This is the usetItem",usetItem)
             if (element.userId == usetItem.uuid) {
               let user = usetItem;
-              user.paid = element.paid;
-              user.paid_social = element.paid_social;
-              user.waiting_social = element.waiting_social;
-              user.withdrawn = element.withdrawn;
-              user.selectedFood = element.selectedFood;
+              user.paid = element.paid|| false;
+              user.paid_social = element.paid_social || false;
+              user.waiting_social = element.waiting_social|| false;
+              user.withdrawn = element.withdrawn|| false;
+              user.selectedFood = element.selectedFood ||"";
               user.waiting = element.waiting || false;
               // user.fcmToken =  element.fcmToken;
               filteredUsers.push(user);
@@ -719,6 +719,7 @@ export default class EventDetails extends React.Component {
     // const list = selectedList.map((obj) => {
     // 	return Object.assign({}, obj);
     // });
+    console.log("THis isthe other result",otherResults)
     const list = Object.assign({}, selectedList);
 
     otherResults.ntpPlayer = list;
