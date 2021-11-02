@@ -27,6 +27,7 @@ import {
   deleteUser,
   blockUser,
 } from "../backend/services/usersService";
+import { addNotification } from "../backend/services/eventService";
 import Swal from "sweetalert2";
 import { Nav, NavItem, NavLink } from "reactstrap";
 import { Link } from "react-router-dom";
@@ -86,6 +87,11 @@ export default class EventDetails extends React.Component {
         longestDrivePlayer: [],
         lowestGrosePlayer: [],
         otherText: "",
+      },
+      notification: {
+        title: "",
+        message: "",
+        TokenArray:[]
       },
       otherDescription: RichTextEditor.createEmptyValue(),
       otherDescriptionShow: RichTextEditor.createEmptyValue(),
@@ -155,6 +161,7 @@ export default class EventDetails extends React.Component {
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleNotificationInputChange = this.handleNotificationInputChange.bind(this);
     this.postEvent = this.postEvent.bind(this);
   }
 
@@ -236,7 +243,7 @@ export default class EventDetails extends React.Component {
 
         participants.forEach((element) => {
           users.forEach((usetItem) => {
-            console.log("This is the usetItem",element)
+            console.log("This is the usetItem",usetItem)
             if (element.userId == usetItem.uuid) {
               let user = usetItem;
               user.paid = element.paid;
@@ -245,6 +252,7 @@ export default class EventDetails extends React.Component {
               user.withdrawn = element.withdrawn;
               user.selectedFood = element.selectedFood;
               user.waiting = element.waiting || false;
+              // user.fcmToken =  element.fcmToken;
               filteredUsers.push(user);
             }
           });
@@ -369,6 +377,14 @@ export default class EventDetails extends React.Component {
     const { appEvent } = this.state;
     appEvent[name] = value;
     this.setState({ appEvent });
+  }
+
+  handleNotificationInputChange = (event)=> {
+    const { value, name } = event.target;
+
+    const { notification } = this.state;
+    notification[name] = value;
+    this.setState({ notification });
   }
 
   handleOtherResultInputChange = (event) => {
@@ -858,6 +874,35 @@ export default class EventDetails extends React.Component {
 
   toggleParticipantPaidStatus = (i) => {};
 
+  postNotification = async (event,TokenArray) => {
+    event.preventDefault();
+    const { match, history } = this.props;
+    const { loading, notification, image } = this.state;
+    if (!loading) {
+      this.setState({ loading: true });
+      notification.TokenArray = JSON.stringify( TokenArray);
+      console.log("THis is the notification being created ",notification)
+      addNotification(notification)
+        .then((response) => {
+          this.setState({
+            loading: false,
+            showSnackBar: true,
+            snackBarMessage: "Notification sent successfully",
+            snackBarVariant: "success",
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+          this.setState({
+            loading: false,
+            showSnackBar: true,
+            snackBarMessage: "Error creating Notification",
+            snackBarVariant: "error",
+          });
+        });
+    }
+  };
+
   saveParticiapnts = (event) => {
     const {
       updatedParticipants,
@@ -1259,12 +1304,17 @@ export default class EventDetails extends React.Component {
 
     const { match, history } = this.props;
     const isEdit = !!match.params.eventId;
+    const TokenArray = []
 
     var header = ["Sr. #", "Name", "Paid","Food Item"];
     var downloadData = [];
     participantstList.map((item, index) => {
+      console.log("This is the great token",item.email)
+      TokenArray.push(item.fcmToken)
+
       downloadData.push([index + 1, item.name, item.paid,item.selectedFood]);
     });
+
     return (
       <div className="row animated fadeIn">
         {showSnackBar && (
@@ -1713,6 +1763,7 @@ export default class EventDetails extends React.Component {
                             </NavLink>
                           </NavItem>
                         </Nav>
+ 
 
                         <div className="table-responsive">
                           <table
@@ -1796,6 +1847,87 @@ export default class EventDetails extends React.Component {
                             </tbody>
                           </table>
                         </div>
+                        <div className="col-12">
+          <div className="row">
+            <div className="col-md-12 col-sm-12">
+              <div className="x_panel">
+                <div className="x_title">
+                  <h2>Send Notification</h2>
+                </div>
+                <div className="x_content">
+                  <br />
+                  <form
+                    id="demo-form2"
+                    data-parsley-validate
+                    className="form-horizontal form-label-left"
+                    onSubmit={(e)=>{
+                      e.preventDefault()
+                      this.postNotification(e,TokenArray)
+                    }}
+                  >
+                    <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">
+                        Title
+                      </label>
+                      <div className="col-md-6 col-sm-6">
+                        <input
+                          required
+                          type="text"
+                          name="title"
+                          className="form-control"
+                          value={this.state.notification.title}
+                          onChange={this.handleNotificationInputChange}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">
+                        Message
+                      </label>
+                      <div className="col-md-6 col-sm-6">
+                        <input
+                          required
+                          type="text"
+                          name="message"
+                          maxLength="80"
+                          className="form-control"
+                          value={this.state.notification.message}
+                          onChange={this.handleNotificationInputChange}
+                        />
+                      </div>
+                    </div>
+
+
+                    <div className="ln_solid" />
+                    <div className="form-group row">
+                      <div className="col-md-6 col-sm-6 offset-md-3">
+                        <Button
+                          className={`btn btn-success btn-lg ${
+                            this.state.loading ? "disabled" : ""
+                          }`}
+                        >
+                          <i
+                            className={`fa fa-spinner fa-pulse ${
+                              this.state.loading ? "" : "d-none"
+                            }`}
+                          />
+                          {" Submit"}
+                        </Button>
+                        <Button
+                          onClick={() => history.goBack()}
+                          className={`mx-3 btn btn-danger btn-lg`}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
                       </div>
                     </div>
 

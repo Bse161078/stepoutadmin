@@ -4,6 +4,8 @@ export class User {
     this.name = x.name;
     this.fname = x.fname;
     this.lname = x.lname;
+    this.fcmToken = x.fcmToken;
+    
     // this.userName = x.userName;
     this.email = x.email;
 
@@ -31,7 +33,8 @@ export class User {
       name: data["name"] ? data["name"] : "",
       fname: data["fname"] ? data["fname"] : "",
       lname: data["lname"] ? data["lname"] : "",
-
+      fcmToken: data["fcmToken"] ? data["fcmToken"] : "",
+      
       email: data["email"] ? data["email"] : "",
       isActive: data["isActive"] !== undefined ? data["isActive"] : false,
       phone: data["phone"] ? data["phone"] : "",
@@ -62,6 +65,7 @@ export class User {
       email: x.email,
       isActive: x.isActive,
       phone: x.phone,
+      // fcmToken: x.fcmToken,
       // collections: x.collections,
       // sneakerSize: x.sneakerSize,
       handicap: x.handicap,

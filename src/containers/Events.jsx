@@ -367,8 +367,8 @@ class Events extends React.Component {
     Swal.fire({
       title: "Are you sure?",
       text: events[index].closeFoodEntry
-        ? "You want to close food entries for this event!"
-        : "You want to open food entries of this event!",
+        ? "You want to open food entries for this event!"
+        : "You want to clos food entries of this event!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -628,7 +628,11 @@ class Events extends React.Component {
                         <th>Start Sheet Url</th>
                         <th>Result Page Url</th>
                         <th>Open</th>
+                        
                         {eventList != pastEvents ? <th>Entry</th> : null}
+                        {eventList != pastEvents ? <th>Food Entry</th> : null}
+                        {eventList != pastEvents ? <th>Edit</th> : null}
+                        {eventList != pastEvents ? <th>Delete</th> : null}
                       </tr>
                     </thead>
                     <tbody>
@@ -907,7 +911,7 @@ class Events extends React.Component {
                               event.closeFoodEntry == true? (
                                 <td>
                                   <Tooltip
-                                    title="Close Food Entry"
+                                    title="Open Food Entry"
                                     aria-label="open"
                                   >
                                     <span
@@ -926,7 +930,7 @@ class Events extends React.Component {
                               ) : (
                                 <td>
                                   <Tooltip
-                                    title="Close Entry"
+                                    title="Close Food Entry"
                                     aria-label="close"
                                   >
                                     <span
