@@ -41,6 +41,8 @@ export class Event {
   static fromFirestore(doc) {
     const data = doc.data();
 
+    console.log("This is the data of the event",data)
+
     if (!data) return null;
     return new Event({
       uuid: doc.id,
@@ -55,9 +57,8 @@ export class Event {
       location: data["location"] ? data["location"] : [],
       website: data["website"] ? data["website"] : [],
       closeFoodEntry: data["closeFoodEntry"],
-
-      
-
+      guest_first_name: data["guest_first_name"],
+      guest_last_name: data["guest_last_name"],
       fee: data["fee"] ? data["fee"] : [],
       executive_fee: data["executive_fee"] ? data["executive_fee"] : [],
       golf_guest_fee: data["golf_guest_fee"] ? data["golf_guest_fee"] : [],

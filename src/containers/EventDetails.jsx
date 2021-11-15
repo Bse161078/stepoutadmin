@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import axios from "axios";
 import RichTextEditor from "react-rte";
 import {
@@ -164,9 +164,9 @@ export default class EventDetails extends React.Component {
     this.handleNotificationInputChange = this.handleNotificationInputChange.bind(this);
     this.postEvent = this.postEvent.bind(this);
   }
-
   componentDidMount() {
-    this.fetchEventbyId();
+    // this.fetchEventbyId();
+    this.fetchAllUsers();
   }
 
   fetchEventbyId = () => {
@@ -228,6 +228,51 @@ export default class EventDetails extends React.Component {
     }
   };
 
+   getUserNameById = (id,element,participants)=>{
+    var  element = element
+    this.state.allusers.forEach((usetItem) => {
+      console.log("This is the usetItem",element)
+      if (id == usetItem.uuid) {
+        element.fcmToken = usetItem.fcmToken;
+        element.name = usetItem.name;
+        element.image = usetItem.image;
+        return element
+      }
+    });
+    return element
+  }
+
+  fetchAllUsers = () => {
+    let users = [];
+    let tempUsers = [];
+    let filteredUsers = [];
+    getUsers()
+      .then((response) => {
+        tempUsers = response;
+        tempUsers.forEach((item) => {
+          let temp = item;
+          temp.waiting = item.waiting || false;
+          users.push(temp);
+        });
+
+        console.log("These are sorted user", users);
+        this.setState({
+          users: users,
+          allusers: users,
+          loading: false,
+          responseMessage: "No Users Found",
+        });
+        this.fetchEventbyId()
+      })
+      .catch((err) => {
+        console.log("#######err#####", err);
+        this.setState({
+          loading: false,
+          responseMessage: "No Users Found...",
+        });
+      });
+  };
+
   fetchUsers = (participants) => {
     let users = [];
     let tempUsers = [];
@@ -243,7 +288,7 @@ export default class EventDetails extends React.Component {
 
         participants.forEach((element) => {
           users.forEach((usetItem) => {
-            console.log("This is the usetItem",usetItem)
+            console.log("This is the usetItem",element)
             if (element.userId == usetItem.uuid) {
               let user = usetItem;
               user.paid = element.paid|| false;
@@ -258,21 +303,27 @@ export default class EventDetails extends React.Component {
           });
         });
 
-        const paid = filteredUsers.filter((element) => {
-          return element.paid && !element.withdrawn && !element.waiting;
+        const paid = participants.filter((element) => {
+          element = this.getUserNameById(element.userId,element,participants);
+          console.log("This is the  element", element, element.guest_first_name==="" ,!element.guest_first_name)
+          return element.paid && !element.withdrawn && !element.waiting &&  !element.guest_first_name;
         });
-        const unPaid = filteredUsers.filter((element) => {
-          return !element.paid && !element.waiting_social && !element.paid_social && !element.withdrawn && !element.waiting;
+        const unPaid = participants.filter((element) => {
+          return !element.paid && !element.waiting_social && !element.paid_social && !element.withdrawn && !element.waiting&& (element.guest_first_name==""|| !element.guest_first_name);
         });
-        const paidSocial = filteredUsers.filter((element) => {
-          return element.paid_social && !element.withdrawn && !element.waiting;
+        const paidSocial = participants.filter((element) => {
+          // element.name = element.guest_first_name +" "+element.guest_last_name;
+          return element.paid && !element.withdrawn && !element.waiting&& element.guest_first_name!="" && element.guest_first_name!=null;
         });
-        const waitingSocial = filteredUsers.filter((element) => {
+        const waitingSocial = participants.filter((element) => {
           console.log("Thsi is  watin social",element.waiting_social)
-          return element.waiting_social && !element.withdrawn && !element.waiting;
+          // element.name = element.guest_first_name +" "+element.guest_last_name;
+          return !element.paid &&!element.withdrawn && !element.waiting && element.guest_first_name!=""&& element.guest_first_name!=null
         });
         console.log("These are paid social",paidSocial)
         console.log("These are waiting social",waitingSocial)
+        console.log("These are  paid",paid)
+
         const withdrawn = filteredUsers.filter((element) => {
           return element.withdrawn;
         });
@@ -384,6 +435,14 @@ export default class EventDetails extends React.Component {
 
     const { notification } = this.state;
     notification[name] = value;
+    this.setState({ notification });
+  }
+
+  handleNotificationCheckboxChange = (event)=> {
+    const { checked, name } = event.target;
+
+    const { notification } = this.state;
+    notification[name] = checked;
     this.setState({ notification });
   }
 
@@ -875,7 +934,53 @@ export default class EventDetails extends React.Component {
 
   toggleParticipantPaidStatus = (i) => {};
 
-  postNotification = async (event,TokenArray) => {
+  postNotification = async (event,tok) => {
+    var TokenArray = [];
+
+    // paidParticipants,
+    // unPaidParticipants,
+    // withdrawnParticipants,
+    // paidWaitingParticipants,
+    // unPaidWaitingParticipants
+    if(this.state.notification.paid_particiapants)
+    {
+      this.state.paidParticipants.map(
+        (item)=>{
+          TokenArray.push(item.fcmToken)
+        }
+      )
+    }
+    if(this.state.notification.unpaid_particiapants)
+    {
+      this.state.unPaidParticipants.map(
+        (item)=>{
+          TokenArray.push(item.fcmToken)
+        }
+      )
+    }
+    if(this.state.notification.waiting_paid_particiapants)
+    {
+      this.state.paidWaitingParticipants.map(
+        (item)=>{
+          TokenArray.push(item.fcmToken)
+        }
+      )
+    }
+    if(this.state.notification.waiting_unpaid_particiapants)
+    {
+      this.state.unPaidWaitingParticipants.map(
+        (item)=>{
+          TokenArray.push(item.fcmToken)
+        }
+      )
+    }
+    if(TokenArray.length<=0)
+    {
+      alert("Please Click at least on checkbox");
+      return
+    }
+
+    
     event.preventDefault();
     const { match, history } = this.props;
     const { loading, notification, image } = this.state;
@@ -1259,6 +1364,7 @@ export default class EventDetails extends React.Component {
   };
 
   render() {
+    console.log("THis is notification",this.state.notification)
     const {
       appEvent,
       divisions,
@@ -1893,11 +1999,76 @@ export default class EventDetails extends React.Component {
                           name="message"
                           maxLength="80"
                           className="form-control"
-                          value={this.state.notification.message}
+                          checked={this.state.notification.message}
                           onChange={this.handleNotificationInputChange}
                         />
                       </div>
                     </div>
+                    <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">
+                        Paid Participants
+                      </label>
+                      <div className="col-md-6 col-sm-6">
+                        <input
+                          // required
+                          type="checkbox"
+                          name="paid_particiapants"
+                          maxLength="80"
+                          className="form-control"
+                          value={this.state.notification.paid_particiapants}
+                          onChange={this.handleNotificationCheckboxChange}
+                        />
+                      </div>
+           
+                    </div>
+                    <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">
+                        Unpaid Participants
+                      </label>
+                      <div className="col-md-6 col-sm-6">
+                        <input
+                          // required
+                          type="checkbox"
+                          name="unpaid_particiapants"
+                          maxLength="80"
+                          className="form-control"
+                          value={this.state.notification.unpaid_particiapants}
+                          onChange={this.handleNotificationCheckboxChange}
+                        />
+                      </div>
+                      </div>
+                      <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">
+                        Waiting (paid) Participants
+                      </label>
+                      <div className="col-md-6 col-sm-6">
+                        <input
+                          // required
+                          type="checkbox"
+                          name="waiting_paid_particiapants"
+                          maxLength="80"
+                          className="form-control"
+                          value={this.state.notification.waiting_paid_particiapants}
+                          onChange={this.handleNotificationCheckboxChange}
+                        />
+                      </div>
+                      </div>
+                      <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">
+                        Waiting (paid) Participants
+                      </label>
+                      <div className="col-md-6 col-sm-6">
+                        <input
+                          // required
+                          type="checkbox"
+                          name="waiting_unpaid_particiapants"
+                          maxLength="80"
+                          className="form-control"
+                          value={this.state.notification.waiting_unpaid_particiapants}
+                          onChange={this.handleNotificationCheckboxChange}
+                        />
+                      </div>
+                      </div>
 
 
                     <div className="ln_solid" />
