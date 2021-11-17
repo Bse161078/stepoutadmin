@@ -52,6 +52,9 @@ import { firebase } from "../backend/firebase";
 import { getSignedInUser } from "../backend/services/authService";
 import { RootContext } from "../../src/backend/Context";
 
+import MembershipFee from "./MembershipFee";
+import MembershipFeeForm from "./MembershipFeeForm";
+
 
 class App extends React.Component {
   constructor(props) {
@@ -177,6 +180,13 @@ class App extends React.Component {
                     path="/events/event-form"
                     component={EventForm}
                   />
+
+                  <Route exact={true} path="/membership-fee" component={MembershipFee} />
+                  <Route exact={true} path="/membership-fee-form" component={MembershipFeeForm} />
+
+
+
+
                     <Route
                     exact={true}
                     path="/golfcourses/golfcourses-form"

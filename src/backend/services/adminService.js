@@ -4,34 +4,38 @@ import { Admin } from '../models/admin';
 // import * as admin from 'firebase-admin';
 
 export const getAdmins = async function () {
-    const query = await db.collection('Admins').limit(20).get();
-    let admins = [];
+    const query = await db.collection("Fee").get();
+    return query.data();
+};
 
-    query.docs.forEach((doc) => {
-        const admin = Admin.fromFirestore(doc);
-        if (admin) {
-            admins.push(admin);
-        }
-    });
-    console.log('Admins', admins);
-
-    return admins;
+export const getFee = async function () {
+    const query = await db.collection("Fee").doc("Fee").get();
+    console.log("This is the query",query.data())
+    // query.docs.forEach((doc) => {
+    //     console.log("this is dot",doc.data())
+    //     var data = doc.data();
+        
+    //     if (data) {
+    //       events.push(data);
+    //     }
+    //   });
+    return query.data();
 };
 
 export const addAdmin = async function (data) {
-    await db.collection('Admins').add(data);
+    await db.collection('Fee').add(data);
 };
 
 export const deleteAdmin = async function (id) {
-    await db.collection('Admins').doc(id).delete();
+    await db.collection('Fee').doc("Fee").delete();
 };
 
-export const updateAdmin = async function (id, data) {
-    await db.collection('Admins').doc(id).set(data, { merge: true });
+export const updateFee = async function (data) {
+    await db.collection('Fee').doc("Fee").set(data, { merge: true });
 };
 
 export const getAdminById = async function (id) {
-    const query = await db.collection('Admins').doc(id).get();
+    const query = await db.collection('Fee').doc(id).get();
     return Admin.fromFirestore(query);
 };
 
