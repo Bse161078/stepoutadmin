@@ -151,7 +151,7 @@ export default class MemberForm extends React.Component {
             <div className="col-md-12 col-sm-12">
               <div className="x_panel">
                 <div className="x_title">
-                  <h2>Enter MembershipFee Details</h2>
+                  <h2>Enter Membership Fee Details</h2>
                 </div>
                 <div className="x_content">
                   <br />

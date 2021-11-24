@@ -31,6 +31,12 @@ export default {
       icon: "icon-fire",
     },
     {
+      name: "Membership",
+      url: "/membership-fee-form",
+      icon: "icon-fire",
+    },
+    
+    {
       name: "Users",
       url: "/users",
       icon: "icon-user",
