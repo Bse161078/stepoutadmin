@@ -1,6 +1,9 @@
 import React from "react";
 import { Button } from "reactstrap";
 import { addNotification } from "../backend/services/eventService";
+import {
+  getUsers,
+} from "../backend/services/usersService";
 import SnackBar from "../components/SnackBar";
 
 import moment from "moment";
@@ -14,14 +17,99 @@ export default class Notifications extends React.Component {
         title: "",
         message: "",
       },
+      executive: [],
+      members: [],
+      guests: [],
+      unknown: [],
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.postNotification = this.postNotification.bind(this);
+    this.fetchUsers = this.fetchUsers.bind(this)
   }
 
+  fetchUsers = () => {
+    getUsers()
+      .then((response) => {
+        console.log("############", response);
+
+        const sortedUsers = response.sort((a, b) => {
+          var nameA = a.lname.toUpperCase();
+          var nameB = b.lname.toUpperCase();
+
+          if (nameA < nameB) {
+            return -1;
+          }
+          if (nameA > nameB) {
+            return 1;
+          }
+          // names must be equal
+          return 0;
+        });
+
+        // let tempUsers = [...sortedUsers];
+        // const { activePage } = this.state;
+        // const indexOfLastTodo = activePage * 10;
+        // const indexOfFirstTodo = indexOfLastTodo - 10;
+        // const currentTodos = tempUsers.slice(indexOfFirstTodo, indexOfLastTodo);
+        var executive = [];
+        var members = [];
+        var guests = [];
+        var unknown = [];
+        sortedUsers.map((item) => {
+          // console.log("THis is greate",item.membership.toLowerCase())
+          if (
+            item.membership.toLowerCase() == "executive" ||
+            item.membership.toLowerCase() == "paid"
+          ) {
+            executive.push(item);
+          } else if (
+            item.membership.toLowerCase() == "member" ||
+            item.membership.toLowerCase() == "unpaid"
+          ) {
+            members.push(item);
+          } else if (
+            item.membership.toLowerCase() == "Social Guest".toLowerCase() ||  item.membership.toLowerCase() == "Golf Guest".toLowerCase()
+          ) {
+            guests.push(item);
+          } else {
+            unknown.push(item);
+          }
+        });
+        console.log("This is great", executive);
+        console.log("This is members", members);
+        console.log("This is guests", guests);
+        console.log("This is unknown", unknown);
+
+        this.setState({
+          executive: executive,
+          members: members,
+          guests: guests,
+          unknown: unknown,
+          // pages: Math.ceil(response.data.length/10),
+          loading: false,
+          responseMessage: "No Users Found",
+        });
+      })
+      .catch((err) => {
+        console.log("#######err#####", err);
+        this.setState({
+          loading: false,
+          responseMessage: "No Users Found...",
+        });
+      });
+  };
+
+  handleNotificationCheckboxChange = (event)=> {
+    const { checked, name } = event.target;
+
+    const { notification } = this.state;
+    notification[name] = checked;
+    this.setState({ notification });
+  }
   componentDidMount() {
     const { match } = this.props;
+    this.fetchUsers()
     // if (match.params.eventId) {
     //   getEventById(match.params.eventId).then((response) => {
     //     this.setState({
@@ -48,13 +136,92 @@ export default class Notifications extends React.Component {
     this.setState({ notification });
   }
 
-  postNotification = async (event) => {
+  // postNotification = async (event) => {
+  //   event.preventDefault();
+  //   const { match, history } = this.props;
+  //   const { loading, notification, image } = this.state;
+  //   if (!loading) {
+  //     this.setState({ loading: true });
+
+  //     addNotification(notification)
+  //       .then((response) => {
+  //         this.setState({
+  //           loading: false,
+  //           showSnackBar: true,
+  //           snackBarMessage: "Notification sent successfully",
+  //           snackBarVariant: "success",
+  //         });
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+  //         this.setState({
+  //           loading: false,
+  //           showSnackBar: true,
+  //           snackBarMessage: "Error creating Notification",
+  //           snackBarVariant: "error",
+  //         });
+  //       });
+  //   }
+  // };
+
+  postNotification = async (event,tok) => {
+    var TokenArray = [];
+
+    // paidParticipants,
+    // unPaidParticipants,
+    // withdrawnParticipants,
+    // paidWaitingParticipants,
+    // unPaidWaitingParticipants
+    var executive = [];
+    var members = [];
+    var guests = [];
+    var unknown = [];
+    if(this.state.notification.executive)
+    {
+      this.state.executive.map(
+        (item)=>{
+          TokenArray.push(item.fcmToken)
+        }
+      )
+    }
+    if(this.state.notification.members)
+    {
+      this.state.members.map(
+        (item)=>{
+          TokenArray.push(item.fcmToken)
+        }
+      )
+    }
+    if(this.state.notification.guests)
+    {
+      this.state.guests.map(
+        (item)=>{
+          TokenArray.push(item.fcmToken)
+        }
+      )
+    }
+    if(this.state.notification.unknown)
+    {
+      this.state.unknown.map(
+        (item)=>{
+          TokenArray.push(item.fcmToken)
+        }
+      )
+    }
+    if(TokenArray.length<=0)
+    {
+      alert("Please Click at least on checkbox");
+      return
+    }
+
+    
     event.preventDefault();
     const { match, history } = this.props;
     const { loading, notification, image } = this.state;
     if (!loading) {
       this.setState({ loading: true });
-
+      notification.TokenArray = JSON.stringify( TokenArray);
+      console.log("THis is the notification being created ",notification)
       addNotification(notification)
         .then((response) => {
           this.setState({
@@ -149,24 +316,71 @@ export default class Notifications extends React.Component {
                         />
                       </div>
                     </div>
+ 
                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                        User Type
+                        Executive
                       </label>
-                      <div className="col-sm-2">
-                        <select
-                          style={{ marginTop: 8 }}
-                          onChange={this.handleInputChange}
-                          name="type"
-                          required
-                        >
-                          <option name="unknown">Unknown</option>
-
-                          <option name="executive">Executive</option>
-                          <option name="member">Member</option>
-                          <option name="guest">Guest</option>
-                        </select>
+                      <div className="col-md-6 col-sm-6">
+                        <input
+                          // required
+                          type="checkbox"
+                          name="executive"
+                          maxLength="80"
+                          className="form-control"
+                          value={this.state.notification.executive}
+                          onChange={this.handleNotificationCheckboxChange}
+                        />
                       </div>
+                      </div>
+                      <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">
+                        Member
+                      </label>
+                      <div className="col-md-6 col-sm-6">
+                        <input
+                          // required
+                          type="checkbox"
+                          name="members"
+                          maxLength="80"
+                          className="form-control"
+                          value={this.state.notification.members}
+                          onChange={this.handleNotificationCheckboxChange}
+                        />
+                      </div>
+                      </div>
+                      <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">
+                       Guest
+                      </label>
+                      <div className="col-md-6 col-sm-6">
+                        <input
+                          // required
+                          type="checkbox"
+                          name="guests"
+                          maxLength="80"
+                          className="form-control"
+                          value={this.state.notification.guests}
+                          onChange={this.handleNotificationCheckboxChange}
+                        />
+                      </div>
+                      </div>
+                      <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">
+                        Unknown
+                      </label>
+                      <div className="col-md-6 col-sm-6">
+                        <input
+                          // required
+                          type="checkbox"
+                          name="unknown"
+                          maxLength="80"
+                          className="form-control"
+                          value={this.state.notification.unknown}
+                          onChange={this.handleNotificationCheckboxChange}
+                        />
+                      </div>
+           
                     </div>
 
                     <div className="ln_solid" />
