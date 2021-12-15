@@ -631,8 +631,8 @@ class Events extends React.Component {
                         
                         {eventList != pastEvents ? <th>Entry</th> : null}
                         {eventList != pastEvents ? <th>Food Entry</th> : null}
-                        {eventList != pastEvents ? <th>Edit</th> : null}
-                        {eventList != pastEvents ? <th>Delete</th> : null}
+                        {<th>Edit</th>}
+                        {<th>Delete</th>}
                       </tr>
                     </thead>
                     <tbody>

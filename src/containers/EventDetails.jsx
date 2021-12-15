@@ -1413,13 +1413,13 @@ export default class EventDetails extends React.Component {
     const isEdit = !!match.params.eventId;
     const TokenArray = []
 
-    var header = ["Sr. #", "Name", "Paid","Food Item"];
+    var header = ["Sr. #", "Name", "Paid","Food Item","Handicap Index"];
     var downloadData = [];
     participantstList.map((item, index) => {
       console.log("This is the great token",item.email)
       TokenArray.push(item.fcmToken)
 
-      downloadData.push([index + 1, item.name, item.paid,item.selectedFood]);
+      downloadData.push([index + 1, item.name, item.paid,item.selectedFood,item.handicap]);
     });
 
     return (
@@ -1884,6 +1884,9 @@ export default class EventDetails extends React.Component {
                                 <th>Image</th>
                                 <th>Paid</th>
                                 <th>Selected Food</th>
+                                <th>Handicap Index</th>
+                                <th>Edit</th>
+                                <th>Delete</th>
                               </tr>
                             </thead>
 
@@ -1906,6 +1909,7 @@ export default class EventDetails extends React.Component {
                                     </td>
                                     <td>{user.paid ? "Yes" : "No"}</td>
                                     <td>{user.selectedFood}</td>
+                                    <td>{user.handicap}</td>
 
                                     
 
@@ -2055,7 +2059,7 @@ export default class EventDetails extends React.Component {
                       </div>
                       <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                        Waiting (paid) Participants
+                        Waiting (unpaid) Participants
                       </label>
                       <div className="col-md-6 col-sm-6">
                         <input

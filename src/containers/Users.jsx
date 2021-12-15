@@ -818,8 +818,11 @@ export default class Users extends React.Component {
                       <th>Membership</th>
                       <th>Membership Fee Status</th>
                       <th>Credit</th>
+                      <th>Handicaps</th>
 
                       <th>Blocked</th>
+                      <th>Edit</th>
+                        <th>Delete</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -839,9 +842,10 @@ export default class Users extends React.Component {
                             {user.lname}, {user.fname}
                           </td>
                           <td>{user.phone}</td>
-                          <td>{user.membership}</td>
-                          <td>{user.membership_fee_status}</td>
+                          <td style={{textTransform:"capitalize"}}>{user.membership}</td>
+                          <td style={{textTransform:"capitalize"}}>{user.membership_fee_status}</td>
                           <th>{user.credit}</th>
+                          <th>{user.handicap || 0}</th>
                           <td>
                             <div className="app-body-row">
                               <div style={{ marginRight: "10px" }}>
@@ -941,8 +945,10 @@ export default class Users extends React.Component {
                         <th>Membership</th>
                         <th>Membership Fee Status</th>
                         <th>Credit</th>
-
+                        <th>Handicap</th>
                         <th>Blocked</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1016,9 +1022,10 @@ export default class Users extends React.Component {
                                 {user.lname}, {user.fname}
                               </td>
                               <td>{user.phone}</td>
-                              <td>{user.membership}</td>
-                              <td>{user.membership_fee_status}</td>
+                              <td style={{textTransform:"capitalize"}}>{user.membership}</td>
+                              <td style={{textTransform:"capitalize"}}>{user.membership_fee_status}</td>
                               <th>{user.credit || 0}</th>
+                              <th>{user.handicap || 0}</th>
                               <td>
                                 <div className="app-body-row">
                                   <div style={{ marginRight: "10px" }}>
