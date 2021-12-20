@@ -11,14 +11,13 @@ export const getAdmins = async function () {
 export const getFee = async function () {
     const query = await db.collection("Fee").doc("Fee").get();
     console.log("This is the query",query.data())
-    // query.docs.forEach((doc) => {
-    //     console.log("this is dot",doc.data())
-    //     var data = doc.data();
-        
-    //     if (data) {
-    //       events.push(data);
-    //     }
-    //   });
+    return query.data();
+};
+
+
+export const getMerit = async function () {
+    const query = await db.collection("merit").doc("merit").get();
+    console.log("This is the query",query.data())
     return query.data();
 };
 
@@ -33,6 +32,12 @@ export const deleteAdmin = async function (id) {
 export const updateFee = async function (data) {
     await db.collection('Fee').doc("Fee").set(data, { merge: true });
 };
+
+export const updateMerit = async function (data) {
+    await db.collection('merit').doc("merit").set(data, { merge: true });
+};
+
+
 
 export const getAdminById = async function (id) {
     const query = await db.collection('Fee').doc(id).get();

@@ -54,6 +54,7 @@ import { RootContext } from "../../src/backend/Context";
 
 import MembershipFee from "./MembershipFee";
 import MembershipFeeForm from "./MembershipFeeForm";
+import MeritForm from "./MeritForm";
 
 
 class App extends React.Component {
@@ -183,9 +184,10 @@ class App extends React.Component {
 
                   <Route exact={true} path="/membership-fee" component={MembershipFee} />
                   <Route exact={true} path="/membership-fee-form" component={MembershipFeeForm} />
+                  <Route exact={true} path="/merit-form" component={MeritForm} />
 
 
-
+                  
 
                     <Route
                     exact={true}

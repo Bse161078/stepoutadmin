@@ -35,6 +35,12 @@ export default {
       url: "/membership-fee-form",
       icon: "icon-fire",
     },
+    {
+      name: "Mert Link",
+      url: "/merit-form",
+      icon: "icon-fire",
+    },
+
     
     {
       name: "Users",
