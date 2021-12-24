@@ -77,7 +77,7 @@ export default class Users extends React.Component {
         this.setState({
           events: response,
           loading: false,
-          responseMessage: "No Events Found",
+          responseMessage: "No Users Found",
         });
 
         const upcoming = response.filter((element) => {
