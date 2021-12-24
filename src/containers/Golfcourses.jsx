@@ -509,6 +509,8 @@ class Events extends React.Component {
                         {/* <th>Location</th> */}
                         <th>Phone</th>
                          <th>Website</th>
+                         <th>Edit</th>
+                         <th>Delete</th>
                        
                         
                        
