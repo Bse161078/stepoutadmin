@@ -134,7 +134,7 @@ export default class Users extends React.Component {
       .catch(() => {
         this.setState({
           loading: false,
-          responseMessage: "No Events Found...",
+          responseMessage: "No Users Found...",
         });
       });
   };
