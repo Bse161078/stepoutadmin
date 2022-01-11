@@ -9,12 +9,10 @@ import {
   deleteUser,
   blockUser,
   updateMemberShipUser,
-  updateMemberShipPaymentStatusUser
+  updateMemberShipPaymentStatusUser,
 } from "../backend/services/usersService";
 import moment from "moment";
-import {
-  getEvents,
-} from "../backend/services/eventService";
+import { getEvents } from "../backend/services/eventService";
 import SnackBar from "../components/SnackBar";
 import { RootConsumer } from "../backend/Context";
 import Swal from "sweetalert2";
@@ -143,6 +141,18 @@ export default class Users extends React.Component {
     getUsers()
       .then((response) => {
         console.log("############", response);
+        var keepIndex = [
+          207, 208, 209, 210, 212, 216, 220, 221, 222, 223, 224, 225, 257, 258,
+          259, 274, 275, 337, 357, 368, 369, 370, 373, 379, 380, 393, 394, 395,
+          408, 409, 417, 418, 512, 513, 592, 644, 646, 718, 800, 884, 885, 957,
+          958, 1025, 1026, 1027, 1189, 1271, 1275, 1286, 1440, 1480, 1495, 1510,
+          1593, 1594, 1599, 1600, 1613, 1631, 1686, 1981, 2006, 2040, 2094,
+          2121, 2274, 2403, 2868, 2880, 3230, 3330, 3331, 3332, 3337, 3338,
+          3339, 3340, 3341, 3343, 3344, 3346, 3348, 3349, 3350, 3351, 3352,
+          3353, 3359, 3360, 3361, 3365, 3372, 3373, 3378, 3396, 3412, 3425,
+          3427, 3437, 3443, 3444, 3446, 3854, 3855, 3882, 3883, 3937, 3939,
+          3948, 3949, 4009, 4167, 4278, 4279, 4281, 4297, 4300, 4301, 4452,
+        ];
 
         const sortedUsers = response.sort((a, b) => {
           var nameA = a.lname.toUpperCase();
@@ -157,6 +167,7 @@ export default class Users extends React.Component {
           // names must be equal
           return 0;
         });
+        
 
         // let tempUsers = [...sortedUsers];
         // const { activePage } = this.state;
@@ -167,8 +178,17 @@ export default class Users extends React.Component {
         var members = [];
         var guests = [];
         var unknown = [];
-        sortedUsers.map((item) => {
-          // console.log("THis is greate",item.membership.toLowerCase())
+        var toKeep = [];
+        var toDelete = [];
+        sortedUsers.map((item,index) => {
+          if(keepIndex.includes(index+1))
+          {
+            toKeep.push(item)
+          }
+          else
+          {
+            toDelete.push(item)
+          }
           if (
             item.membership.toLowerCase() == "executive" ||
             item.membership.toLowerCase() == "paid"
@@ -180,13 +200,16 @@ export default class Users extends React.Component {
           ) {
             members.push(item);
           } else if (
-            item.membership.toLowerCase() == "Social Guest".toLowerCase() ||  item.membership.toLowerCase() == "Golf Guest".toLowerCase()
+            item.membership.toLowerCase() == "Social Guest".toLowerCase() ||
+            item.membership.toLowerCase() == "Golf Guest".toLowerCase()
           ) {
             guests.push(item);
           } else {
             unknown.push(item);
           }
         });
+        console.log("These are all users to keep", toKeep);
+        console.log("These are all users to delete", toDelete);
         console.log("This is great", executive);
         console.log("This is members", members);
         console.log("This is guests", guests);
@@ -281,9 +304,7 @@ export default class Users extends React.Component {
     });
   }
 
-  isRegisteredForFutureEvent= (id)=>{
-
-  }
+  isRegisteredForFutureEvent = (id) => {};
 
   blockUserMultiple() {
     const users = this.state.users.slice();
@@ -398,7 +419,6 @@ export default class Users extends React.Component {
       }
     });
   }
-
 
   blockUser(userId, index) {
     const users = this.state.users.slice();
@@ -726,7 +746,7 @@ export default class Users extends React.Component {
                     </div>
 
                     <div className="col-sm-2">
-                    <p>Membership Payment</p>
+                      <p>Membership Payment</p>
                       <select
                         style={{ marginTop: 8 }}
                         onChange={(e) =>
@@ -822,7 +842,7 @@ export default class Users extends React.Component {
 
                       <th>Blocked</th>
                       <th>Edit</th>
-                        <th>Delete</th>
+                      <th>Delete</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -842,8 +862,12 @@ export default class Users extends React.Component {
                             {user.lname}, {user.fname}
                           </td>
                           <td>{user.phone}</td>
-                          <td style={{textTransform:"capitalize"}}>{user.membership}</td>
-                          <td style={{textTransform:"capitalize"}}>{user.membership_fee_status}</td>
+                          <td style={{ textTransform: "capitalize" }}>
+                            {user.membership}
+                          </td>
+                          <td style={{ textTransform: "capitalize" }}>
+                            {user.membership_fee_status}
+                          </td>
                           <th>{user.credit}</th>
                           <th>{user.handicap || 0}</th>
                           <td>
@@ -954,10 +978,7 @@ export default class Users extends React.Component {
                     <tbody>
                       {userList && userList.length >= 1 ? (
                         userList.map((user, index) => {
-                          console.log(
-                            "THis is result ",
-                            user
-                          );
+                          console.log("THis is result ", user);
                           return (
                             <tr key={index}>
                               <td>
@@ -1022,8 +1043,12 @@ export default class Users extends React.Component {
                                 {user.lname}, {user.fname}
                               </td>
                               <td>{user.phone}</td>
-                              <td style={{textTransform:"capitalize"}}>{user.membership}</td>
-                              <td style={{textTransform:"capitalize"}}>{user.membership_fee_status}</td>
+                              <td style={{ textTransform: "capitalize" }}>
+                                {user.membership}
+                              </td>
+                              <td style={{ textTransform: "capitalize" }}>
+                                {user.membership_fee_status}
+                              </td>
                               <th>{user.credit || 0}</th>
                               <th>{user.handicap || 0}</th>
                               <td>
