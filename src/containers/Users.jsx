@@ -4,6 +4,7 @@ import axios from "axios";
 import { CSVLink } from "react-csv";
 // import { Pagination } from "react-bootstrap";
 import classnames from "classnames";
+import firebase from "firebase";
 import {
   getUsers,
   deleteUser,
@@ -167,7 +168,7 @@ export default class Users extends React.Component {
           // names must be equal
           return 0;
         });
-        
+
 
         // let tempUsers = [...sortedUsers];
         // const { activePage } = this.state;
@@ -180,13 +181,11 @@ export default class Users extends React.Component {
         var unknown = [];
         var toKeep = [];
         var toDelete = [];
-        sortedUsers.map((item,index) => {
-          if(keepIndex.includes(index+1))
-          {
+        sortedUsers.map((item, index) => {
+          if (keepIndex.includes(index + 1)) {
             toKeep.push(item)
           }
-          else
-          {
+          else {
             toDelete.push(item)
           }
           if (
@@ -283,6 +282,14 @@ export default class Users extends React.Component {
         this.state.selected.map((userId, index) => {
           deleteUser(userId)
             .then((response) => {
+              //deleting user from authentication
+              // await admin.auth().deleteUser(userId)
+              //   .then(function () {
+              //     console.log("Successfully deleted user");
+              //   })
+              //   .catch(function (error) {
+              //     console.log("Error deleting user:", error);
+              //   })
               const users = this.state.users.slice();
               users.splice(index, 1);
               this.setState({
@@ -304,7 +311,7 @@ export default class Users extends React.Component {
     });
   }
 
-  isRegisteredForFutureEvent = (id) => {};
+  isRegisteredForFutureEvent = (id) => { };
 
   blockUserMultiple() {
     const users = this.state.users.slice();
@@ -554,7 +561,7 @@ export default class Users extends React.Component {
       snackBarVariant,
     } = this.state;
     console.log("This is", this.state.selected);
-    const exportToCSV = () => {};
+    const exportToCSV = () => { };
     var header = ["Sr. #", "Name", "Phone", "Membership", "Blocked"];
     var data = [];
 
@@ -689,7 +696,7 @@ export default class Users extends React.Component {
                         name="search"
                         placeholder="Enter search keyword"
                         value={this.state.q}
-                        // onChange={(event) => this.setState({ q: event.target.value })}
+                      // onChange={(event) => this.setState({ q: event.target.value })}
                       />
                       <span className="input-group-btn">
                         <button
@@ -819,7 +826,7 @@ export default class Users extends React.Component {
                         this.toggle("5");
                       }}
                     >
-                      Unkown
+                      Unknown
                     </NavLink>
                   </NavItem>
                 </Nav>
@@ -933,7 +940,7 @@ export default class Users extends React.Component {
                             type="checkbox"
                             checked={
                               this.state.selected.length ===
-                              this.state.users.length
+                                this.state.users.length
                                 ? true
                                 : false
                             }
