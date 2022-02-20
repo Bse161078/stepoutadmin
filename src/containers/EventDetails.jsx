@@ -91,7 +91,7 @@ export default class EventDetails extends React.Component {
       notification: {
         title: "",
         message: "",
-        TokenArray:[]
+        TokenArray: [],
       },
       otherDescription: RichTextEditor.createEmptyValue(),
       otherDescriptionShow: RichTextEditor.createEmptyValue(),
@@ -161,7 +161,8 @@ export default class EventDetails extends React.Component {
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
-    this.handleNotificationInputChange = this.handleNotificationInputChange.bind(this);
+    this.handleNotificationInputChange =
+      this.handleNotificationInputChange.bind(this);
     this.postEvent = this.postEvent.bind(this);
   }
   componentDidMount() {
@@ -228,19 +229,21 @@ export default class EventDetails extends React.Component {
     }
   };
 
-   getUserNameById = (id,element,participants)=>{
-    var  element = element
+  getUserNameById = (id, element, participants) => {
+    var element = element;
     this.state.allusers.forEach((usetItem) => {
-      console.log("This is the usetItem",element)
+      console.log("This is the usetItem", element);
       if (id == usetItem.uuid) {
         element.fcmToken = usetItem.fcmToken;
         element.name = usetItem.name;
         element.image = usetItem.image;
-        return element
+        element.handicap = usetItem.handicap;
+        element.handicap = usetItem.handicap;
+        return element;
       }
     });
-    return element
-  }
+    return element;
+  };
 
   fetchAllUsers = () => {
     let users = [];
@@ -262,7 +265,7 @@ export default class EventDetails extends React.Component {
           loading: false,
           responseMessage: "No Users Found",
         });
-        this.fetchEventbyId()
+        this.fetchEventbyId();
       })
       .catch((err) => {
         console.log("#######err#####", err);
@@ -288,14 +291,14 @@ export default class EventDetails extends React.Component {
 
         participants.forEach((element) => {
           users.forEach((usetItem) => {
-            console.log("This is the usetItem",element)
+            console.log("This is the usetItem", element);
             if (element.userId == usetItem.uuid) {
               let user = usetItem;
-              user.paid = element.paid|| false;
+              user.paid = element.paid || false;
               user.paid_social = element.paid_social || false;
-              user.waiting_social = element.waiting_social|| false;
-              user.withdrawn = element.withdrawn|| false;
-              user.selectedFood = element.selectedFood ||"";
+              user.waiting_social = element.waiting_social || false;
+              user.withdrawn = element.withdrawn || false;
+              user.selectedFood = element.selectedFood || "";
               user.waiting = element.waiting || false;
               // user.fcmToken =  element.fcmToken;
               filteredUsers.push(user);
@@ -304,25 +307,54 @@ export default class EventDetails extends React.Component {
         });
 
         const paid = participants.filter((element) => {
-          element = this.getUserNameById(element.userId,element,participants);
-          console.log("This is the  element", element, element.guest_first_name==="" ,!element.guest_first_name)
-          return element.paid && !element.withdrawn && !element.waiting &&  !element.guest_first_name;
+          element = this.getUserNameById(element.userId, element, participants);
+          console.log(
+            "This is the  element",
+            element,
+            element.guest_first_name === "",
+            !element.guest_first_name
+          );
+          return (
+            element.paid &&
+            !element.withdrawn &&
+            !element.waiting &&
+            !element.guest_first_name
+          );
         });
         const unPaid = participants.filter((element) => {
-          return !element.paid && !element.waiting_social && !element.paid_social && !element.withdrawn && !element.waiting&& (element.guest_first_name==""|| !element.guest_first_name);
+          return (
+            !element.paid &&
+            !element.waiting_social &&
+            !element.paid_social &&
+            !element.withdrawn &&
+            !element.waiting &&
+            (element.guest_first_name == "" || !element.guest_first_name)
+          );
         });
         const paidSocial = participants.filter((element) => {
           // element.name = element.guest_first_name +" "+element.guest_last_name;
-          return element.paid && !element.withdrawn && !element.waiting&& element.guest_first_name!="" && element.guest_first_name!=null;
+          return (
+            element.paid &&
+            !element.withdrawn &&
+            !element.waiting &&
+            element.guest_first_name != "" &&
+            element.guest_first_name != null
+          );
         });
         const waitingSocial = participants.filter((element) => {
-          console.log("Thsi is  watin social",element.waiting_social)
+          console.log("Thsi is  watin social", element.waiting_social);
           // element.name = element.guest_first_name +" "+element.guest_last_name;
-          return !element.paid &&!element.withdrawn && !element.waiting && element.guest_first_name!=""&& element.guest_first_name!=null
+          return (
+            !element.paid &&
+            !element.withdrawn &&
+            !element.waiting &&
+            element.guest_first_name != "" &&
+            element.guest_first_name != null
+          );
         });
-        console.log("These are paid social",paidSocial)
-        console.log("These are waiting social",waitingSocial)
-        console.log("These are  paid",paid)
+        console.log("These are paid social", paidSocial);
+        console.log("These are waiting social", waitingSocial);
+        console.log("These are  paid", paid);
 
         const withdrawn = filteredUsers.filter((element) => {
           return element.withdrawn;
@@ -430,21 +462,21 @@ export default class EventDetails extends React.Component {
     this.setState({ appEvent });
   }
 
-  handleNotificationInputChange = (event)=> {
+  handleNotificationInputChange = (event) => {
     const { value, name } = event.target;
 
     const { notification } = this.state;
     notification[name] = value;
     this.setState({ notification });
-  }
+  };
 
-  handleNotificationCheckboxChange = (event)=> {
+  handleNotificationCheckboxChange = (event) => {
     const { checked, name } = event.target;
 
     const { notification } = this.state;
     notification[name] = checked;
     this.setState({ notification });
-  }
+  };
 
   handleOtherResultInputChange = (event) => {
     const { value, name } = event.target;
@@ -778,7 +810,7 @@ export default class EventDetails extends React.Component {
     // const list = selectedList.map((obj) => {
     // 	return Object.assign({}, obj);
     // });
-    console.log("THis isthe other result",otherResults)
+    console.log("THis isthe other result", otherResults);
     const list = Object.assign({}, selectedList);
 
     otherResults.ntpPlayer = list;
@@ -849,19 +881,16 @@ export default class EventDetails extends React.Component {
 
   handleChange = (e) => {
     let user = this.state.selectedUser;
-    console.log("THs is the value on change",e.target.value)
+    console.log("THs is the value on change", e.target.value);
     if (e.target.value == "Paid") {
       user.paid = true;
-    } 
-    else if (e.target.value==="Paid (Social)") {
+    } else if (e.target.value === "Paid (Social)") {
       user.paid_social = true;
       user.waiting_social = false;
-    }
-    else if (e.target.value==="Waiting (Social)") {
+    } else if (e.target.value === "Waiting (Social)") {
       user.waiting_social = true;
-      user.paid_social =false;
-    }
-    else if (e.target.value==="Un Paid") {
+      user.paid_social = false;
+    } else if (e.target.value === "Un Paid") {
       user.paid = false;
     }
     this.setState({ selectedUser: user });
@@ -934,7 +963,7 @@ export default class EventDetails extends React.Component {
 
   toggleParticipantPaidStatus = (i) => {};
 
-  postNotification = async (event,tok) => {
+  postNotification = async (event, tok) => {
     var TokenArray = [];
 
     // paidParticipants,
@@ -942,52 +971,38 @@ export default class EventDetails extends React.Component {
     // withdrawnParticipants,
     // paidWaitingParticipants,
     // unPaidWaitingParticipants
-    if(this.state.notification.paid_particiapants)
-    {
-      this.state.paidParticipants.map(
-        (item)=>{
-          TokenArray.push(item.fcmToken)
-        }
-      )
+    if (this.state.notification.paid_particiapants) {
+      this.state.paidParticipants.map((item) => {
+        TokenArray.push(item.fcmToken);
+      });
     }
-    if(this.state.notification.unpaid_particiapants)
-    {
-      this.state.unPaidParticipants.map(
-        (item)=>{
-          TokenArray.push(item.fcmToken)
-        }
-      )
+    if (this.state.notification.unpaid_particiapants) {
+      this.state.unPaidParticipants.map((item) => {
+        TokenArray.push(item.fcmToken);
+      });
     }
-    if(this.state.notification.waiting_paid_particiapants)
-    {
-      this.state.paidWaitingParticipants.map(
-        (item)=>{
-          TokenArray.push(item.fcmToken)
-        }
-      )
+    if (this.state.notification.waiting_paid_particiapants) {
+      this.state.paidWaitingParticipants.map((item) => {
+        TokenArray.push(item.fcmToken);
+      });
     }
-    if(this.state.notification.waiting_unpaid_particiapants)
-    {
-      this.state.unPaidWaitingParticipants.map(
-        (item)=>{
-          TokenArray.push(item.fcmToken)
-        }
-      )
+    if (this.state.notification.waiting_unpaid_particiapants) {
+      this.state.unPaidWaitingParticipants.map((item) => {
+        TokenArray.push(item.fcmToken);
+      });
     }
-    if(TokenArray.length<=0)
-    {
+    if (TokenArray.length <= 0) {
       alert("Please Click at least on checkbox");
-      return
+      return;
     }
 
-    
     event.preventDefault();
     const { match, history } = this.props;
     const { loading, notification, image } = this.state;
     if (!loading) {
       this.setState({ loading: true });
-      notification.TokenArray = JSON.stringify( TokenArray);
-      console.log("THis is the notification being created ",notification)
+      notification.TokenArray = JSON.stringify(TokenArray);
+      console.log("THis is the notification being created ", notification);
       addNotification(notification)
         .then((response) => {
           this.setState({
@@ -1024,12 +1039,14 @@ export default class EventDetails extends React.Component {
     if (appEvent.entry) {
       updatedParticipants.forEach((element) => {
         users.forEach((user) => {
-          console.log("THis ist he element",element)
+          console.log("THis ist he element", element);
           if (user.uuid == element.userId) {
             element.paid = user.paid ? user.paid : false;
             element.waiting = user.waiting ? user.waiting : false;
             element.paid_social = user.paid_social ? user.paid_social : false;
-            element.waiting_social = user.waiting_social ? user.waiting_social : false;
+            element.waiting_social = user.waiting_social
+              ? user.waiting_social
+              : false;
             console.log("This is  user. wating", user);
             // element.registerNumber = updatedParticipants.length + 1;
           }
@@ -1066,9 +1083,8 @@ export default class EventDetails extends React.Component {
   };
 
   deleteParticiapnts = (userId, index) => {
-    const { participants } = this.state;
+    let { participants } = this.state;
     const { match, history } = this.props;
-
     let elementToDelete = {};
 
     participants.forEach((element) => {
@@ -1078,6 +1094,10 @@ export default class EventDetails extends React.Component {
     });
 
     if (match.params.eventId) {
+      participants = participants.map((item) => {
+        delete item.image;
+        return item;
+      });
       updateEventParticipants(match.params.eventId, participants)
         .then((response) => {
           this.setState({
@@ -1101,7 +1121,7 @@ export default class EventDetails extends React.Component {
   };
 
   updateStatus = (event) => {
-    const { participants, selectedUser } = this.state;
+    let { participants, selectedUser } = this.state;
     participants.forEach((element) => {
       if (element.userId === selectedUser.uuid) {
         element.paid = selectedUser.paid;
@@ -1113,8 +1133,11 @@ export default class EventDetails extends React.Component {
 
     event.preventDefault();
     const { match, history } = this.props;
-
     if (match.params.eventId) {
+      participants = participants.map((item) => {
+        delete item.image;
+        return item;
+      });
       updateEventParticipants(match.params.eventId, participants)
         .then((response) => {
           this.setState({
@@ -1364,7 +1387,7 @@ export default class EventDetails extends React.Component {
   };
 
   render() {
-    console.log("THis is notification",this.state.notification)
+    console.log("THis is notification", this.state.notification);
     const {
       appEvent,
       divisions,
@@ -1403,23 +1426,28 @@ export default class EventDetails extends React.Component {
         ? withdrawnParticipants
         : activeTab == "4"
         ? paidWaitingParticipants
-        :activeTab == "5"
+        : activeTab == "5"
         ? unPaidWaitingParticipants
-        :activeTab == "6"
+        : activeTab == "6"
         ? paidSocialParticipants
         : unPaidSocialParticipants;
 
     const { match, history } = this.props;
     const isEdit = !!match.params.eventId;
-    const TokenArray = []
+    const TokenArray = [];
 
-    var header = ["Sr. #", "Name", "Paid","Food Item","Handicap Index"];
+    var header = ["Sr. #", "Name", "Paid", "Food Item", "Handicap Index"];
     var downloadData = [];
     participantstList.map((item, index) => {
-      console.log("This is the great token",item.email)
-      TokenArray.push(item.fcmToken)
-
-      downloadData.push([index + 1, item.name, item.paid,item.selectedFood,item.handicap]);
+      console.log("This is the great token", item.email);
+      TokenArray.push(item.fcmToken);
+      downloadData.push([
+        index + 1,
+        item.name,
+        item.paid,
+        item.selectedFood,
+        item.handicap,
+      ]);
     });
 
     return (
@@ -1870,7 +1898,6 @@ export default class EventDetails extends React.Component {
                             </NavLink>
                           </NavItem>
                         </Nav>
- 
 
                         <div className="table-responsive">
                           <table
@@ -1910,8 +1937,6 @@ export default class EventDetails extends React.Component {
                                     <td>{user.paid ? "Yes" : "No"}</td>
                                     <td>{user.selectedFood}</td>
                                     <td>{user.handicap}</td>
-
-                                    
 
                                     <td>
                                       <Tooltip
@@ -1959,151 +1984,179 @@ export default class EventDetails extends React.Component {
                           </table>
                         </div>
                         <div className="col-12">
-          <div className="row">
-            <div className="col-md-12 col-sm-12">
-              <div className="x_panel">
-                <div className="x_title">
-                  <h2>Send Notification</h2>
-                </div>
-                <div className="x_content">
-                  <br />
-                  <form
-                    id="demo-form2"
-                    data-parsley-validate
-                    className="form-horizontal form-label-left"
-                    onSubmit={(e)=>{
-                      e.preventDefault()
-                      this.postNotification(e,TokenArray)
-                    }}
-                  >
-                    <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">
-                        Title
-                      </label>
-                      <div className="col-md-6 col-sm-6">
-                        <input
-                          required
-                          type="text"
-                          name="title"
-                          className="form-control"
-                          value={this.state.notification.title}
-                          onChange={this.handleNotificationInputChange}
-                        />
-                      </div>
-                    </div>
+                          <div className="row">
+                            <div className="col-md-12 col-sm-12">
+                              <div className="x_panel">
+                                <div className="x_title">
+                                  <h2>Send Notification</h2>
+                                </div>
+                                <div className="x_content">
+                                  <br />
+                                  <form
+                                    id="demo-form2"
+                                    data-parsley-validate
+                                    className="form-horizontal form-label-left"
+                                    onSubmit={(e) => {
+                                      e.preventDefault();
+                                      this.postNotification(e, TokenArray);
+                                    }}
+                                  >
+                                    <div className="form-group row">
+                                      <label className="control-label col-md-3 col-sm-3">
+                                        Title
+                                      </label>
+                                      <div className="col-md-6 col-sm-6">
+                                        <input
+                                          required
+                                          type="text"
+                                          name="title"
+                                          className="form-control"
+                                          value={this.state.notification.title}
+                                          onChange={
+                                            this.handleNotificationInputChange
+                                          }
+                                        />
+                                      </div>
+                                    </div>
 
-                    <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">
-                        Message
-                      </label>
-                      <div className="col-md-6 col-sm-6">
-                        <input
-                          required
-                          type="text"
-                          name="message"
-                          maxLength="80"
-                          className="form-control"
-                          checked={this.state.notification.message}
-                          onChange={this.handleNotificationInputChange}
-                        />
-                      </div>
-                    </div>
-                    <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">
-                        Paid Participants
-                      </label>
-                      <div className="col-md-6 col-sm-6">
-                        <input
-                          // required
-                          type="checkbox"
-                          name="paid_particiapants"
-                          maxLength="80"
-                          className="form-control"
-                          value={this.state.notification.paid_particiapants}
-                          onChange={this.handleNotificationCheckboxChange}
-                        />
-                      </div>
-           
-                    </div>
-                    <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">
-                        Unpaid Participants
-                      </label>
-                      <div className="col-md-6 col-sm-6">
-                        <input
-                          // required
-                          type="checkbox"
-                          name="unpaid_particiapants"
-                          maxLength="80"
-                          className="form-control"
-                          value={this.state.notification.unpaid_particiapants}
-                          onChange={this.handleNotificationCheckboxChange}
-                        />
-                      </div>
-                      </div>
-                      <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">
-                        Waiting (paid) Participants
-                      </label>
-                      <div className="col-md-6 col-sm-6">
-                        <input
-                          // required
-                          type="checkbox"
-                          name="waiting_paid_particiapants"
-                          maxLength="80"
-                          className="form-control"
-                          value={this.state.notification.waiting_paid_particiapants}
-                          onChange={this.handleNotificationCheckboxChange}
-                        />
-                      </div>
-                      </div>
-                      <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">
-                        Waiting (unpaid) Participants
-                      </label>
-                      <div className="col-md-6 col-sm-6">
-                        <input
-                          // required
-                          type="checkbox"
-                          name="waiting_unpaid_particiapants"
-                          maxLength="80"
-                          className="form-control"
-                          value={this.state.notification.waiting_unpaid_particiapants}
-                          onChange={this.handleNotificationCheckboxChange}
-                        />
-                      </div>
-                      </div>
+                                    <div className="form-group row">
+                                      <label className="control-label col-md-3 col-sm-3">
+                                        Message
+                                      </label>
+                                      <div className="col-md-6 col-sm-6">
+                                        <input
+                                          required
+                                          type="text"
+                                          name="message"
+                                          maxLength="80"
+                                          className="form-control"
+                                          checked={
+                                            this.state.notification.message
+                                          }
+                                          onChange={
+                                            this.handleNotificationInputChange
+                                          }
+                                        />
+                                      </div>
+                                    </div>
+                                    <div className="form-group row">
+                                      <label className="control-label col-md-3 col-sm-3">
+                                        Paid Participants
+                                      </label>
+                                      <div className="col-md-6 col-sm-6">
+                                        <input
+                                          // required
+                                          type="checkbox"
+                                          name="paid_particiapants"
+                                          maxLength="80"
+                                          className="form-control"
+                                          value={
+                                            this.state.notification
+                                              .paid_particiapants
+                                          }
+                                          onChange={
+                                            this
+                                              .handleNotificationCheckboxChange
+                                          }
+                                        />
+                                      </div>
+                                    </div>
+                                    <div className="form-group row">
+                                      <label className="control-label col-md-3 col-sm-3">
+                                        Unpaid Participants
+                                      </label>
+                                      <div className="col-md-6 col-sm-6">
+                                        <input
+                                          // required
+                                          type="checkbox"
+                                          name="unpaid_particiapants"
+                                          maxLength="80"
+                                          className="form-control"
+                                          value={
+                                            this.state.notification
+                                              .unpaid_particiapants
+                                          }
+                                          onChange={
+                                            this
+                                              .handleNotificationCheckboxChange
+                                          }
+                                        />
+                                      </div>
+                                    </div>
+                                    <div className="form-group row">
+                                      <label className="control-label col-md-3 col-sm-3">
+                                        Waiting (paid) Participants
+                                      </label>
+                                      <div className="col-md-6 col-sm-6">
+                                        <input
+                                          // required
+                                          type="checkbox"
+                                          name="waiting_paid_particiapants"
+                                          maxLength="80"
+                                          className="form-control"
+                                          value={
+                                            this.state.notification
+                                              .waiting_paid_particiapants
+                                          }
+                                          onChange={
+                                            this
+                                              .handleNotificationCheckboxChange
+                                          }
+                                        />
+                                      </div>
+                                    </div>
+                                    <div className="form-group row">
+                                      <label className="control-label col-md-3 col-sm-3">
+                                        Waiting (unpaid) Participants
+                                      </label>
+                                      <div className="col-md-6 col-sm-6">
+                                        <input
+                                          // required
+                                          type="checkbox"
+                                          name="waiting_unpaid_particiapants"
+                                          maxLength="80"
+                                          className="form-control"
+                                          value={
+                                            this.state.notification
+                                              .waiting_unpaid_particiapants
+                                          }
+                                          onChange={
+                                            this
+                                              .handleNotificationCheckboxChange
+                                          }
+                                        />
+                                      </div>
+                                    </div>
 
-
-                    <div className="ln_solid" />
-                    <div className="form-group row">
-                      <div className="col-md-6 col-sm-6 offset-md-3">
-                        <Button
-                          className={`btn btn-success btn-lg ${
-                            this.state.loading ? "disabled" : ""
-                          }`}
-                        >
-                          <i
-                            className={`fa fa-spinner fa-pulse ${
-                              this.state.loading ? "" : "d-none"
-                            }`}
-                          />
-                          {" Submit"}
-                        </Button>
-                        <Button
-                          onClick={() => history.goBack()}
-                          className={`mx-3 btn btn-danger btn-lg`}
-                        >
-                          Cancel
-                        </Button>
-                      </div>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+                                    <div className="ln_solid" />
+                                    <div className="form-group row">
+                                      <div className="col-md-6 col-sm-6 offset-md-3">
+                                        <Button
+                                          className={`btn btn-success btn-lg ${
+                                            this.state.loading ? "disabled" : ""
+                                          }`}
+                                        >
+                                          <i
+                                            className={`fa fa-spinner fa-pulse ${
+                                              this.state.loading ? "" : "d-none"
+                                            }`}
+                                          />
+                                          {" Submit"}
+                                        </Button>
+                                        <Button
+                                          onClick={() => history.goBack()}
+                                          className={`mx-3 btn btn-danger btn-lg`}
+                                        >
+                                          Cancel
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  </form>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
 
@@ -2549,7 +2602,6 @@ export default class EventDetails extends React.Component {
                               </Tooltip>
                             )}
                           </td>
-                        
 
                           <td
                             onClick={() => {
@@ -2581,7 +2633,8 @@ export default class EventDetails extends React.Component {
                           <td
                             onClick={() => {
                               let allUsers = this.state.users;
-                              allUsers[index].waiting_social = !user.waiting_social;
+                              allUsers[index].waiting_social =
+                                !user.waiting_social;
                               allUsers[index].paid_social = false;
                               this.setState({ users: allUsers });
                               this.selectUser(index);
@@ -2605,9 +2658,6 @@ export default class EventDetails extends React.Component {
                               </Tooltip>
                             )}
                           </td>
-                       
-
-
                         </tr>
                       ))
                     ) : (
@@ -2683,8 +2733,10 @@ export default class EventDetails extends React.Component {
                 <select
                   value={
                     this.state.selectedUser && this.state.selectedUser.paid
-                      ? "Paid":this.state.selectedUser.paid_social
-                      ? "Paid  Social":this.state.selectedUser.waiting_social
+                      ? "Paid"
+                      : this.state.selectedUser.paid_social
+                      ? "Paid  Social"
+                      : this.state.selectedUser.waiting_social
                       ? "Upaid Social"
                       : "Un Paid"
                   }

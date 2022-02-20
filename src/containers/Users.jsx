@@ -169,7 +169,6 @@ export default class Users extends React.Component {
           return 0;
         });
 
-
         // let tempUsers = [...sortedUsers];
         // const { activePage } = this.state;
         // const indexOfLastTodo = activePage * 10;
@@ -183,10 +182,9 @@ export default class Users extends React.Component {
         var toDelete = [];
         sortedUsers.map((item, index) => {
           if (keepIndex.includes(index + 1)) {
-            toKeep.push(item)
-          }
-          else {
-            toDelete.push(item)
+            toKeep.push(item);
+          } else {
+            toDelete.push(item);
           }
           if (
             item.membership.toLowerCase() == "executive" ||
@@ -248,14 +246,24 @@ export default class Users extends React.Component {
       if (result.value) {
         deleteUser(userId)
           .then((response) => {
-            const users = this.state.users.slice();
-            users.splice(index, 1);
+            const users = [...this.state.users]; // this.state.users.slice();
+            let selectedIndex = null;
+            users.forEach((user, index) => {
+              if (user.uuid === userId) {
+                selectedIndex = index;
+              }
+            });
+            if (selectedIndex) {
+              users.splice(selectedIndex, 1);
+            }
+
             this.setState({
-              users,
+              users: [...users],
               showSnackBar: true,
               snackBarMessage: "User deleted successfully",
               snackBarVariant: "success",
             });
+            this.fetchUsers();
           })
           .catch(() => {
             this.setState({
@@ -279,6 +287,7 @@ export default class Users extends React.Component {
       confirmButtonText: "Delete",
     }).then((result) => {
       if (result.value) {
+        console.log("dddd", this.state.selected);
         this.state.selected.map((userId, index) => {
           deleteUser(userId)
             .then((response) => {
@@ -298,6 +307,7 @@ export default class Users extends React.Component {
                 snackBarMessage: "User deleted successfully",
                 snackBarVariant: "success",
               });
+              this.fetchUsers();
             })
             .catch(() => {
               this.setState({
@@ -311,7 +321,7 @@ export default class Users extends React.Component {
     });
   }
 
-  isRegisteredForFutureEvent = (id) => { };
+  isRegisteredForFutureEvent = (id) => {};
 
   blockUserMultiple() {
     const users = this.state.users.slice();
@@ -338,6 +348,7 @@ export default class Users extends React.Component {
                 snackBarMessage: "User blocked successfully",
                 snackBarVariant: "success",
               });
+              this.fetchUsers();
             })
             .catch(() => {
               this.setState({
@@ -454,6 +465,7 @@ export default class Users extends React.Component {
                 : "User blocked successfully",
               snackBarVariant: "success",
             });
+            this.fetchUsers();
           })
           .catch(() => {
             this.setState({
@@ -561,7 +573,7 @@ export default class Users extends React.Component {
       snackBarVariant,
     } = this.state;
     console.log("This is", this.state.selected);
-    const exportToCSV = () => { };
+    const exportToCSV = () => {};
     var header = ["Sr. #", "Name", "Phone", "Membership", "Blocked"];
     var data = [];
 
@@ -569,7 +581,7 @@ export default class Users extends React.Component {
       <RootConsumer>
         {(context) => {
           globalContext = context;
-          console.log("This is event tab", context.userTab);
+          // console.log("This is event tab", context.userTab);
 
           var userList = [];
           if (context.userTab == "1") {
@@ -641,7 +653,7 @@ export default class Users extends React.Component {
           } else if (context.userTab == "5") {
             userList = this.state.unknown;
           }
-          console.log("THis is the user list", userList);
+          // console.log("THis is the user list", userList);
           return (
             <div className="row animated fadeIn">
               {showSnackBar && (
@@ -696,7 +708,7 @@ export default class Users extends React.Component {
                         name="search"
                         placeholder="Enter search keyword"
                         value={this.state.q}
-                      // onChange={(event) => this.setState({ q: event.target.value })}
+                        // onChange={(event) => this.setState({ q: event.target.value })}
                       />
                       <span className="input-group-btn">
                         <button
@@ -940,12 +952,12 @@ export default class Users extends React.Component {
                             type="checkbox"
                             checked={
                               this.state.selected.length ===
-                                this.state.users.length
+                              this.state.users.length
                                 ? true
                                 : false
                             }
                             onChange={(e) => {
-                              console.log("This is temp");
+                              console.log("This is temp", context.userTab);
                               if (
                                 this.state.selected.length ===
                                 this.state.users.length
@@ -958,8 +970,36 @@ export default class Users extends React.Component {
                                 var temp = [];
                                 var tempIndex = [];
                                 this.state.users.map((user, index) => {
-                                  temp.push(user.uuid);
-                                  tempIndex.push(index);
+                                  if (context.userTab === "1") {
+                                    temp.push(user.uuid);
+                                    tempIndex.push(index);
+                                  } else if (
+                                    context.userTab === "2" &&
+                                    user.membership.toLowerCase() ===
+                                      "executive"
+                                  ) {
+                                    temp.push(user.uuid);
+                                    tempIndex.push(index);
+                                  } else if (
+                                    context.userTab === "3" &&
+                                    user.membership.toLowerCase() === "member"
+                                  ) {
+                                    temp.push(user.uuid);
+                                    tempIndex.push(index);
+                                  } else if (
+                                    context.userTab === "4" &&
+                                    user.membership.toLowerCase() ===
+                                      "golf guest"
+                                  ) {
+                                    temp.push(user.uuid);
+                                    tempIndex.push(index);
+                                  } else if (
+                                    context.userTab === "5" &&
+                                    user.membership.toLowerCase() === "unknown"
+                                  ) {
+                                    temp.push(user.uuid);
+                                    tempIndex.push(index);
+                                  }
                                 });
                                 this.setState({
                                   selected: temp,
@@ -985,7 +1025,7 @@ export default class Users extends React.Component {
                     <tbody>
                       {userList && userList.length >= 1 ? (
                         userList.map((user, index) => {
-                          console.log("THis is result ", user);
+                          // console.log("THis is result ", user);
                           return (
                             <tr key={index}>
                               <td>
