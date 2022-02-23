@@ -630,7 +630,7 @@ class Events extends React.Component {
                         <th>Open</th>
                         
                         {eventList != pastEvents ? <th>Entry</th> : null}
-                        {eventList != pastEvents ? <th>Food Entry</th> : null}
+                        {eventList != pastEvents ? <th>Special Request</th> : null}
                         {<th>Edit</th>}
                         {<th>Delete</th>}
                       </tr>

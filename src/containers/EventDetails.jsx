@@ -1025,7 +1025,7 @@ export default class EventDetails extends React.Component {
   };
 
   saveParticiapnts = (event) => {
-    const {
+    let {
       updatedParticipants,
       users,
       paidParticipants,
@@ -1054,6 +1054,10 @@ export default class EventDetails extends React.Component {
       });
       console.log("This is updated participants", updatedParticipants);
       if (match.params.eventId) {
+        updatedParticipants = updatedParticipants.map((item) => {
+          delete item.image;
+          return item;
+        });
         updateEventParticipants(match.params.eventId, updatedParticipants)
           .then((response) => {
             this.setState({
@@ -1086,7 +1090,6 @@ export default class EventDetails extends React.Component {
     let { participants } = this.state;
     const { match, history } = this.props;
     let elementToDelete = {};
-
     participants.forEach((element) => {
       if (element.userId == userId) {
         element.withdrawn = true;
@@ -1910,7 +1913,7 @@ export default class EventDetails extends React.Component {
                                 <th>Name</th>
                                 <th>Image</th>
                                 <th>Paid</th>
-                                <th>Selected Food</th>
+                                <th>Special Request</th>
                                 <th>Handicap Index</th>
                                 <th>Edit</th>
                                 <th>Delete</th>
@@ -1964,7 +1967,7 @@ export default class EventDetails extends React.Component {
                                           aria-hidden="true"
                                           onClick={() =>
                                             this.deleteParticiapnts(
-                                              user.uuid,
+                                              user.userId,
                                               index
                                             )
                                           }
