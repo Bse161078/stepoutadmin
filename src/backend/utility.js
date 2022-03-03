@@ -3,13 +3,13 @@ import firebase from "firebase";
 
 export async function connectFirebase() {
     const firebaseConfig = {
-      apiKey: "AIzaSyBS7sW8y4EL12VVw2iFxzeWLccqmZG6BD0",
-      authDomain: "sneakerlog-c7664.firebaseapp.com",
-      databaseURL: "https://sneakerlog-c7664.firebaseio.com",
-      projectId: "sneakerlog-c7664",
-      storageBucket: "sneakerlog-c7664.appspot.com",
-      messagingSenderId: "657981798987",
-      appId: "1:657981798987:web:b910a2849ef0e30ab22bce"
+      apiKey: "AIzaSyAzpJWqF1QM-ky4jYGs9qXbl9qLZLgAw1U",
+      authDomain: "nuga-test.firebaseapp.com",
+      projectId: "nuga-test",
+      storageBucket: "nuga-test.appspot.com",
+      messagingSenderId: "648610325258",
+      appId: "1:648610325258:web:8a6a2b0b92f2033b2a90f3",
+      measurementId: "G-77SK58XF0T"
     };
   // Initialize Firebase
   if (!firebase.apps.length) {

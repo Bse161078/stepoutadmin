@@ -99,7 +99,7 @@ class Login extends Component {
         .then((doc) => {
           if (doc.exists) {
             // console.log("Document data:", doc.data());
-            // console.log("signInResult:", userId);
+             console.log("signInResult:", userId);
             Cookie.set("sneakerlog_access_token", { expires: 14 });
             this.props.history.push("/events");
           } else {

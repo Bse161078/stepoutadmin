@@ -624,7 +624,7 @@ class Events extends React.Component {
                         <th>Date</th>
                         <th>Time</th>
                         <th>About</th>
-                        <th>Food Item</th>
+                        <th>Request Message</th>
                         <th>Start Sheet Url</th>
                         <th>Result Page Url</th>
                         <th>Open</th>

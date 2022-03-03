@@ -20,7 +20,7 @@ import Swal from "sweetalert2";
 import ReactHTMLTableToExcel from "react-html-table-to-excel";
 import { Nav, NavItem, NavLink } from "reactstrap";
 
-import { API_END_POINT } from "../config";
+import  {API_END_POINT}  from "../config";
 import Cookie from "js-cookie";
 import { Tooltip } from "@material-ui/core";
 

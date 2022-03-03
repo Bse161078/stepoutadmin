@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef,useState } from "react";
 import axios from "axios";
 import RichTextEditor from "react-rte";
 import {
@@ -63,13 +63,20 @@ import { CSVLink } from "react-csv";
 var subtitle;
 
 export default class EventDetails extends React.Component {
+  
   constructor(props) {
     super(props);
     this.state = {
       loading: false,
+      selected: [],
+        selectedIndex: [],
+        events: [],
+        allCheckBox:false,
+        checkbox:false,
       appEvent: {
         name: "",
         date: "",
+        
         time: {},
         location: "",
         about: "",
@@ -78,7 +85,10 @@ export default class EventDetails extends React.Component {
         ntpPlayer: [],
         longestDrivePlayer: [],
         lowestGrosePlayer: [],
+       
+        
       },
+    
       otherResults: {
         ntp: "",
         longestDrive: "",
@@ -1419,6 +1429,10 @@ export default class EventDetails extends React.Component {
       unPaidWaitingParticipants,
       paidSocialParticipants,
       unPaidSocialParticipants,
+      selected: [],
+        selectedIndex: [],
+        events: [],
+      
     } = this.state;
     const participantstList =
       activeTab == "1"
@@ -1439,7 +1453,7 @@ export default class EventDetails extends React.Component {
     const isEdit = !!match.params.eventId;
     const TokenArray = [];
 
-    var header = ["Sr. #", "Name", "Paid", "Food Item", "Handicap Index"];
+    var header = ["Sr. #", "Name", "Paid", "FoodItem", "Handicap Index"];
     var downloadData = [];
     participantstList.map((item, index) => {
       console.log("This is the great token", item.email);
@@ -1452,7 +1466,8 @@ export default class EventDetails extends React.Component {
         item.handicap,
       ]);
     });
-
+    //  const [count,setCount] = useState(0)
+    console.log("allcheckbox",this.state.participants,this.state.selectedIndex,this.state.selected)
     return (
       <div className="row animated fadeIn">
         {showSnackBar && (
@@ -1786,7 +1801,7 @@ export default class EventDetails extends React.Component {
                             <h3>List of Participants</h3>
                           </div>
                           {/* <div className="col-sm-2"></div> */}
-                          <div className="col-sm-2 pull-right mobile-space">
+                          {this.state.selected.length <= 1 && <div className="col-sm-2 pull-right mobile-space">
                             <button
                               type="button"
                               className="btn btn-success"
@@ -1794,7 +1809,7 @@ export default class EventDetails extends React.Component {
                             >
                               Add New Participants
                             </button>
-                          </div>
+                          </div>}
                           <div className="col-sm-4 pull-right mobile-space">
                             {/* <ReactHTMLTableToExcel
                               id="test-table-xls-button"
@@ -1803,15 +1818,63 @@ export default class EventDetails extends React.Component {
                               filename="Users"
                               sheet="tablexls"
                               buttonText="Download as XLS"
-                            /> */}
-                            <CSVLink
+                              /> */}
+                                           
+                  {this.state.selected.length > 1 && (
+                  <div className="row space-1">
+                    <div className="col-sm-6"></div>
+                    {/* <div className="col-sm-4"></div> */}
+                    <div className="col-sm-2 pull-right mobile-space">
+                      <button
+                      
+                        type="button"
+                        className="btn btn-danger"
+                        onClick={() => 
+                         this.state.selected.map((userid)=>{
+                         
+                          
+                         this.deleteParticiapnts(userid,this.state.selectedIndex.map((index)=>index))
+                        
+                          
+                        })
+                         
+                        }
+                      >
+                        Delete Multiple Participants
+                      </button>
+                    </div>
+
+                    <div className="col-sm-2 pull-left mobile-space">
+                      <button
+                  
+                        type="button"
+                        className="btn btn-danger"
+                        onClick={() => this.state.selectedUser.map((user)=>{
+                         
+                          
+                          this.onpenStatusModal(user)
+                         
+                           
+                         })
+                        
+                        }
+                      >
+                        Update Multiple Participants
+                      </button>
+                    </div>
+                 
+                  </div>
+                )}
+
+
+{this.state.selected.length <= 1 &&<CSVLink
                               className="btn btn-success"
                               filename={"Participants.csv"}
                               data={downloadData}
                               headers={header}
                             >
                               Download CSV
-                            </CSVLink>
+                            </CSVLink>}
                           </div>
                         </div>
 
@@ -1909,6 +1972,44 @@ export default class EventDetails extends React.Component {
                           >
                             <thead>
                               <tr>
+                             <th> <input
+                            type="checkbox" 
+                           
+                            checked={
+                              this.state.selectedIndex.length ===
+                              this.state.participants.length
+                                ? true
+                                : false
+                            }
+                            onChange={(e) => {
+                              console.log("This is temp");
+                              if (
+                                this.state.selectedIndex.length ===
+                                this.state.participants.length
+                              ) {
+                                this.setState({
+                                  selectedIndex: [],
+                                  selected: [],
+                                });
+                              } else {
+                                var temp = [];
+                                var tempIndex = [];
+                                var tempuser = [];
+                                this.state.participants.map((event, index) => {
+                                  temp.push(event.userId);
+                                  tempIndex.push(index);
+                                  tempuser.push(event)
+                              
+                                });
+                                this.setState({
+                                  selectedIndex: tempIndex,
+                                  selectedUser:tempuser,
+                                  selected: temp,
+                                });
+                              }
+                            }}
+                        
+                            /></th>
                                 <th>Sr. #</th>
                                 <th>Name</th>
                                 <th>Image</th>
@@ -1923,7 +2024,59 @@ export default class EventDetails extends React.Component {
                             <tbody>
                               {participantstList && participantstList.length ? (
                                 participantstList.map((user, index) => (
+
                                   <tr key={index}>
+                                    <td><input
+                            type="checkbox" 
+                            checked={
+                              this.state.selected.includes(user.userId)
+                                ? true
+                                : false
+                            }
+                            onChange={(e) => {
+                              console.log("This is temp");
+                              if (
+                                this.state.selected.includes(user.userId)
+                              ) {
+                                var temp = [];
+                                var tempIndex = [];
+                                this.state.selected.map((id, index) => {
+                                  if (id != user.userId) {
+                                    console.log(
+                                      "This is true",
+                                      user.userId,
+                                      id
+                                    );
+                                    temp.push(id);
+                                    tempIndex.push(
+                                      this.state.selectedIndex[index]
+                                    );
+                                  }
+                                });
+                                console.log(
+                                  "This is temmp after removing",
+                                  temp
+                                );
+                                this.setState({
+                                  selected: temp,
+                                  selectedIndex: tempIndex,
+                                });
+                              } else {
+                                var temp = this.state.selected;
+                                var tempIndex = this.state.selectedIndex;
+                                var tempuser = []
+                                temp.push(user.userId);
+                                tempIndex.push(index);
+                                tempuser.push(user)
+                                this.setState({
+                                  selected : temp,
+                                  selectedIndex : tempIndex,
+                                  selectedUser : tempuser
+                                });
+                              }
+                            }}
+                            
+                            /></td>
                                     <td>{index + 1}</td>
                                     <td>{user.name}</td>
                                     <td>
@@ -1940,7 +2093,7 @@ export default class EventDetails extends React.Component {
                                     <td>{user.paid ? "Yes" : "No"}</td>
                                     <td>{user.selectedFood}</td>
                                     <td>{user.handicap}</td>
-
+                                  
                                     <td>
                                       <Tooltip
                                         title="Update Status"
