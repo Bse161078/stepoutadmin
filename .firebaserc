@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "nuga-test"
-  }
+    "default": "nuga-test",
+    "nuga": "nuga-test"
+  },
+  "targets": {}
 }

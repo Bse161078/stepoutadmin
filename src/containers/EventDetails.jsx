@@ -1848,7 +1848,7 @@ export default class EventDetails extends React.Component {
                       <button
                   
                         type="button"
-                        className="btn btn-danger"
+                        className="btn btn-success"
                         onClick={() => this.state.selectedUser.map((user)=>{
                          
                           
@@ -1982,7 +1982,7 @@ export default class EventDetails extends React.Component {
                                 : false
                             }
                             onChange={(e) => {
-                              console.log("This is temp");
+                              console.log("This is temp",this.state.selectedIndex);
                               if (
                                 this.state.selectedIndex.length ===
                                 this.state.participants.length
