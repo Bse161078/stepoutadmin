@@ -161,6 +161,7 @@ export default class EventDetails extends React.Component {
       activeTab: "1",
       modalIsOpen: false,
       statusModal: false,
+      multiplestatusModal:false,
       divsionIsOpen: false,
       otherResultModal: false,
       pairingModal: false,
@@ -168,8 +169,8 @@ export default class EventDetails extends React.Component {
       selectedDivisionIndex: null,
       selectedGroupIndex: null,
       selectedUser: {},
-    };
 
+    };
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleNotificationInputChange =
       this.handleNotificationInputChange.bind(this);
@@ -717,8 +718,20 @@ export default class EventDetails extends React.Component {
 
   toggleStatusModal = () => {
     this.setState({ statusModal: !this.state.statusModal });
+    this.state.selectedIndex.length=0
+    this.setState({
+      selectedIndex: [],
+      selected: [],
+    });
   };
-
+  toggleMultipleStatusModal = () => {
+    this.setState({ multiplestatusModal: !this.state.multiplestatusModal });
+    this.state.selectedIndex.length=0
+    this.setState({
+      selectedIndex: [],
+      selected: [],
+    });
+  };
   toggleDivisionModal = (index = null, item = null) => {
     const divisionPlayerList = [...this.state.filteredUsers];
     if (index != null && item != null) {
@@ -741,10 +754,19 @@ export default class EventDetails extends React.Component {
   toggleOtherResultModal = () => {
     this.setState({ otherResultModal: !this.state.otherResultModal });
   };
-
+  
   onpenStatusModal = (user) => {
     this.setState({ selectedUser: user });
     this.setState({ statusModal: true });
+  };
+  onpenMultipleStatusModal = (user) => {
+    
+    this.setState({ SelectedUser: user})
+    // filterSelectedUser.push(user)
+// console.log(filterSelectedUser,'===user==== modal=============================');
+// console.log(filterSelectedUser);
+console.log('=======user=============================');
+    this.setState({ multiplestatusModal: true });
   };
 
   togglePairingsModal = (index = null, item = null) => {
@@ -970,6 +992,7 @@ export default class EventDetails extends React.Component {
     }
     this.setState({ users, updatedParticipants: temp });
   };
+  
 
   toggleParticipantPaidStatus = (i) => {};
 
@@ -1134,6 +1157,7 @@ export default class EventDetails extends React.Component {
   };
 
   updateStatus = (event) => {
+    event.preventDefault();
     let { participants, selectedUser } = this.state;
     participants.forEach((element) => {
       if (element.userId === selectedUser.uuid) {
@@ -1144,7 +1168,6 @@ export default class EventDetails extends React.Component {
       }
     });
 
-    event.preventDefault();
     const { match, history } = this.props;
     if (match.params.eventId) {
       participants = participants.map((item) => {
@@ -1161,6 +1184,11 @@ export default class EventDetails extends React.Component {
           });
           this.toggleStatusModal();
           this.fetchEventbyId();
+          this.state.selectedIndex.length=0
+          this.setState({
+            selectedIndex: [],
+            selected: [],
+          });
         })
         .catch((err) => {
           console.log("err:", err);
@@ -1174,7 +1202,52 @@ export default class EventDetails extends React.Component {
         });
     }
   };
+  updateMultipleStatus = (event) => {
+    event.preventDefault();
+    let { participants, selectedUser } = this.state;
+    participants.forEach((element) => {
+      if (element.userId === selectedUser.uuid) {
+        element.paid = selectedUser.paid;
+        element.waiting = selectedUser.waiting;
+        element.paid_social = selectedUser.paid_social;
+        element.waiting_social = selectedUser.waiting_social;
+      }
+    });
 
+    const { match, history } = this.props;
+    if (match.params.eventId) {
+      participants = participants.map((item) => {
+        delete item.image;
+        return item;
+      });
+      updateEventParticipants(match.params.eventId, participants)
+        .then((response) => {
+          this.setState({
+            loading: false,
+            showSnackBar: true,
+            snackBarMessage: "Event updated successfully",
+            snackBarVariant: "success",
+          });
+          this.toggleStatusModal();
+          this.fetchEventbyId();
+          this.state.selectedIndex.length=0
+          this.setState({
+            selectedIndex: [],
+            selected: [],
+          });
+        })
+        .catch((err) => {
+          console.log("err:", err);
+          this.setState({
+            loading: false,
+            showSnackBar: true,
+            snackBarMessage: "Error updating event",
+            snackBarVariant: "error",
+          });
+          this.toggleStatusModal();
+        });
+    }
+  };
   addDivision = async (event) => {
     const { divisions, division, selectedDivisionIndex } = this.state;
     event.preventDefault();
@@ -1353,6 +1426,7 @@ export default class EventDetails extends React.Component {
           this.togglePairingsModal();
         });
     }
+    // getWorkoutDays()
   };
 
   deleteGroup = async (group) => {
@@ -1435,17 +1509,17 @@ export default class EventDetails extends React.Component {
       
     } = this.state;
     const participantstList =
-      activeTab == "1"
+      activeTab === "1"
         ? paidParticipants
-        : activeTab == "2"
+        : activeTab === "2"
         ? unPaidParticipants
-        : activeTab == "3"
+        : activeTab === "3"
         ? withdrawnParticipants
-        : activeTab == "4"
+        : activeTab === "4"
         ? paidWaitingParticipants
-        : activeTab == "5"
+        : activeTab === "5"
         ? unPaidWaitingParticipants
-        : activeTab == "6"
+        : activeTab === "6"
         ? paidSocialParticipants
         : unPaidSocialParticipants;
 
@@ -1457,7 +1531,7 @@ export default class EventDetails extends React.Component {
     var downloadData = [];
     participantstList.map((item, index) => {
       console.log("This is the great token", item.email);
-      TokenArray.push(item.fcmToken);
+      TokenArray.push(item.fcmToken); 
       downloadData.push([
         index + 1,
         item.name,
@@ -1832,6 +1906,7 @@ export default class EventDetails extends React.Component {
                         onClick={() => 
                          this.state.selected.map((userid)=>{
                          
+                         console.log(this.state.selected,' this.state.selectedUser')
                           
                          this.deleteParticiapnts(userid,this.state.selectedIndex.map((index)=>index))
                         
@@ -1850,9 +1925,11 @@ export default class EventDetails extends React.Component {
                         type="button"
                         className="btn btn-success"
                         onClick={() => this.state.selectedUser.map((user)=>{
-                         
+                         console.log(user.name,' this.state.selectedUser')
+                          // this.setState.selectedUser({users:user})
+                       
                           
-                          this.onpenStatusModal(user)
+                          this.onpenMultipleStatusModal(user.name)
                          
                            
                          })
@@ -1977,15 +2054,16 @@ export default class EventDetails extends React.Component {
                            
                             checked={
                               this.state.selectedIndex.length ===
-                              this.state.participants.length
+                              participantstList.length
                                 ? true
                                 : false
                             }
                             onChange={(e) => {
-                              console.log("This is temp",this.state.selectedIndex);
+                              console.log("selected",this.state.selected);
+                              
                               if (
                                 this.state.selectedIndex.length ===
-                                this.state.participants.length
+                                participantstList.length
                               ) {
                                 this.setState({
                                   selectedIndex: [],
@@ -1995,7 +2073,8 @@ export default class EventDetails extends React.Component {
                                 var temp = [];
                                 var tempIndex = [];
                                 var tempuser = [];
-                                this.state.participants.map((event, index) => {
+                                participantstList.map((event, index) => {
+                                  console.log(participantstList)
                                   temp.push(event.userId);
                                   tempIndex.push(index);
                                   tempuser.push(event)
@@ -2023,8 +2102,8 @@ export default class EventDetails extends React.Component {
 
                             <tbody>
                               {participantstList && participantstList.length ? (
+                                console.log(participantstList,'participantstList'),
                                 participantstList.map((user, index) => (
-
                                   <tr key={index}>
                                     <td><input
                             type="checkbox" 
@@ -2830,10 +2909,10 @@ export default class EventDetails extends React.Component {
           </ModalBody>
           <ModalFooter>
             <Button color="primary" onClick={this.saveParticiapnts}>
-              Save
+              Save  
             </Button>
             <Button color="secondary" onClick={this.toggleModal}>
-              Cancel
+              Cancel 
             </Button>
           </ModalFooter>
         </Modal>
@@ -2843,7 +2922,7 @@ export default class EventDetails extends React.Component {
           toggle={this.toggleStatusModal} /* className={className} */
         >
           <ModalHeader toggle={this.toggleStatusModal}>
-            Update Participant Status
+          Update Participant Status
           </ModalHeader>
           <ModalBody>
             <div className="form-group row">
@@ -2927,15 +3006,114 @@ export default class EventDetails extends React.Component {
           </ModalBody>
           <ModalFooter>
             <Button color="primary" onClick={this.updateStatus}>
-              Save
+              Save 
             </Button>
             <Button color="secondary" onClick={this.toggleStatusModal}>
               Cancel
             </Button>
           </ModalFooter>
         </Modal>
+  {/* Modal for update group events */}
+        <Modal
+          isOpen={this.state.multiplestatusModal}
+          toggle={this.toggleMultipleStatusModal} /* className={className} */
+        >
+          <ModalHeader toggle={this.toggleMultipleStatusModal}>
+          Update Participant Status
+          </ModalHeader>
+          <ModalBody>
+            {/* <div className="form-group row">
+              <label className="control-label col-md-3 col-sm-3">Image</label>
+              <div className="col-md-6 col-sm-6">
+                <img
+                  style={{ marginRight: "5px" }}
+                  width="100"
+                  className="img-fluid"
+                  src={`${
+                    this.state.selectedUser &&
+                    this.state.selectedUser.profileImage
+                  }`}
+                  alt="profileImage"
+                />
+              </div>
+            </div> */}
 
-        <Modal isOpen={this.state.divsionIsOpen} /* className={className} */>
+            <div className="form-group row">
+              <label className="control-label col-md-3 col-sm-3">
+                Name of Participant
+              </label>
+              <div className="col-md-6 col-sm-6">
+              {console.log(this.state.selectedUser,"okkkkkokoko")}
+                <input
+                  disabled
+                  required
+                  type="text"
+                  name="name"
+                  className="form-control"
+                  value={
+                    this.state.selectedUser && this.state.selectedUser.name
+                  }
+                  onChange={this.handleInputChange}
+                />
+              </div>
+            </div>
+
+            <div className="form-group row">
+              <label className="control-label col-md-3 col-sm-3">Paid</label>
+              <div className="col-md-6 col-sm-6">
+                {/* <input type="select" required type="number" name="fee" className="form-control" value={appEvent.fee} onChange={this.handleInputChange} /> */}
+                {/* <ButtonToggle color="primary">primary</ButtonToggle> */}
+                <select
+                  value={
+                    this.state.selectedUser && this.state.selectedUser.paid
+                      ? "Paid"
+                      : this.state.selectedUser.paid_social
+                      ? "Paid  Social"
+                      : this.state.selectedUser.waiting_social
+                      ? "Upaid Social"
+                      : "Un Paid"
+                  }
+                  onChange={this.handleChange}
+                >
+                  <option name="paid">Paid</option>
+                  <option name="unpaid">Un Paid</option>
+                  <option name="paid_social">Paid (Social)</option>
+                  <option name="waiting_social">Waiting (Social)</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="form-group row">
+              <label className="control-label col-md-3 col-sm-3">Waiting</label>
+              <div className="col-md-6 col-sm-6">
+                {/* <input type="select" required type="number" name="fee" className="form-control" value={appEvent.fee} onChange={this.handleInputChange} /> */}
+                {/* <ButtonToggle color="primary">primary</ButtonToggle> */}
+                <select
+                  value={
+                    this.state.selectedUser && this.state.selectedUser.waiting
+                      ? "Waiting"
+                      : "Active"
+                  }
+                  onChange={this.handleChangeWaiting}
+                >
+                  <option name="waiting">Waiting</option>
+                  <option name="active">Active</option>
+                </select>
+              </div>
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button color="primary" onClick={this.updateMultipleStatus}>
+              Save 
+            </Button>
+            <Button color="secondary" onClick={this.toggleMultipleStatusModal}>
+              Cancel
+            </Button>
+          </ModalFooter>
+        </Modal>
+  
+  
+    <Modal isOpen={this.state.divsionIsOpen} /* className={className} */>
           <ModalHeader toggle={this.toggleDivisionModal}>
             Add New Division
           </ModalHeader>
@@ -3188,7 +3366,7 @@ export default class EventDetails extends React.Component {
           </ModalBody>
           <ModalFooter>
             <Button color="primary" onClick={this.addOtherResult}>
-              Save
+              Save 
             </Button>
             <Button color="secondary" onClick={this.toggleOtherResultModal}>
               Cancel
@@ -3273,7 +3451,7 @@ export default class EventDetails extends React.Component {
           </ModalBody>
           <ModalFooter>
             <Button color="primary" onClick={this.addGroup}>
-              Save
+              Save  
             </Button>
             <Button
               color="secondary"

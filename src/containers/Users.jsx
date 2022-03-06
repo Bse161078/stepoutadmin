@@ -387,6 +387,13 @@ export default class Users extends React.Component {
                 snackBarVariant: "success",
               });
               this.fetchUsers();
+              this.state.selectedIndex.length=0
+              this.setState({
+                selectedIndex: [],
+                selected: [],
+              });
+              this.fetchUsers();
+
             })
             .catch(() => {
               this.setState({
@@ -398,6 +405,7 @@ export default class Users extends React.Component {
         });
       }
     });
+   
   }
 
   changeMembershipStatusMultiple(e) {
@@ -425,6 +433,11 @@ export default class Users extends React.Component {
                 snackBarVariant: "success",
               });
               this.fetchUsers();
+              this.state.selectedIndex.length=0
+    this.setState({
+      selectedIndex: [],
+      selected: [],
+    });
             })
             .catch(() => {
               this.setState({
@@ -436,6 +449,7 @@ export default class Users extends React.Component {
         });
       }
     });
+    
   }
 
   blockUser(userId, index) {
@@ -653,7 +667,7 @@ export default class Users extends React.Component {
           } else if (context.userTab == "5") {
             userList = this.state.unknown;
           }
-          // console.log("THis is the user list", userList);
+          console.log("THis is the user list", userList);
           return (
             <div className="row animated fadeIn">
               {showSnackBar && (
@@ -951,16 +965,17 @@ export default class Users extends React.Component {
                           <input
                             type="checkbox"
                             checked={
-                              this.state.selected.length ===
-                              this.state.users.length
+                              this.state.selectedIndex.length ===
+                              userList.length
                                 ? true
                                 : false
                             }
+                           
                             onChange={(e) => {
                               console.log("This is temp", context.userTab);
                               if (
                                 this.state.selected.length ===
-                                this.state.users.length
+                                userList.length
                               ) {
                                 this.setState({
                                   selected: [],
@@ -969,7 +984,7 @@ export default class Users extends React.Component {
                               } else {
                                 var temp = [];
                                 var tempIndex = [];
-                                this.state.users.map((user, index) => {
+                                userList.map((user, index) => {
                                   if (context.userTab === "1") {
                                     temp.push(user.uuid);
                                     tempIndex.push(index);
