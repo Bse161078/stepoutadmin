@@ -344,12 +344,15 @@ export default class EventDetails extends React.Component {
         });
         const paidSocial = participants.filter((element) => {
           // element.name = element.guest_first_name +" "+element.guest_last_name;
+          console.log(element,"filter");
           return (
             element.paid &&
             !element.withdrawn &&
             !element.waiting &&
-            element.guest_first_name != "" &&
-            element.guest_first_name != null
+            (element.guest_first_name == "" || !element.guest_first_name)
+
+            // element.guest_first_name != "" &&
+            // element.guest_first_name != null
           );
         });
         const waitingSocial = participants.filter((element) => {
@@ -359,8 +362,10 @@ export default class EventDetails extends React.Component {
             !element.paid &&
             !element.withdrawn &&
             !element.waiting &&
-            element.guest_first_name != "" &&
-            element.guest_first_name != null
+            (element.guest_first_name == "" || !element.guest_first_name)
+           
+            // element.guest_first_name != "" &&
+            // element.guest_first_name != null
           );
         });
         console.log("These are paid social", paidSocial);
@@ -2817,6 +2822,7 @@ console.log('=======user=============================');
                               let allUsers = this.state.users;
                               allUsers[index].waiting = !user.waiting;
                               this.setState({ users: allUsers });
+                              console.log(allUsers,'all users for waiting');
                             }}
                           >
                             {user.waiting ? (
@@ -2840,14 +2846,21 @@ console.log('=======user=============================');
 
                           <td
                             onClick={() => {
+                              // let allUsers = this.state.users;
+                              // allUsers[index].paid_social = !user.paid_social;
+                              // allUsers[index].waiting_social = false;
+                              // this.setState({ users: allUsers });
+                              // this.selectUser(index);
+                              // alert('ok')
                               let allUsers = this.state.users;
                               allUsers[index].paid_social = !user.paid_social;
-                              allUsers[index].waiting_social = false;
                               this.setState({ users: allUsers });
-                              this.selectUser(index);
+                              console.log(user.paid_social,"user.paid_social")
+
                             }}
                           >
                             {user.paid_social ? (
+                              
                               <Tooltip title="Selected" aria-label="selected">
                                 <span
                                   className="fa fa-check-square-o"
