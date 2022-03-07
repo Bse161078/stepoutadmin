@@ -1207,51 +1207,113 @@ console.log('=======user=============================');
         });
     }
   };
-  updateMultipleStatus = (event) => {
-    event.preventDefault();
-    let { participants, selectedUser } = this.state;
-    participants.forEach((element) => {
-      if (element.userId === selectedUser.uuid) {
-        element.paid = selectedUser.paid;
-        element.waiting = selectedUser.waiting;
-        element.paid_social = selectedUser.paid_social;
-        element.waiting_social = selectedUser.waiting_social;
-      }
-    });
+  
+  updateMultipleStatus = (e) => {
+    let user = this.state.selectedUser;
 
-    const { match, history } = this.props;
-    if (match.params.eventId) {
-      participants = participants.map((item) => {
-        delete item.image;
-        return item;
-      });
-      updateEventParticipants(match.params.eventId, participants)
-        .then((response) => {
-          this.setState({
-            loading: false,
+    console.log("This is it", e);
+    if (e == "Paid") {
+      user.paid = true;
+    } else if (e === "Paid (Social)") {
+      user.paid_social = true;
+      user.waiting_social = false;
+    } else if (e === "Waiting (Social)") {
+      user.waiting_social = true;
+      user.paid_social = false;
+    } else if (e === "Un Paid") {
+      user.paid = false;
+    }
+    this.setState({ selectedUser: user });
+   
+    // const users = this.state.participants.slice();
+    let users = this.state.selectedUser.slice();
+console.log(this.state.selected,"user in event page");
+    Swal.fire({
+      title: "Are you sure?",
+      // text: users[index].isActive
+      //   ? "You want to Block these user!"
+      //   : "You want to Un-block this user!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Change",
+    }).then((result) => {
+      if (result.value) {
+        this.state.selected.map((userId, index) => {
+        
+        
+          updateEventParticipants(userId, e)
+            .then((response) => {
+              this.setState({
+                 users ,
+
             showSnackBar: true,
             snackBarMessage: "Event updated successfully",
             snackBarVariant: "success",
-          });
-          this.toggleStatusModal();
-          this.fetchEventbyId();
-          this.state.selectedIndex.length=0
-          this.setState({
-            selectedIndex: [],
-            selected: [],
-          });
-        })
-        .catch((err) => {
-          console.log("err:", err);
-          this.setState({
-            loading: false,
-            showSnackBar: true,
-            snackBarMessage: "Error updating event",
-            snackBarVariant: "error",
-          });
-          this.toggleStatusModal();
+              });
+              this.fetchEventbyId();
+              this.state.selectedIndex.length=0
+    this.setState({
+      selectedIndex: [],
+      selected: [],
+    });
+            })
+            .catch((err) => {
+              console.log(err);
+              this.setState({
+                        showSnackBar: true,
+                        snackBarMessage: "Error updating event",
+                        snackBarVariant: "error",
+                      });
+            });
         });
-    }
+      }
+    });
+    // event.preventDefault();
+    // let { participants, selectedUser } = this.state;
+    // participants.forEach((element) => {
+    //   if (element.userId === selectedUser.uuid) {
+    //     element.paid = selectedUser.paid;
+    //     element.waiting = selectedUser.waiting;
+    //     element.paid_social = selectedUser.paid_social;
+    //     element.waiting_social = selectedUser.waiting_social;
+    //   }
+    // });
+
+    // const { match, history } = this.props;
+    // if (match.params.eventId) {
+    //   participants = participants.map((item) => {
+    //     delete item.image;
+    //     return item;
+    //   });
+    //   updateEventParticipants(match.params.eventId, participants)
+    //     .then((response) => {
+    //       this.setState({
+    //         loading: false,
+    //         showSnackBar: true,
+    //         snackBarMessage: "Event updated successfully",
+    //         snackBarVariant: "success",
+    //       });
+    //       // this.toggleStatusModal();
+    //       this.fetchEventbyId();
+    //       this.state.selectedIndex.length=0
+    //       this.setState({
+    //         selectedIndex: [],
+    //         selected: [],
+    //       });
+    //     })
+    //     .catch((err) => {
+    //       console.log("err:", err);
+    //       this.setState({
+    //         loading: false,
+    //         showSnackBar: true,
+    //         snackBarMessage: "Error updating event",
+    //         snackBarVariant: "error",
+    //       });
+    //       // this.toggleStatusModal();
+    //     });
+    // }
   };
   addDivision = async (event) => {
     const { divisions, division, selectedDivisionIndex } = this.state;
@@ -1905,7 +1967,7 @@ console.log('=======user=============================');
                     {/* <div className="col-sm-4"></div> */}
                     <div className="col-sm-2 pull-right mobile-space">
                       <button
-                      
+                      style={{height:"40px"}}
                         type="button"
                         className="btn btn-danger"
                         onClick={() => 
@@ -1924,7 +1986,7 @@ console.log('=======user=============================');
                       </button>
                     </div>
 
-                    <div className="col-sm-2 pull-left mobile-space">
+                    {/* <div className="col-sm-2 pull-left mobile-space">
                       <button
                   
                         type="button"
@@ -1943,8 +2005,102 @@ console.log('=======user=============================');
                       >
                         Update Multiple Participants
                       </button>
+                  
+                    </div> */}
+                    
+<div className="col-sm-2">
+  <div className="row">
+  <div className="form-group row">
+              <label className="control-label col-md-3 col-sm-3">Paid</label>
+              <div className="col-md-6 col-sm-6">
+                {/* <input type="select" required type="number" name="fee" className="form-control" value={appEvent.fee} onChange={this.handleInputChange} /> */}
+                {/* <ButtonToggle color="primary">primary</ButtonToggle> */}
+                <select
+                  // value={
+                  //   this.state.selectedUser && this.state.selectedUser.paid
+                  //     ? "Paid"
+                  //     : this.state.selectedUser.paid_social
+                  //     ? "Paid  Social"
+                  //     : this.state.selectedUser.waiting_social
+                  //     ? "Upaid Social"
+                  //     : "Un Paid"
+                  // }
+                  // onChange={this.handleChange}
+                  onChange={(e) =>{
+                    this.updateMultipleStatus(e.target.value)
+                    console.log(e.target.value,"e.target.value")}
+                  }
+
+                >
+                  <option name="Unknown">Unknown</option>
+
+                  <option name="paid">Paid</option>
+                  <option name="unpaid">Un Paid</option>
+                  <option name="paid_social">Paid (Social)</option>
+                  <option name="waiting_social">Waiting (Social)</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="form-group row">
+              <label className="control-label col-md-3 col-sm-3">Waiting</label>
+              <div className="col-md-6 col-sm-6">
+                {/* <input type="select" required type="number" name="fee" className="form-control" value={appEvent.fee} onChange={this.handleInputChange} /> */}
+                {/* <ButtonToggle color="primary">primary</ButtonToggle> */}
+                <select
+                  // value={
+                  //   this.state.selectedUser && this.state.selectedUser.waiting
+                  //     ? "Waiting"
+                  //     : "Active"
+                  // }
+                  onChange={(e) =>{
+                    this.updateMultipleStatus(e.target.value)
+                    console.log(e.target.value,"e.target.value")}
+                  }
+                  // onChange={this.handleChangeWaiting}
+                >
+                  {/* <option name="Unknown">Unknown</option> */}
+
+                  <option name="waiting">Waiting</option>
+                  <option name="active">Active</option>
+                </select>
+              </div>
+            </div>
+  </div>
+</div>
+
+                    {/* <div className="col-sm-2">
+                      <p>Membership</p>
+                      <select
+                        style={{ marginTop: 8 }}
+                        onChange={(e) =>
+                          this.changeMembershipMultiple(e.target.value)
+                        }
+                      >
+                        <option name="unknown">Unknown</option>
+
+                        <option name="executive">Executive</option>
+                        <option name="member">Member</option>
+                        <option name="Social Guest">Social Guest</option>
+                        <option name="Golf Guest">Golf Guest</option>
+                      </select>
                     </div>
-                 
+
+                    <div className="col-sm-2">
+                      <p>Membership Payment</p>
+                      <select
+                        style={{ marginTop: 8 }}
+                        onChange={(e) =>
+                          this.changeMembershipStatusMultiple(e.target.value)
+                        }
+                      >
+                        <option name="unknown">Unknown</option>
+
+                        <option name="paid">Paid</option>
+                        <option name="unpaid">Unpaid</option>
+                      </select>
+                    </div> */}
+                    
                   </div>
                 )}
 

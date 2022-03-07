@@ -411,6 +411,8 @@ export default class Users extends React.Component {
   changeMembershipStatusMultiple(e) {
     console.log("This is it", e);
     const users = this.state.users.slice();
+    console.log(this.state.selected,"user in event page");
+
     Swal.fire({
       title: "Are you sure?",
       // text: users[index].isActive
