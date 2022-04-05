@@ -55,6 +55,9 @@ import { RootContext } from "../../src/backend/Context";
 import MembershipFee from "./MembershipFee";
 import MembershipFeeForm from "./MembershipFeeForm";
 import MeritForm from "./MeritForm";
+import Venues from "./Venues";
+import Blogs from "./Blogs";
+import Trips from "./Trips";
 
 
 class App extends React.Component {
@@ -105,6 +108,21 @@ class App extends React.Component {
                   {/* <Route exact={true} path='/' component={Stats}/>      */}
 
                   <Route exact={true} path="/users" component={Users} />
+                    <Route
+                        exact={true}
+                        path="/Venues"
+                        component={Venues}
+                    />
+                    <Route
+                        exact={true}
+                        path="/Blogs"
+                        component={Blogs}
+                    />
+                    <Route
+                        exact={true}
+                        path="/Trips"
+                        component={Trips}
+                    />
                   <Route
                     exact={true}
                     path="/users/user-form"
@@ -246,7 +264,7 @@ class App extends React.Component {
                   <Route exact={true} path="/about" component={AboutForm} />
 
                   <Route exact={true} path="/faq" component={FAQForm} />
-                  <Redirect to={"/events"} from="/" />
+                  <Redirect to={"/Venues"} from="/" />
                 </Switch>
               </Container>
             </main>

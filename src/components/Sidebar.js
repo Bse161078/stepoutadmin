@@ -30,10 +30,21 @@ class Sidebar extends Component {
 	}
 
 	hideMobile() {
-		if (document.body.classList.contains("sidebar-mobile-show")) {
+
+        if (document.body.classList.contains("sidebar-mobile-show")) {
 			document.body.classList.toggle("sidebar-mobile-show");
 		}
 	}
+
+	onClickNav=(item)=>{
+		console.log("onClickNav",item,"props = ",this.props.history)
+        this.props.history.push("/test")
+
+        if (document.body.classList.contains("sidebar-mobile-show")) {
+            document.body.classList.toggle("sidebar-mobile-show");
+        }
+	}
+
 
 	// todo Sidebar nav secondLevel
 	// secondLevelActive(routeName) {
@@ -98,12 +109,17 @@ class Sidebar extends Component {
 
 		// nav link
 		const navLink = (item, key, classes) => {
-			const url = item.url ? item.url : "";
-			const adminOrSuperAdmin = props.user && ((props.user.department && props.user.department === "admin") || !!props.user.superadmin);
+
+            const url = item.url ? item.url : "";
+            console.log("url = ",url)
+
+            const adminOrSuperAdmin = props.user && ((props.user.department && props.user.department === "admin") || !!props.user.superadmin);
 			return (
 				<NavItem key={key} className={classes.item}>
 					{isExternal(url) ? (
-						<RsNavLink href={url} className={classes.link} active>
+						<RsNavLink href={url} className={classes.link} active onClick={(e)=>{
+							console.log("navLinkClicked")
+						}}>
 							{item.icon ? <i className={classes.icon}></i> : null}
 							{item.name}
 							{badge(item.badge)}
@@ -117,7 +133,7 @@ class Sidebar extends Component {
 							</NavLink>
 						</HasRole>
 					) : (
-						<NavLink to={url} className={classes.link} activeClassName="active" onClick={this.hideMobile} exact={true}>
+						<NavLink to={url} className={classes.link} activeClassName="active" onClick={(e)=>this.onClickNav(item)} exact={true}>
 							{item.icon ? <i className={classes.icon}></i> : null}
 							{adminOrSuperAdmin && item.alternateName ? item.alternateName : item.name}
 							{badge(item.badge)}
@@ -155,7 +171,7 @@ class Sidebar extends Component {
 
 		// nav list
 		const navList = (items) => {
-			return items.map((item, index) => navType(item, index));
+			return items.map((item, index) => navItem(item, index));
 		};
 
 		const isExternal = (url) => {
