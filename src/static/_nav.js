@@ -21,37 +21,37 @@ export default {
     //   icon: 'icon-list',
     // },
     {
-      name: "Events",
-      url: "/events",
+      name: "Venues",
+      url: "/venues",
       icon: "icon-fire",
     },
     {
-      name: "Golf Courses",
-      url: "/golfcourses",
+      name: "Blogs",
+      url: "/blogs",
       icon: "icon-fire",
     },
     {
-      name: "Membership",
-      url: "/membership-fee-form",
+      name: "Trips",
+      url: "/Trips",
       icon: "icon-fire",
     },
-    {
-      name: "Mert Link",
-      url: "/merit-form",
-      icon: "icon-fire",
-    },
+    // {
+    //   name: "Mert Link",
+    //   url: "/merit-form",
+    //   icon: "icon-fire",
+    // },
 
     
-    {
-      name: "Users",
-      url: "/users",
-      icon: "icon-user",
-    },
-    {
-      name: "Notifications",
-      url: "/notifications",
-      icon: "icon-bell",
-    },
+    // {
+    //   name: "Users",
+    //   url: "/users",
+    //   icon: "icon-user",
+    // },
+    // {
+    //   name: "Notifications",
+    //   url: "/notifications",
+    //   icon: "icon-bell",
+    //},
     // {
     //   name: 'News',
     //   url: '/news',
@@ -68,31 +68,31 @@ export default {
     //   url: '/gallery',
     //   icon: 'icon-picture',
     // },
-    {
-      name: "Privacy Policy",
-      url: "/privacy-policy",
-      icon: "icon-key",
-    },
-    {
-      name: "Terms of Service",
-      url: "/terms-service",
-      icon: "icon-docs",
-    },
-    {
-      name: "FAQ",
-      url: "/faq",
-      icon: "icon-list",
-    },
-    {
-      name: "About",
-      url: "/about",
-      icon: "icon-globe ",
-    },
+    // {
+    //   name: "Privacy Policy",
+    //   url: "/privacy-policy",
+    //   icon: "icon-key",
+    // },
+    // {
+    //   name: "Terms of Service",
+    //   url: "/terms-service",
+    //   icon: "icon-docs",
+    // },
+    // {
+    //   name: "FAQ",
+    //   url: "/faq",
+    //   icon: "icon-list",
+    // },
+    // {
+    //   name: "About",
+    //   url: "/about",
+    //   icon: "icon-globe ",
+    // },
     {
       name: "Logout",
       url: "/logout",
       icon: "icon-logout",
       // variant: "red",
-    },
+    }
   ],
 };

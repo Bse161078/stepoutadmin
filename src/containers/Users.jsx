@@ -379,6 +379,7 @@ export default class Users extends React.Component {
       if (result.value) {
         this.state.selected.map((userId, index) => {
           updateMemberShipUser(userId, e)
+          console.log("usersupdate",userId)
             .then((response) => {
               this.setState({
                 users,

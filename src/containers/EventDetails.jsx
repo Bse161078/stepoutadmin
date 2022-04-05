@@ -1241,7 +1241,7 @@ console.log(this.state.selected,"user in event page");
     }).then((result) => {
       if (result.value) {
         this.state.selected.map((userId, index) => {
-        
+      console.log("participantsid",users)
         
           updateEventParticipants(userId, e)
             .then((response) => {
