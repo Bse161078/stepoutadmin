@@ -595,143 +595,34 @@ export default class Users extends React.Component {
     var data = [];
 
     return (
-      <RootConsumer>
-        {(context) => {
-          globalContext = context;
-          // console.log("This is event tab", context.userTab);
-
-          var userList = [];
-          if (context.userTab == "1") {
-            this.state.allusers.map((user, index) => {
-              data.push([
-                index + 1,
-                user.lname + "," + user.fname,
-                user.phone,
-                user.membership,
-                user.membership_fee_status,
-                user.isActive ? "Block" : "Un Block",
-              ]);
-            });
-          } else if (context.userTab == "2") {
-            this.state.executive.map((user, index) => {
-              data.push([
-                index + 1,
-                user.lname + "," + user.fname,
-                user.phone,
-                user.membership,
-                user.membership_fee_status,
-                user.isActive ? "Block" : "Un Block",
-              ]);
-            });
-          } else if (context.userTab == "3") {
-            this.state.members.map((user, index) => {
-              data.push([
-                index + 1,
-                user.lname + "," + user.fname,
-                user.phone,
-                user.membership,
-                user.membership_fee_status,
-                user.isActive ? "Block" : "Un Block",
-              ]);
-            });
-          } else if (context.userTab == "4") {
-            this.state.guests.map((user, index) => {
-              data.push([
-                index + 1,
-                user.lname + "," + user.fname,
-                user.phone,
-                user.membership,
-                user.membership_fee_status,
-                user.isActive ? "Block" : "Un Block",
-              ]);
-            });
-          } else if (context.userTab == "5") {
-            this.state.unknown.map((user, index) => {
-              data.push([
-                index + 1,
-                user.lname + "," + user.fname,
-                user.phone,
-                user.membership,
-                user.membership_fee_status,
-                user.isActive ? "Block" : "Un Block",
-              ]);
-            });
-          }
-
-          if (context.userTab == 1) {
-            userList = this.state.allusers;
-          }
-          if (context.userTab == "2") {
-            userList = this.state.executive;
-          } else if (context.userTab == "3") {
-            userList = this.state.members;
-          } else if (context.userTab == "4") {
-            userList = this.state.guests;
-          } else if (context.userTab == "5") {
-            userList = this.state.unknown;
-          }
-          console.log("THis is the user list", userList);
-          return (
-            <div className="row animated fadeIn">
-              {showSnackBar && (
-                <SnackBar
-                  open={showSnackBar}
-                  message={snackBarMessage}
-                  variant={snackBarVariant}
-                  onClose={() => this.closeSnackBar()}
-                />
-              )}
-              <div className="col-12">
-                <div className="row space-1">
+      <div class="container my-4" style={{overflow:"auto"}} >
+      <div className="row space-1">
                   <div className="col-sm-8">
                     <h3>List of Users</h3>
                   </div>
                   {/* <div className="col-sm-4"></div> */}
                   <div className="col-sm-2 pull-right mobile-space">
-                    <Link to="/users/user-form">
+                    <Link to="/user/userForm">
                       <button type="button" className="btn btn-success">
-                        Add new User
+                        Add new Users
                       </button>
                     </Link>
                   </div>
-                  <div className="col-sm-2 pull-right mobile-space">
-                    {/* <ReactHTMLTableToExcel
-                        id="test-table-xls-button"
-                        className="btn btn-success"
-                        table="table-to-xls"
-                        filename="Users"
-                        sheet="tablexls"
-                        buttonText="Download as XLS"
-                      /> */}
-                    <CSVLink
-                      className="btn btn-success"
-                      filename={"users.csv"}
-                      data={data}
-                      headers={header}
-                    >
-                      Download CSV
-                    </CSVLink>
-                  </div>
                 </div>
-                <div className="row space-1">
+                  <div className="row space-1">
                   <div className="col-sm-4"></div>
                   <div className="col-sm-4">
                     <div className="input-group">
-                      <input
-                        value={this.state.q}
-                        onChange={this.handleInputChange}
-                        className="form-control"
+                      <input className="form-control"
                         type="text"
                         name="search"
                         placeholder="Enter search keyword"
-                        value={this.state.q}
-                        // onChange={(event) => this.setState({ q: event.target.value })}
+                        // onChange={(event) => }q: event.target.value })}
                       />
                       <span className="input-group-btn">
                         <button
                           type="button"
-                          onClick={() => this.handleSearch()}
-                          className="btn btn-info search-btn"
+                         
                         >
                           Search
                         </button>
@@ -740,462 +631,73 @@ export default class Users extends React.Component {
                   </div>
                   <div className="col-sm-4"></div>
                 </div>
-                {this.state.selected.length > 1 && (
-                  <div className="row space-1">
-                    <div className="col-sm-4">
-                      <h3>List of Users</h3>
-                    </div>
-                    {/* <div className="col-sm-4"></div> */}
-                    <div className="col-sm-2 pull-right mobile-space">
-                      <button
-                        type="button"
-                        className="btn btn-danger"
-                        onClick={() => this.removeUserMultiple()}
-                      >
-                        Delete Multiple
-                      </button>
-                    </div>
-                    <div className="col-sm-2 pull-right mobile-space">
-                      <button
-                        type="button"
-                        className="btn btn-danger"
-                        onClick={() => this.blockUserMultiple()}
-                      >
-                        Block Multiple
-                      </button>
-                    </div>
-                    <div className="col-sm-2">
-                      <p>Membership</p>
-                      <select
-                        style={{ marginTop: 8 }}
-                        onChange={(e) =>
-                          this.changeMembershipMultiple(e.target.value)
-                        }
-                      >
-                        <option name="unknown">Unknown</option>
-
-                        <option name="executive">Executive</option>
-                        <option name="member">Member</option>
-                        <option name="Social Guest">Social Guest</option>
-                        <option name="Golf Guest">Golf Guest</option>
-                      </select>
-                    </div>
-
-                    <div className="col-sm-2">
-                      <p>Membership Payment</p>
-                      <select
-                        style={{ marginTop: 8 }}
-                        onChange={(e) =>
-                          this.changeMembershipStatusMultiple(e.target.value)
-                        }
-                      >
-                        <option name="unknown">Unknown</option>
-
-                        <option name="paid">Paid</option>
-                        <option name="unpaid">Unpaid</option>
-                      </select>
-                    </div>
-                  </div>
-                )}
-                <Nav tabs>
-                  <NavItem>
-                    <NavLink
-                      className={classnames({
-                        active: context.userTab === "1",
-                      })}
-                      onClick={() => {
-                        this.toggle("1");
-                      }}
-                    >
-                      All Users{" "}
-                    </NavLink>
-                  </NavItem>
-                  <NavItem>
-                    <NavLink
-                      className={classnames({
-                        active: context.userTab === "2",
-                      })}
-                      onClick={() => {
-                        this.toggle("2");
-                      }}
-                    >
-                      Executive
-                    </NavLink>
-                  </NavItem>
-                  <NavItem>
-                    <NavLink
-                      className={classnames({
-                        active: context.userTab === "3",
-                      })}
-                      onClick={() => {
-                        this.toggle("3");
-                      }}
-                    >
-                      Member
-                    </NavLink>
-                  </NavItem>
-                  <NavItem>
-                    <NavLink
-                      className={classnames({
-                        active: context.userTab === "4",
-                      })}
-                      onClick={() => {
-                        this.toggle("4");
-                      }}
-                    >
-                      Guest
-                    </NavLink>
-                  </NavItem>
-                  <NavItem>
-                    <NavLink
-                      className={classnames({
-                        active: context.userTab === "5",
-                      })}
-                      onClick={() => {
-                        this.toggle("5");
-                      }}
-                    >
-                      Unknown
-                    </NavLink>
-                  </NavItem>
-                </Nav>
-
-                <table
-                  className="table table-striped"
-                  style={{ display: "none" }}
-                  id="table-to-xls"
-                >
-                  <thead>
-                    <tr>
-                      <th>Sr. #</th>
-                      {/* <th>Image</th> */}
-                      <th>Name</th>
-                      <th>Phone</th>
-                      <th>Membership</th>
-                      <th>Membership Fee Status</th>
-                      <th>Credit</th>
-                      <th>Handicaps</th>
-
-                      <th>Blocked</th>
-                      <th>Edit</th>
-                      <th>Delete</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {userList && userList >= 1 ? (
-                      userList.map((user, index) => (
-                        <tr key={index}>
-                          <td>{index + 1}</td>
-                          {/* <td>
-                              {
-                                <img
-                                  style={{ height: "50px", width: "50px" }}
-                                  src={user.profileImage}
-                                />
-                              }
-                            </td> */}
-                          <td>
-                            {user.lname}, {user.fname}
-                          </td>
-                          <td>{user.phone}</td>
-                          <td style={{ textTransform: "capitalize" }}>
-                            {user.membership}
-                          </td>
-                          <td style={{ textTransform: "capitalize" }}>
-                            {user.membership_fee_status}
-                          </td>
-                          <th>{user.credit}</th>
-                          <th>{user.handicap || 0}</th>
-                          <td>
-                            <div className="app-body-row">
-                              <div style={{ marginRight: "10px" }}>
-                                {user.isActive ? "No" : "Yes"}
-                              </div>
-                              <Tooltip
-                                title={user.isActive ? "Block" : "Un Block"}
-                                aria-label="block"
-                              >
-                                <span
-                                  className="fa fa-edit"
-                                  style={{ cursor: "pointer" }}
-                                  aria-hidden="true"
-                                  onClick={() =>
-                                    this.blockUser(user.uuid, index)
-                                  }
-                                ></span>
-                              </Tooltip>
-                            </div>
-                          </td>
-                          <td>
-                            <Link to={`/users/edit-user/${user.uuid}`}>
-                              <Tooltip title="Edit" aria-label="edit">
-                                <span
-                                  className="fa fa-edit"
-                                  aria-hidden="true"
-                                ></span>
-                              </Tooltip>
-                            </Link>
-                          </td>
-                          <td>
-                            <Tooltip title="Delete" aria-label="delete">
-                              <span
-                                className="fa fa-trash"
-                                style={{ cursor: "pointer" }}
-                                aria-hidden="true"
-                                onClick={() =>
-                                  this.removeUser(user.uuid, index)
-                                }
-                              ></span>
-                            </Tooltip>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan="15" className="text-center">
-                          {responseMessage}
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-
-                <div className="table-responsive">
-                  <table className="table table-striped">
-                    <thead>
-                      <tr>
-                        <td>
-                          <input
-                            type="checkbox"
-                            checked={
-                              this.state.selectedIndex.length ===
-                              userList.length
-                                ? true
-                                : false
-                            }
-                           
-                            onChange={(e) => {
-                              console.log("This is temp", context.userTab);
-                              if (
-                                this.state.selected.length ===
-                                userList.length
-                              ) {
-                                this.setState({
-                                  selected: [],
-                                  selectedIndex: [],
-                                });
-                              } else {
-                                var temp = [];
-                                var tempIndex = [];
-                                userList.map((user, index) => {
-                                  if (context.userTab === "1") {
-                                    temp.push(user.uuid);
-                                    tempIndex.push(index);
-                                  } else if (
-                                    context.userTab === "2" &&
-                                    user.membership.toLowerCase() ===
-                                      "executive"
-                                  ) {
-                                    temp.push(user.uuid);
-                                    tempIndex.push(index);
-                                  } else if (
-                                    context.userTab === "3" &&
-                                    user.membership.toLowerCase() === "member"
-                                  ) {
-                                    temp.push(user.uuid);
-                                    tempIndex.push(index);
-                                  } else if (
-                                    context.userTab === "4" &&
-                                    user.membership.toLowerCase() ===
-                                      "golf guest"
-                                  ) {
-                                    temp.push(user.uuid);
-                                    tempIndex.push(index);
-                                  } else if (
-                                    context.userTab === "5" &&
-                                    user.membership.toLowerCase() === "unknown"
-                                  ) {
-                                    temp.push(user.uuid);
-                                    tempIndex.push(index);
-                                  }
-                                });
-                                this.setState({
-                                  selected: temp,
-                                  selectedIndex: tempIndex,
-                                });
-                              }
-                            }}
-                          ></input>
-                        </td>
-                        <th>Sr. #</th>
-                        <th>Image</th>
-                        <th>Name</th>
-                        <th>Phone</th>
-                        <th>Membership</th>
-                        <th>Membership Fee Status</th>
-                        <th>Credit</th>
-                        <th>Handicap</th>
-                        <th>Blocked</th>
-                        <th>Edit</th>
-                        <th>Delete</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {userList && userList.length >= 1 ? (
-                        userList.map((user, index) => {
-                          // console.log("THis is result ", user);
-                          return (
-                            <tr key={index}>
-                              <td>
-                                <input
-                                  type="checkbox"
-                                  checked={
-                                    this.state.selected.includes(user.uuid)
-                                      ? true
-                                      : false
-                                  }
-                                  onChange={(e) => {
-                                    console.log("This is temp");
-                                    if (
-                                      this.state.selected.includes(user.uuid)
-                                    ) {
-                                      var temp = [];
-                                      var tempIndex = [];
-                                      this.state.selected.map((id, index) => {
-                                        if (id != user.uuid) {
-                                          console.log(
-                                            "This is true",
-                                            user.uuid,
-                                            id
-                                          );
-                                          temp.push(id);
-                                          tempIndex.push(
-                                            this.state.selectedIndex[index]
-                                          );
-                                        }
-                                      });
-                                      console.log(
-                                        "This is temmp after removing",
-                                        temp
-                                      );
-                                      this.setState({
-                                        selected: temp,
-                                        selectedIndex: tempIndex,
-                                      });
-                                    } else {
-                                      var temp = this.state.selected;
-                                      var tempIndex = this.state.selectedIndex;
-                                      temp.push(user.uuid);
-                                      tempIndex.push(index);
-                                      this.setState({
-                                        selected: temp,
-                                        selectedIndex: tempIndex,
-                                      });
-                                    }
-                                  }}
-                                ></input>
-                              </td>
-                              <td>{index + 1}</td>
-                              <td>
-                                {
-                                  <img
-                                    style={{ height: "50px", width: "50px" }}
-                                    src={user.profileImage}
-                                  />
-                                }
-                              </td>
-                              <td>
-                                {user.lname}, {user.fname}
-                              </td>
-                              <td>{user.phone}</td>
-                              <td style={{ textTransform: "capitalize" }}>
-                                {user.membership}
-                              </td>
-                              <td style={{ textTransform: "capitalize" }}>
-                                {user.membership_fee_status}
-                              </td>
-                              <th>{user.credit || 0}</th>
-                              <th>{user.handicap || 0}</th>
-                              <td>
-                                <div className="app-body-row">
-                                  <div style={{ marginRight: "10px" }}>
-                                    {user.isActive ? "No" : "Yes"}
-                                  </div>
-                                  <Tooltip
-                                    title={user.isActive ? "Block" : "Un Block"}
-                                    aria-label="block"
-                                  >
-                                    <span
-                                      className="fa fa-edit"
-                                      style={{ cursor: "pointer" }}
-                                      aria-hidden="true"
-                                      onClick={() =>
-                                        this.blockUser(user.uuid, index)
-                                      }
-                                    ></span>
-                                  </Tooltip>
-                                </div>
-                              </td>
-                              <td>
-                                <Link to={`/users/edit-user/${user.uuid}`}>
-                                  <Tooltip title="Edit" aria-label="edit">
-                                    <span
-                                      className="fa fa-edit"
-                                      aria-hidden="true"
-                                    ></span>
-                                  </Tooltip>
-                                </Link>
-                              </td>
-                              <td>
-                                <Tooltip title="Delete" aria-label="delete">
-                                  <span
-                                    className="fa fa-trash"
-                                    style={{ cursor: "pointer" }}
-                                    aria-hidden="true"
-                                    onClick={() =>
-                                      this.removeUser(user.uuid, index)
-                                    }
-                                  ></span>
-                                </Tooltip>
-                              </td>
-                            </tr>
-                          );
-                        })
-                      ) : (
-                        <tr>
-                          <td colSpan="15" className="text-center">
-                            {responseMessage}
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-                {/* <div className="text-center">
-                    <Pagination
-                      prev
-                      next
-                      items={this.state.pages}
-                      activePage={this.state.activePage}
-                      onSelect={this.handleSelect.bind(this)}
-                    >
-                      {" "}
-                    </Pagination>
-                  </div> */}
-                <div>
-                  {/* <Pagination
-                      activePage={this.state.activePage}
-                      itemsCountPerPage={10}
-                      totalItemsCount={this.state.allusers.length}
-                      pageRangeDisplayed={5}
-                      onChange={this.handlePageChange}
-                    /> */}
-                </div>
-              </div>
-            </div>
-          );
-        }}
-      </RootConsumer>
+      <table id="dtBasicExample" class="table table-striped table-bordered" cellspacing="0" width="100%">
+        <thead>
+          <tr>
+            <th class="th-sm">First Name
+            </th>
+            <th class="th-sm">Last Name
+            </th>
+            <th class="th-sm">Gender
+            </th>
+            <th class="th-sm">Occupation
+            </th>
+            <th class="th-sm">Trip Location
+            </th>
+            <th class="th-sm">DOB
+            </th>
+            <th class="th-sm">Activities
+            </th>
+            <th class="th-sm">Restaurants
+            </th>
+            <th class="th-sm">Edit
+            </th>
+            <th class="th-sm">Delete
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Peter </td>
+            <td>Griffin</td>
+            <td>Male</td>
+            <td>Peon</td>
+            <td>California 347a</td>
+            <td>04-12-1998</td>
+            <td>Indoor</td>
+            <td>Chinese</td>
+            <td>
+          <Link to={`/events/edit-event`}>
+          <Tooltip title="Edit" aria-label="edit">
+            <span
+              className="fa fa-edit"
+              aria-hidden="true"
+            ></span>
+          </Tooltip>
+          </Link>
+          </td>
+          <td>
+          <Tooltip title="Delete" aria-label="delete">
+          <span
+            className="fa fa-trash"
+            style={{ cursor: "pointer" }}
+            aria-hidden="true"
+            onClick={() =>
+              {}
+            }
+          ></span>
+          </Tooltip>
+          </td>
+        </tr>
+        </tbody>
+       
+      </table>
+  
+  
+  
+  
+  
+    </div>
     );
   }
 }

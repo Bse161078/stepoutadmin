@@ -20,7 +20,7 @@ import {
 import Select from "react-select";
 import "react-select/dist/react-select.css";
 import { TextField } from "@material-ui/core";
-export default class UserForm extends React.Component {
+export default class TripsForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -324,7 +324,7 @@ export default class UserForm extends React.Component {
             <div className="col-md-12 col-sm-12">
               <div className="x_panel">
                 <div className="x_title">
-                  <h2>Enter Venue Details</h2>
+                  <h2>Enter Trips Details</h2>
                 </div>
                 <div className="x_content">
                   <br />
@@ -334,15 +334,56 @@ export default class UserForm extends React.Component {
                     className="form-horizontal form-label-left"
                    // onSubmit={history.push('/Venues/AddVenue')}
                   >
-                     <div className="form-group row">
+                    <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                        First Name
+                        Display Image
+                      </label>
+                        <div className="col-md-6 col-sm-6">
+                        <input
+                          type="file"
+                          accept="Cimage/*"
+                          name="profileImage"
+                          className="form-control"
+                          onChange={this.handleCarouselImage}
+                        />
+                      </div>
+                      </div>
+                      {Cimage ? (
+                      <div className="form-group row">
+                        <label className="control-label col-md-3 col-sm-3"></label>
+                        <div className="col-md-6 col-sm-6">
+                          <img
+                            style={{ marginRight: "5px" }}
+                            width="100"
+                            className="img-fluid"
+                            src={Cfile}
+                            alt="profileImage"
+                          />
+                        </div>
+                      </div>
+                    ) : user.profileImage && user.profileImage.length ? (
+                      <div className="form-group row">
+                        <label className="control-label col-md-3 col-sm-3"></label>
+                        <div className="col-md-6 col-sm-6">
+                          <img
+                            style={{ marginRight: "5px" }}
+                            width="100"
+                            className="img-fluid"
+                            src={`${user.profileImage}`}
+                            alt="profileImage"
+                          />
+                        </div>
+                      </div>
+                    ) : null}
+                    <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">
+                         Name
                       </label>
                       <div className="col-md-6 col-sm-6">
                         <input
                           required
                           type="text"
-                          name="fname"
+                          name="name"
                           className="form-control"
                           value={user.fname}
                           onChange={this.handleInputChange}
@@ -351,44 +392,45 @@ export default class UserForm extends React.Component {
                     </div>
                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                        Last Name
+                        Description
                       </label>
                       <div className="col-md-6 col-sm-6">
                         <input
                           required
                           type="text"
-                          name="lname"
+                          name="description"
                           className="form-control"
                           value={user.lname}
                           onChange={this.handleInputChange}
                         />
                       </div>
                     </div>
-
-                    <div className="form-group row">
+                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                        DOB
+                        Venues
                       </label>
                       <div className="col-md-6 col-sm-6">
-                        <input
-                          required
-                          type="date"
-                          name="dob"
-                          className="form-control"
-                          value={user.email}
-                          onChange={this.handleInputChange}
-                        />
+                      <select data-placeholder="Begin typing a name to filter..." multiple class="chosen-select" name="test">
+                        <option>Blue Swan Palace</option>
+                        <option>Boulevard Hall</option>
+                        <option>Bridgewater Manor</option>
+                        <option>Cityplace Events</option>
+                        <option>Creative Affairs</option>
+                        <option>Paradise Point Resort</option>
+                        <option>Gateway Center</option>
+                        <option>Elite Bookings</option>
+                    </select>
                       </div>
                     </div>
-
-                    <div className="form-group row">
+                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                        Occupation
+                        Start Time
                       </label>
                       <div className="col-md-6 col-sm-6">
                         <input
-                          type="text"
-                          name="occupation"
+                          // required
+                          type="time"
+                          name="start time"
                           className="form-control"
                           value={user.phone}
                           onChange={this.handleInputChange}
@@ -398,12 +440,12 @@ export default class UserForm extends React.Component {
 
                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                        Location 
+                        End Time 
                       </label>
                       <div className="col-md-6 col-sm-6">
                         <input
-                          type="text"
-                          name="location"
+                          type="time"
+                          name="End Time"
                           className="form-control"
                           value={user.credit}
                           onChange={this.handleInputChange}
@@ -413,40 +455,19 @@ export default class UserForm extends React.Component {
 
                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                        Location
+                        Total Time
                       </label>
                       <div className="col-md-6 col-sm-6">
                         <input
                           required
-                          type="text"
-                          name="location"
+                          type="time"
+                          name="total time"
                           className="form-control"
                           value={user.handicap}
                           onChange={this.handleInputChange}
                         />
                       </div>
                     </div>
-
-                    <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">
-                        Type of restaurants
-                      </label>
-                      <div className="col-md-6 col-sm-6">
-                        <select
-                          style={{ marginTop: 8 }}
-                          value={user.membership}
-                          onChange={this.handleChange}
-                        >
-                           <option name="none">None</option>
-                          <option name="italian" >Italian</option>
-                          <option name="american" >American</option>
-                          <option name="chinese" >Chinese</option>
-                          <option name="greek">Greek</option>
-                          <option name="desi">Desi</option>
-                        </select>
-                      </div>
-                    </div>
-
                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
                         Add Tags
@@ -482,7 +503,7 @@ export default class UserForm extends React.Component {
                           {isEdit ? " Update" : " Submit"}
                         </Button>
                         <Button
-                          onClick={() => history.push('/users')}
+                          onClick={() => history.push('/Trips')}
                           className={`mx-3 btn btn-danger btn-lg`}
                         >
                           Cancel

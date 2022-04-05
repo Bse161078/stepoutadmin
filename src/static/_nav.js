@@ -22,18 +22,23 @@ export default {
     // },
     {
       name: "Venues",
-      url: "/venues",
+      url: "/Venues",
       icon: "icon-fire",
     },
     {
       name: "Blogs",
-      url: "/blogs",
+      url: "/Blogs",
       icon: "icon-fire",
     },
     {
       name: "Trips",
       url: "/Trips",
       icon: "icon-fire",
+    },
+    {
+      name: "Users",
+      url: "/Users",
+      icon: "icon-user",
     },
     // {
     //   name: "Mert Link",

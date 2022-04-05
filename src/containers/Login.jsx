@@ -21,7 +21,7 @@ import { withRouter } from "react-router-dom";
 import { API_END_POINT } from "../config";
 import { signInWithEmail } from "../backend/services/authService";
 import sneaker from "../public/img/logo.png";
-import golf from "../public/img/golf.png";
+import golf from "../public/img/logo.png";
 import firebase from "firebase";
 
 const style = {
@@ -101,11 +101,11 @@ class Login extends Component {
             // console.log("Document data:", doc.data());
              console.log("signInResult:", userId);
             Cookie.set("sneakerlog_access_token", { expires: 14 });
-            this.props.history.push("/events");
+            this.props.history.push("/Venues");
           } else {
             // doc.data() will be undefined in this case
             Cookie.set("sneakerlog_access_token", { expires: 14 });
-            this.props.history.push("/events");
+            this.props.history.push("/Venues");
             // console.log("No such document!");
             // this.setState({ loading: false });
             // alert("You are not authorized to access");
@@ -127,7 +127,7 @@ class Login extends Component {
                 <Card className="p-4">
                   <CardBody>
                     <div className="loginLogo-container d-flex d-lg-none">
-                      <img className={`companyLogo`} src={sneaker} />
+                      
                       <img className={`companyLogo`} src={golf} />
                     </div>
                     <h1>Login</h1>

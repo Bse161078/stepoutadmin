@@ -575,7 +575,7 @@ class Events extends React.Component {
                   </NavItem>
                 </Nav>
                 <div className="table-responsive">
-                  <table className="table table-striped">
+                  <table className="table table-striped" style="overflow-x:auto;" >
                     <thead>
                       <tr>
                         <th>

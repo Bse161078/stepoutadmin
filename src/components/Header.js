@@ -3,7 +3,7 @@ import { Nav, NavItem, NavbarToggler, NavbarBrand, UncontrolledTooltip } from "r
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import icon from "../public/img/favicon_io/192x192.png";
-import logo from "../public/img/golf.png";
+import logo from "../public/img/logo.png";
 
 const style = {
 	logoWrapper: {
@@ -53,22 +53,22 @@ class Header extends Component {
 
 	render() {
 		return (
-			<header className="app-header navbar">
-				<NavbarToggler className="d-lg-none" onClick={this.mobileSidebarToggle}>
-					<span className="navbar-toggler-icon"></span>
+			<header className="app-header navbar" style={{backgroundColor:'#0AC2CC'}} >
+				<NavbarToggler className="d-lg-none"  style={{backgroundColor:'#0AC2CC'}} onClick={this.mobileSidebarToggle}>
+					<span className="navbar-toggler-icon" style={{backgroundColor:'#0AC2CC'}} ></span>
 				</NavbarToggler>
 
-				<NavbarBrand href="/" className="p-0">
-					<div style={style.logoWrapper} className={`svg-logo`}>
+				<NavbarBrand href="/" className="p-0" style={{backgroundColor:'#0AC2CC'}}>
+					<div style={style.logoWrapper} className={`svg-logo`} style={{backgroundColor:'#0AC2CC'}} >
 						<img className={`img-fluid companyLogo`} src={logo} />
 						{/* <h2 className="d-md-down-none admin-heading">Nuga Dashboard</h2> */}
 					</div>
-					<div style={{ backgroundColor: "#382636" }} className={`png-logo`}>
+					<div style={{ backgroundColor: "#0AC2CC" }} className={`png-logo`}>
 						<img className={`img-fluid companyLogo`} src={logo} />
 					</div>
 				</NavbarBrand>
 
-				<NavbarToggler className="d-md-down-none mr-auto" onClick={this.sidebarToggle}>
+				<NavbarToggler className="d-md-down-none mr-auto" style={{backgroundColor:'#0AC2CC'}} onClick={this.sidebarToggle}>
 					<span className="navbar-toggler-icon"></span>
 				</NavbarToggler>
 

@@ -30,10 +30,21 @@ class Sidebar extends Component {
 	}
 
 	hideMobile() {
-		if (document.body.classList.contains("sidebar-mobile-show")) {
+
+        if (document.body.classList.contains("sidebar-mobile-show")) {
 			document.body.classList.toggle("sidebar-mobile-show");
 		}
 	}
+
+	onClickNav=(item)=>{
+		console.log("onClickNav",item,"props = ",this.props.history)
+        this.props.history.push("/test")
+
+        if (document.body.classList.contains("sidebar-mobile-show")) {
+            document.body.classList.toggle("sidebar-mobile-show");
+        }
+	}
+
 
 	// todo Sidebar nav secondLevel
 	// secondLevelActive(routeName) {
@@ -88,6 +99,7 @@ class Sidebar extends Component {
 
 		// nav item with nav link
 		const navItem = (item, key) => {
+			console.log("navItem",item)
 			const classes = {
 				item: classNames(item.class),
 				link: classNames("nav-link", item.variant ? `nav-link-${item.variant}` : ""),
@@ -98,26 +110,31 @@ class Sidebar extends Component {
 
 		// nav link
 		const navLink = (item, key, classes) => {
-			const url = item.url ? item.url : "";
-			const adminOrSuperAdmin = props.user && ((props.user.department && props.user.department === "admin") || !!props.user.superadmin);
+
+            const url = item.url ? item.url : "";
+            console.log("url = ",item)
+
+            const adminOrSuperAdmin = props.user && ((props.user.department && props.user.department === "admin") || !!props.user.superadmin);
 			return (
-				<NavItem key={key} className={classes.item}>
+				<NavItem key={key} className={classes.item}  >
 					{isExternal(url) ? (
-						<RsNavLink href={url} className={classes.link} active>
+						<RsNavLink href={url} className={classes.link}style={{backgroundColor:'#0AC2CC'}} active onClick={(e)=>{
+							console.log("navLinkClicked")
+						}}>
 							{item.icon ? <i className={classes.icon}></i> : null}
 							{item.name}
 							{badge(item.badge)}
 						</RsNavLink>
 					) : item.requiredRole && item.requiredDepartment ? (
 						<HasRole requiredRole={item.requiredRole} requiredDepartment={item.requiredDepartment}>
-							<NavLink to={url} className={classes.link} activeClassName="active" onClick={this.hideMobile} exact={true}>
+							<NavLink to={url} className={classes.link} style={{backgroundColor:'#0AC2CC'}} activeClassName="active" onClick={this.hideMobile} exact={true}>
 								{item.icon ? <i className={classes.icon}></i> : null}
 								{adminOrSuperAdmin && item.alternateName ? item.alternateName : item.name}
 								{badge(item.badge)}
 							</NavLink>
 						</HasRole>
 					) : (
-						<NavLink to={url} className={classes.link} activeClassName="active" onClick={this.hideMobile} exact={true}>
+						<NavLink to={url} className={classes.link} activeClassName="active" onClick={(e)=>this.onClickNav(item)} exact={true}>
 							{item.icon ? <i className={classes.icon}></i> : null}
 							{adminOrSuperAdmin && item.alternateName ? item.alternateName : item.name}
 							{badge(item.badge)}
@@ -155,7 +172,7 @@ class Sidebar extends Component {
 
 		// nav list
 		const navList = (items) => {
-			return items.map((item, index) => navType(item, index));
+			return items.map((item, index) => navItem(item, index));
 		};
 
 		const isExternal = (url) => {

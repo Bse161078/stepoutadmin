@@ -20,7 +20,7 @@ import {
 import Select from "react-select";
 import "react-select/dist/react-select.css";
 import { TextField } from "@material-ui/core";
-export default class UserForm extends React.Component {
+export default class BlogsForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -324,7 +324,7 @@ export default class UserForm extends React.Component {
             <div className="col-md-12 col-sm-12">
               <div className="x_panel">
                 <div className="x_title">
-                  <h2>Enter Venue Details</h2>
+                  <h2>Enter Blogs Details</h2>
                 </div>
                 <div className="x_content">
                   <br />
@@ -336,13 +336,13 @@ export default class UserForm extends React.Component {
                   >
                      <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                        First Name
+                         Title
                       </label>
                       <div className="col-md-6 col-sm-6">
                         <input
                           required
                           type="text"
-                          name="fname"
+                          name="title"
                           className="form-control"
                           value={user.fname}
                           onChange={this.handleInputChange}
@@ -351,121 +351,68 @@ export default class UserForm extends React.Component {
                     </div>
                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                        Last Name
+                         Description
                       </label>
                       <div className="col-md-6 col-sm-6">
                         <input
                           required
                           type="text"
-                          name="lname"
+                          name="description"
                           className="form-control"
-                          value={user.lname}
+                          value={user.fname}
                           onChange={this.handleInputChange}
                         />
                       </div>
                     </div>
-
                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                        DOB
+                        Display Image
                       </label>
-                      <div className="col-md-6 col-sm-6">
+                        <div className="col-md-6 col-sm-6">
                         <input
-                          required
-                          type="date"
-                          name="dob"
+                          type="file"
+                          accept="Cimage/*"
+                          name="profileImage"
                           className="form-control"
-                          value={user.email}
-                          onChange={this.handleInputChange}
+                          onChange={this.handleCarouselImage}
                         />
                       </div>
-                    </div>
-
-                    <div className="form-group row">
+                      </div>
+                      {Cimage ? (
+                      <div className="form-group row">
+                        <label className="control-label col-md-3 col-sm-3"></label>
+                        <div className="col-md-6 col-sm-6">
+                          <img
+                            style={{ marginRight: "5px" }}
+                            width="100"
+                            className="img-fluid"
+                            src={Cfile}
+                            alt="profileImage"
+                          />
+                        </div>
+                      </div>
+                    ) : user.profileImage && user.profileImage.length ? (
+                      <div className="form-group row">
+                        <label className="control-label col-md-3 col-sm-3"></label>
+                        <div className="col-md-6 col-sm-6">
+                          <img
+                            style={{ marginRight: "5px" }}
+                            width="100"
+                            className="img-fluid"
+                            src={`${user.profileImage}`}
+                            alt="profileImage"
+                          />
+                        </div>
+                      </div>
+                    ) : null}
+                      <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                        Occupation
+                        Carousel  Image
                       </label>
                       <div className="col-md-6 col-sm-6">
-                        <input
-                          type="text"
-                          name="occupation"
-                          className="form-control"
-                          value={user.phone}
-                          onChange={this.handleInputChange}
-                        />
+                      <input type="file" id="files" name="files" multiple/>
                       </div>
                     </div>
-
-                    <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">
-                        Location 
-                      </label>
-                      <div className="col-md-6 col-sm-6">
-                        <input
-                          type="text"
-                          name="location"
-                          className="form-control"
-                          value={user.credit}
-                          onChange={this.handleInputChange}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">
-                        Location
-                      </label>
-                      <div className="col-md-6 col-sm-6">
-                        <input
-                          required
-                          type="text"
-                          name="location"
-                          className="form-control"
-                          value={user.handicap}
-                          onChange={this.handleInputChange}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">
-                        Type of restaurants
-                      </label>
-                      <div className="col-md-6 col-sm-6">
-                        <select
-                          style={{ marginTop: 8 }}
-                          value={user.membership}
-                          onChange={this.handleChange}
-                        >
-                           <option name="none">None</option>
-                          <option name="italian" >Italian</option>
-                          <option name="american" >American</option>
-                          <option name="chinese" >Chinese</option>
-                          <option name="greek">Greek</option>
-                          <option name="desi">Desi</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">
-                        Add Tags
-                      </label>
-                      <div className="col-md-6 col-sm-6">
-                        <select
-                          style={{ marginTop: 8 }}
-                          value={user.membership_fee_status}
-                          onChange={this.handleChangeStatus}
-                        >
-                          <option name="none">None</option>
-                          <option name="indoor">Indoor</option>
-                          <option name="outdoor">Outdoor</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    
-
                     <div className="ln_solid"></div>
                     <div className="form-group row">
                       <div className="col-md-6 col-sm-6 offset-md-3">
@@ -482,7 +429,7 @@ export default class UserForm extends React.Component {
                           {isEdit ? " Update" : " Submit"}
                         </Button>
                         <Button
-                          onClick={() => history.push('/users')}
+                          onClick={() => history.push('/Blogs')}
                           className={`mx-3 btn btn-danger btn-lg`}
                         >
                           Cancel

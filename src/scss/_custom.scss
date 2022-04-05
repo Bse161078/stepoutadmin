@@ -143,7 +143,7 @@ select.form-control:not([size]):not([multiple]) {
 
 
 .loginLogo-container {
-  background: #ffffff;
+  background: #0AC2CC;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -151,7 +151,8 @@ select.form-control:not([size]):not([multiple]) {
 }
 
 .login-background-image{
-  background-image: url('../public/img/BG.png');
+  background-image: url('../public/img/Logoimage.png');
+  background-color: #0AC2CC;
         // flex-direction: column;
         background-repeat: no-repeat;
         background-size: cover;  

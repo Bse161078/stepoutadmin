@@ -1,7 +1,8 @@
 {
   "projects": {
     "default": "nuga-test",
-    "nuga": "nuga-test"
+    "nuga": "nuga-test",
+    "step": "stepoutadmin"
   },
   "targets": {}
 }
