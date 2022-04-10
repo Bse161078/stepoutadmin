@@ -23,12 +23,12 @@ export default {
     {
       name: "Venues",
       url: "/Venues",
-      icon: "icon-fire",
+      icon: "icon-globe",
     },
     {
       name: "Blogs",
       url: "/Blogs",
-      icon: "icon-fire",
+      icon: "icon-list",
     },
     {
       name: "Trips",

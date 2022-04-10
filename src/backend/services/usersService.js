@@ -18,12 +18,13 @@ export const getUsers = async function () {
 };
 
 export const addUser = async function (data) {
+  console.log("usersobj",data)
   await db
     .collection("Users")
     .add(data)
     .then(async function (docRef) {
       //   console.log("Document written with ID: ", docRef.id);
-      data.uuid = docRef.id;
+      data.id = docRef.id;
       await updateUser(docRef.id, data);
     });
 };

@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
+//import { useNavigate } from 'react-router-dom';
 import RichTextEditor from "react-rte";
 import { Button } from "reactstrap";
 import {
@@ -13,47 +14,48 @@ import { firebase } from "../backend/firebase";
 import { imageResizeFileUri } from "../static/_imageUtils";
 import { v4 as uuidv4 } from "uuid";
 import SnackBar from "../components/SnackBar";
-
+import '../scss/style.scss'
 import {
   getEvents,
 } from "../backend/services/eventService";
 import Select from "react-select";
 import "react-select/dist/react-select.css";
 import { TextField } from "@material-ui/core";
+import { add } from "lodash";
+import { findRenderedDOMComponentWithClass } from "react-dom/test-utils";
 export default class UserForm extends React.Component {
   constructor(props) {
+    
     super(props);
     this.state = {
       loading: false,
       user: {
-        uuid: "",
-        name: "",
-        fname: "",
-        lname: "",
+        id :"id" + Math.random().toString(16).slice(2,9),
+        firstname: "",
+        lastname: "",
         email: "",
-        phone: "",
-        handicap: "",
-        profileImage: "",
-        credit:"",
-        card_number: "",
-        user_card_cvv:"",
-        user_card_month:'',
-        user_card_year:'',
-        timestampRegister: new Date(),
-        isActive: true,
-        membership: "Unknown",
-        membership_fee_status:""
+        gender: "",
+        occupation: "",
+        signup_stage: "1",
+        dob:"",
+        Restaurants: [{id:0}],
+        IndoorActivities:[{id:0}],
+        OutdoorActivities:[{id:0}],
+        updatedTripLocation:"",
+        username:''
       },
       upcomingEvents: [],
       pastEvents: [],
       image: "",
+   //   navigate:useNavigate(),
       file: "",
-      userId: "",
+      id: 1,
       description: RichTextEditor.createEmptyValue(),
       showSnackBar: false,
       snackBarMessage: "",
       snackBarVariant: "success",
     };
+    console.log("userobj",this.state.user)
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.postUser = this.postUser.bind(this);
@@ -141,6 +143,7 @@ export default class UserForm extends React.Component {
   componentDidMount() {
     const { match } = this.props;
     console.log("this.props", this.props);
+    
     if (match.params.userId)
    
         this.fetchEvent()
@@ -153,12 +156,38 @@ export default class UserForm extends React.Component {
     user[name] = value;
     this.setState({ user });
   }
+ CreateUser = async (user) => {
+  this.setState({loading:true})
+   try{
+    const { history } = this.props;
+   const res = await addUser(user)
+   console.log("addUser",res)
+ //  this.state.navigate('/users')
+   this.setState({
+    loading: false,
+    showSnackBar: true,
+    snackBarMessage: "User Updated!",
+    snackBarVariant: "success",
+  });
+ }
+ catch(e)
+ {
+  this.setState({
+    loading: false,
+    showSnackBar: true,
+    snackBarMessage: "Error updating user",
+    snackBarVariant: "error",
+  });
+   console.log("addUsererror",e)
+ }
+}
+
+
 
   postUser = async (event) => {
     event.preventDefault();
     const { match, history } = this.props;
     const { loading, user, image } = this.state;
-    user.name = user.fname + " " + user.lname;
     if (!loading) {
       this.setState({ loading: true });
 
@@ -167,32 +196,32 @@ export default class UserForm extends React.Component {
       let downloadUrl;
       let imageUri;
 
-      if (imageFile) {
-        imageUri = await imageResizeFileUri({ file: imageFile });
+      // if (imageFile) {
+      //   imageUri = await imageResizeFileUri({ file: imageFile });
 
-        const storageRef = firebase
-          .storage()
-          .ref()
-          .child("Users")
-          .child(`${uuidv4()}.jpeg`);
+      //   const storageRef = firebase
+      //     .storage()
+      //     .ref()
+      //     .child("Users")
+      //     .child(`${uuidv4()}.jpeg`);
 
-        if (imageUri) {
-          await storageRef.putString(imageUri, "data_url");
-          downloadUrl = await storageRef.getDownloadURL();
-        }
-        user.profileImage = downloadUrl;
-      }
+      //   if (imageUri) {
+      //     await storageRef.putString(imageUri, "data_url");
+      //     downloadUrl = await storageRef.getDownloadURL();
+      //   }
+      //   user.profileImage = downloadUrl;
+      // }
 
       if (match.params.userId) {
         let cloneObject = Object.assign({}, user);
-        if(cloneObject.credit)
-        {
+        // if(cloneObject.credit)
+        // {
          
-        }
-        else
-        { cloneObject.credit = 0;
+        // }
+        // else
+        // { cloneObject.credit = 0;
 
-        }
+        // }
         updateUser(match.params.userId, cloneObject)
           .then((response) => {
             this.setState({
@@ -276,22 +305,67 @@ export default class UserForm extends React.Component {
     }
     return false
   }
-
   handleChange = (e) => {
-    console.log("This is the value",e.target.value)
     if(this.isRegisteredForFutureEvent(this.state.user)===false)
-    {
+      {
+        let user = this.state.user;
+        var restaurants=[{}];
+        let value = Array.from(e.target.selectedOptions, option => option.value);
+       value.map((val)=>{
+        const res={
+          id:this.state.id,
+          name:val,
+          selected:true
+        }
+        restaurants.push(res)
+
+        this.state.id+=1
+       })
+       restaurants.splice(0,1)
+        user.Restaurants=restaurants
+        this.setState(user)
+        console.log("This is the restaurants",user.Restaurants,value,restaurants)
+       
+      }
+  }
+  handleChangeOutdoorActivities = (e) =>{
     let user = this.state.user;
- 
-    user.membership = e.target.value;
-    this.setState({ user });
+    var restaurants=[{}];
+    let value = Array.from(e.target.selectedOptions, option => option.value);
+   value.map((val)=>{
+    const res={
+      id:this.state.id,
+      name:val,
+      selected:true
     }
-  };
+    restaurants.push(res)
+
+    this.state.id+=1
+   })
+    restaurants.splice(0,1)
+    user.OutdoorActivities=restaurants
+    this.setState(user)
+    console.log("This is the indooractivities",user.OutdoorActivities,value,restaurants) 
+  }
 
   handleChangeStatus = (e) => {
     let user = this.state.user;
-    user.membership_fee_status = e.target.value;
-    this.setState({ user });
+    var restaurants=[{}];
+    let value = Array.from(e.target.selectedOptions, option => option.value);
+   value.map((val)=>{
+    const res={
+      id:this.state.id,
+      name:val,
+      selected:true
+    }
+    restaurants.push(res)
+
+    this.state.id+=1
+   })
+    restaurants.splice(0,1)
+    user.IndoorActivities=restaurants
+    this.setState(user)
+    console.log("This is the indooractivities",user.IndoorActivities,value,restaurants)
   };
 
 
@@ -311,11 +385,15 @@ export default class UserForm extends React.Component {
     const isEdit = !!match.params.userId;
     return (
       <div className="row animated fadeIn">
+         {this.state.loading===true&&
+          <div class="loader"></div>
+        }
         {showSnackBar && (
           <SnackBar
             open={showSnackBar}
             message={snackBarMessage}
             variant={snackBarVariant}
+            autoHideDuration={1000}
             onClose={() => this.closeSnackBar()}
           />
         )}
@@ -324,7 +402,7 @@ export default class UserForm extends React.Component {
             <div className="col-md-12 col-sm-12">
               <div className="x_panel">
                 <div className="x_title">
-                  <h2>Enter Venue Details</h2>
+                  <h2>Enter User Details</h2>
                 </div>
                 <div className="x_content">
                   <br />
@@ -342,9 +420,9 @@ export default class UserForm extends React.Component {
                         <input
                           required
                           type="text"
-                          name="fname"
+                          name="firstname"
                           className="form-control"
-                          value={user.fname}
+                          value={user.firstname}
                           onChange={this.handleInputChange}
                         />
                       </div>
@@ -357,9 +435,9 @@ export default class UserForm extends React.Component {
                         <input
                           required
                           type="text"
-                          name="lname"
+                          name="lastname"
                           className="form-control"
-                          value={user.lname}
+                          value={user.lastname}
                           onChange={this.handleInputChange}
                         />
                       </div>
@@ -375,6 +453,36 @@ export default class UserForm extends React.Component {
                           type="date"
                           name="dob"
                           className="form-control"
+                          value={user.dob}
+                          onChange={this.handleInputChange}
+                        />
+                      </div>
+                    </div>
+                    <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">
+                        UserName
+                      </label>
+                      <div className="col-md-6 col-sm-6">
+                        <input
+                          required
+                          type="text"
+                          name="username"
+                          className="form-control"
+                          value={user.username}
+                          onChange={this.handleInputChange}
+                        />
+                      </div>
+                    </div>
+                    <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">
+                        Email
+                      </label>
+                      <div className="col-md-6 col-sm-6">
+                        <input
+                          required
+                          type="email"
+                          name="email"
+                          className="form-control"
                           value={user.email}
                           onChange={this.handleInputChange}
                         />
@@ -387,10 +495,11 @@ export default class UserForm extends React.Component {
                       </label>
                       <div className="col-md-6 col-sm-6">
                         <input
+                        required
                           type="text"
                           name="occupation"
                           className="form-control"
-                          value={user.phone}
+                          value={user.occupation}
                           onChange={this.handleInputChange}
                         />
                       </div>
@@ -402,10 +511,11 @@ export default class UserForm extends React.Component {
                       </label>
                       <div className="col-md-6 col-sm-6">
                         <input
+                        required
                           type="text"
-                          name="location"
+                          name="updatedTripLocation"
                           className="form-control"
-                          value={user.credit}
+                          value={user.updatedTripLocation}
                           onChange={this.handleInputChange}
                         />
                       </div>
@@ -413,17 +523,18 @@ export default class UserForm extends React.Component {
 
                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                        Location
+                        Gender
                       </label>
                       <div className="col-md-6 col-sm-6">
-                        <input
-                          required
-                          type="text"
-                          name="location"
-                          className="form-control"
-                          value={user.handicap}
-                          onChange={this.handleInputChange}
-                        />
+                        <input type="radio" id="male" name="gender" value="Male"
+
+                         onChange={this.handleInputChange}
+                      />
+                        <label for="male">Male</label>
+                        <input type="radio" id="female" name="gender"  value="Female"
+                       onChange={this.handleInputChange}
+                      />
+                        <label for="female">Female</label>
                       </div>
                     </div>
 
@@ -432,36 +543,108 @@ export default class UserForm extends React.Component {
                         Type of restaurants
                       </label>
                       <div className="col-md-6 col-sm-6">
-                        <select
+                      <select
+                        name="restaurants"
                           style={{ marginTop: 8 }}
-                          value={user.membership}
+                          //value={user.Restaurants}
                           onChange={this.handleChange}
+                          multiple
                         >
-                           <option name="none">None</option>
-                          <option name="italian" >Italian</option>
-                          <option name="american" >American</option>
-                          <option name="chinese" >Chinese</option>
-                          <option name="greek">Greek</option>
-                          <option name="desi">Desi</option>
+                          
+                          <option name="Italian" >Italian</option>
+                          <option name="American">American</option>
+                          <option name="Chinese">Chinese</option>
+                          <option name="Greek">Greek</option>
+                          <option name="Desi">Desi</option>
+                          <option name="British">British</option>
+                          <option name="Jewish">Jewish</option>
+                          <option name="Mexican">Mexican</option>
+                          <option name="African">African</option>
+                          <option name="Latvian">Latvian</option>
+                          <option name="Polish">Polish</option>
+                          <option name="Polish">Russian</option>
+                          <option name="Sweedish">Sweedish</option>
+                          <option name="Peruvian">Peruvian</option>
+                          <option name="Hawaiian">Hawaiian</option>
+                          <option name="Brazilian">Brazilian</option>
+                          <option name="Salvadorian">Salvadorian</option>
+                          <option name="Thai">Thai</option>
+                          <option name="French">French</option>
                         </select>
                       </div>
                     </div>
 
                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                        Add Tags
+                        Indoor Activities
                       </label>
                       <div className="col-md-6 col-sm-6">
                         <select
                           style={{ marginTop: 8 }}
-                          value={user.membership_fee_status}
+                          //value={user.tags}
                           onChange={this.handleChangeStatus}
+                          multiple
                         >
-                          <option name="none">None</option>
-                          <option name="indoor">Indoor</option>
-                          <option name="outdoor">Outdoor</option>
+                          <option name="Cinema">Cinema</option>
+                          <option name="Theatre">Theatre</option>
+                          <option name="Indoor Golf">Indoor Golf</option>
+                          <option name="Swimming">Swimming</option>
+                          <option name="Gym">Gym</option>
+                          <option name="Spa">Spa</option>
+                          <option name="Shuffle Board">Shuffle Board</option>
+                          <option name="Arcade">Arcade</option>
+                          <option name="Ping Pong">Ping Pong</option>
+                          <option name="Darts">Darts</option>
+                          <option name="Escape Room">Escape Room</option>
+                          <option name="Tennis">Tennis</option>
+                          <option name="Virtual Reality">Virtual Reality</option>
+                          <option name="Planet Jump">Planet Jump</option>
+                          <option name="Laser Tag">Laser Tag</option>
+                          <option name="Cooking Class">Cooking Class</option>
+                          <option name="Poetry Night">Poetry Night</option>
+                          <option name="Open Mic">Open Mic</option>
+                          <option name="Pottery">Pottery</option>
+                          <option name="Painting">Painting</option>
+                          <option name="Museum">Museum</option>
                         </select>
                       </div>
+                      
+                    </div>
+                    <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">
+                        Outdoor Activities
+                      </label>
+                      <div className="col-md-6 col-sm-6">
+                        <select
+                          style={{ marginTop: 8 }}
+                          //value={user.tags}
+                          onChange={this.handleChangeOutdoorActivities}
+                          multiple
+                        >
+                          <option name="Hiking">Hiking</option>
+                          <option name="Cycling">Cycling</option>
+                          <option name="Rock Climbing">Rock Climbing</option>
+                          <option name="Fishing">Fishing</option>
+                          <option name="Outdoor Golf">Outdoor Golf</option>
+                          <option name="Amusement Park">Amusement Park</option>
+                          <option name="Picnic">Picnic</option>
+                          <option name="Drive in Movie">Drive in Movie</option>
+                          <option name="Outdoor Concert">Outdoor Concert</option>
+                          <option name="Winery">Winery</option>
+                          <option name="Zoo Park">Zoo Park</option>
+                          <option name="Go Ape">Go Ape</option>
+                          <option name="Boat Ride">Boat Ride</option>
+                          <option name="Sightseeing">Sightseeing</option>
+                          <option name="Whitewater Rafting">Whitewater Rafting</option>
+                          <option name="Camping">Camping</option>
+                          <option name="Paddleboarding">Paddleboarding</option>
+                          <option name="Rockpooling">Rockpooling</option>
+                          <option name="Farmers Market">Farmers Market</option>
+                          <option name="Stargazing">Stargazing</option>
+                          <option name="Horseback Riding">Horseback Riding</option>
+                        </select>
+                      </div>
+                      
                     </div>
 
                     
@@ -473,6 +656,17 @@ export default class UserForm extends React.Component {
                           className={`btn btn-success btn-lg ${
                             this.state.loading ? "disabled" : ""
                           }`}
+                          onClick={() =>
+                            this.state.user.email&&this.state.user.firstname&&
+                            this.state.user.lastname&&this.state.user.gender&&this.state.user.dob!=''?
+                            this.CreateUser(user)
+                           :this.setState({
+                            loading: false,
+                            showSnackBar: true,
+                            snackBarMessage: "Please fill the form",
+                            snackBarVariant: "error",
+                          })
+                          }
                         >
                           <i
                             className={`fa fa-spinner fa-pulse ${

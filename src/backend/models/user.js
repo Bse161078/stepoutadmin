@@ -1,26 +1,18 @@
 export class User {
   constructor(x) {
-    this.uuid = x.uuid;
-    this.name = x.name;
-    this.fname = x.fname;
-    this.lname = x.lname;
-    this.fcmToken = x.fcmToken;
-    
-    // this.userName = x.userName;
+    this.IndoorActivities = x.IndoorActivities;
+    this.OutdoorActivities = x.OutdoorActivities;
+    this.Restaurants = x.Restaurants;
+    this.dob = x.dob;
     this.email = x.email;
-
-    this.isActive = x.isActive;
-    this.phone = x.phone;
-    // this.collections = x.collections;
-    // this.sneakerSize = x.sneakerSize;
-    this.handicap = x.handicap;
-    this.membership = x.membership;
-    this.membership_fee_status = x.membership_fee_status;
-    this.credit = x.credit;
-    // this.sneakerCount = x.sneakerCount;
-    // this.sneakerScans = x.sneakerScans;
-    this.timestampRegister = x.timestampRegister;
-    this.profileImage = x.profileImage;
+    this.firstname = x.firstname;
+    this.gender = x.gender;
+    this.id = x.id;
+    this.lastname = x.lastname;
+    this.occupation = x.occupation;
+    this.updatedTripLocation = x.updatedTripLocation;
+    this.signup_stage = x.signup_stage;
+    this.username = x.username;
   }
 
   static fromFirestore(doc) {
@@ -29,21 +21,19 @@ export class User {
     if (!data) return null;
 
     return new User({
-      uuid: doc.id,
-      name: data["name"] ? data["name"] : "",
-      fname: data["fname"] ? data["fname"] : "",
-      lname: data["lname"] ? data["lname"] : "",
-      fcmToken: data["fcmToken"] ? data["fcmToken"] : "",
-      
+      id: doc.id,
+      IndoorActivities: data["IndoorActivities"] ? data["IndoorActivities"] : "",
+      OutdoorActivities: data["OutdoorActivities"] ? data["OutdoorActivities"] : "",
+      Restaurants: data["Restaurants"] ? data["Restaurants"] : "",
+      dob: data["dob"] ? data["dob"] : "",
+      occupation: data["occupation"] ? data["occupation"] : "",
       email: data["email"] ? data["email"] : "",
-      isActive: data["isActive"] !== undefined ? data["isActive"] : false,
-      phone: data["phone"] ? data["phone"] : "",
-      // collections: data['collections'] ? data['collections'] : '',
-      // sneakerSize: data['sneakerSize'] ? data['sneakerSize'] : '',
-      handicap: data["handicap"] ? data["handicap"] : "",
-      membership: data["membership"] ? data["membership"] : "Unknown",
-      membership_fee_status: data["membership_fee_status"] ? data["membership_fee_status"] : "Unknown",
-      credit: data["credit"],
+      firstname: data["firstname"] ? data["firstname"] : "",
+      updatedTripLocation: data["updatedTripLocation"] ? data["updatedTripLocation"] : "",
+      gender: data["gender"] ? data["gender"] : "",
+      lastname: data["lastname"] ? data["lastname"] : "Unknown",
+      signup_stage: data["signup_stage"] ? data["signup_stage"] : "Unknown",
+      username: data["username"],
 
       
 

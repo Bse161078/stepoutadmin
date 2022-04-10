@@ -195,7 +195,7 @@ class Login extends Component {
                   <CardBody className="text-center">
                     <div>
                       <div style={style.logoWrapper} className={`svg-logo`}>
-                        <img className={`companyLogo`} src={sneaker} />
+                        <img  src={sneaker} />
                       </div>
                       {/* <div className={`text-center`} style={{ fontSize: '20px', paddingTop: "10px", fontWeight: "bold" }}>Sneaker Log Dashboard</div> */}
                     </div>

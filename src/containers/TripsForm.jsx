@@ -8,10 +8,14 @@ import {
   updateUser,
   getUserById,
 } from "../backend/services/usersService";
+import {
+  getVenues,
+} from "../backend/services/VenueServices"
+import {addTrip} from '../backend/services/TripsService'
 import moment from "moment";
 import { firebase } from "../backend/firebase";
 import { imageResizeFileUri } from "../static/_imageUtils";
-import { v4 as uuidv4 } from "uuid";
+import { NIL, v4 as uuidv4 } from "uuid";
 import SnackBar from "../components/SnackBar";
 
 import {
@@ -24,30 +28,27 @@ export default class TripsForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: false,
-      user: {
-        uuid: "",
-        name: "",
-        fname: "",
-        lname: "",
-        email: "",
-        phone: "",
-        handicap: "",
-        profileImage: "",
-        credit:"",
-        card_number: "",
-        user_card_cvv:"",
-        user_card_month:'',
-        user_card_year:'',
-        timestampRegister: new Date(),
-        isActive: true,
-        membership: "Unknown",
-        membership_fee_status:""
+      loading: true,
+      trips: {
+        Description: "",
+        Name: "",
+        Venues: "",
+        startTime: "",
+        endTime: "",
+        Rating: "",
+        totalTime: "",
+        Reviews:[],
+        restaurants:'',
+        Image:'',
+        IndoorActivities:'',
+        OutdoorActivities:''
       },
       upcomingEvents: [],
       pastEvents: [],
       image: "",
       file: "",
+      venues:[{}],
+      Dimage:'',
       userId: "",
       description: RichTextEditor.createEmptyValue(),
       showSnackBar: false,
@@ -56,88 +57,48 @@ export default class TripsForm extends React.Component {
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
-    this.postUser = this.postUser.bind(this);
+   // this.postUser = this.postUser.bind(this);
   }
-
-  fetchEvent = () => {
+  componentDidMount(){
+    this.fetchVenues()
+    console.log("venue")
+  }
+  componentWillMount()
+  {
+    this.fetchVenues()
+    console.log("venue")
+  }
+  fetchVenues = () => {
     this.setState({ loading: true });
-    getEvents()
+       getVenues()
+     
       .then((response) => {
         this.setState({
-          events: response,
+          venues: response,
           loading: false,
-          responseMessage: "No Events Found",
         });
-
-        const upcoming = response.filter((element) => {
-          let date = moment(new Date(element.date.seconds * 1000));
-          let curentDate = new Date();
-          console.log(
-            `${element.name} minutes up:`,
-            date.diff(curentDate, "minutes")
-          );
-          return date.diff(curentDate, "minutes") > 0 && element.status == true;
-        });
-        const past = response.filter((element) => {
-          let date = moment(new Date(element.date.seconds * 1000));
-          let curentDate = new Date();
-          // console.log(
-          //   `${element.name} minutes past:`,
-          //   date.diff(curentDate, "minutes")
-          // );
-
-          return date.diff(curentDate, "minutes") < 0 || !element.status;
-        });
-
-        upcoming.sort((a, b) => {
-          var nameA = moment(new Date(a.date.seconds * 1000));
-          // var nameA = a.item_name.charAt(0).toUpperCase();
-          var nameB = moment(new Date(b.date.seconds * 1000));
-          if (nameA.diff(nameB, "minutes") < 0) {
-            return -1;
-          }
-          if (nameA.diff(nameB, "minutes") > 0) {
-            return 1;
-          }
-          // names must be equal
-          return 0;
-        });
-
-        past.sort((a, b) => {
-          var nameA = moment(new Date(a.date.seconds * 1000));
-          // var nameA = a.item_name.charAt(0).toUpperCase();
-          var nameB = moment(new Date(b.date.seconds * 1000));
-
-          if (nameA.diff(nameB, "minutes") > 0) {
-            return -1;
-          }
-          if (nameA.diff(nameB, "minutes") < 0) {
-            return 1;
-          }
-          // names must be equal
-          return 0;
-        });
-
-        this.setState({ upcomingEvents: upcoming, pastEvents: past });
-           getUserById(this.props.match.params.userId)
-        .then((response) => {
-          console.log("user:", response);
-          this.setState({
-            user: response,
-          });
-        })
-        .catch((err) => {
-          window.alert("ERROR!");
-        });
+        console.log("venue",response)
       })
       .catch(() => {
         this.setState({
           loading: false,
-          responseMessage: "No Events Found...",
         });
       });
   };
-
+  uploadImage (evt) {
+    return new  Promise((resolve,reject)=>{
+      console.log(evt);
+      var storage = firebase.storage().ref(`/Trips/`+evt.name);
+      const storageRef=storage.put(evt);
+      storageRef.on("state_changed" , async()=>{
+        let downloadUrl = await storage.getDownloadURL();
+       // this.setState({venue:venue})
+        console.log('hamzaimage',downloadUrl);
+        resolve(downloadUrl)        
+    })
+  
+    })
+}
   componentDidMount() {
     const { match } = this.props;
     console.log("this.props", this.props);
@@ -149,11 +110,34 @@ export default class TripsForm extends React.Component {
   handleInputChange(event) {
     const { value, name } = event.target;
 
-    const { user } = this.state;
-    user[name] = value;
-    this.setState({ user });
+    const { trips } = this.state;
+    trips[name] = value;
+    this.setState({ trips });
   }
 
+  handleAddTrip=async(trip)=>{
+    const img =await this.uploadImage(this.state.Dimage)
+    trip.Image=img
+    
+    addTrip(trip)
+          .then((response) => {
+            this.setState({
+              loading: false,
+              showSnackBar: true,
+              snackBarMessage: "Trip Created successfully",
+              snackBarVariant: "success",
+            });
+          })
+          .catch((err) => {
+            console.log("Error:", err);
+            this.setState({
+              loading: false,
+              showSnackBar: true,
+              snackBarMessage: "Error creating trip",
+              snackBarVariant: "error",
+            });
+          });
+  }
   postUser = async (event) => {
     event.preventDefault();
     const { match, history } = this.props;
@@ -241,6 +225,7 @@ export default class TripsForm extends React.Component {
     });
   };
   handleCarouselImage = (event) => {
+    this.state.Dimage=event.target.files[0]
     this.setState({
       Cimage: event.target.files[0],
       Cfile: URL.createObjectURL(event.target.files[0]),
@@ -278,15 +263,82 @@ export default class TripsForm extends React.Component {
   }
 
   handleChange = (e) => {
-    console.log("This is the value",e.target.value)
-    if(this.isRegisteredForFutureEvent(this.state.user)===false)
-    {
-    let user = this.state.user;
- 
-    user.membership = e.target.value;
-    this.setState({ user });
-    }
-  };
+    if(this.isRegisteredForFutureEvent(this.state.trips)===false)
+      {
+        let trip = this.state.trips;
+        var venues=[{}];
+        var resid=1
+        let value = Array.from(e.target.selectedOptions, option => option.id);
+       value.map((val)=>{
+         for(let i=0;i<this.state.venues.length;i++)
+         {
+           if(val===this.state.venues[i].id&&this.state.venues[i].id!="")
+           {
+             const resvenue={
+               Name:this.state.venues[i].Name,
+               Address:this.state.venues[i].Address,
+               Image:this.state.venues[i].Image
+             }
+             venues.push(resvenue)
+           }
+         
+         }
+       })
+       venues.splice(0,1)
+       trip.Venues=venues
+        this.setState(trip)
+        console.log("This is the restaurants",trip.Venues,venues)
+       
+      }
+  }
+
+  handleChangeRestaurants = (e) => {
+    if(this.isRegisteredForFutureEvent(this.state.venue)===false)
+      {
+        let trip = this.state.trips;
+        var restaurants=[{}];
+        var resid=1
+        let value = Array.from(e.target.selectedOptions, option => option.value);
+       value.map((val)=>{
+        const res={
+          id:resid,
+          name:val,
+          selected:true
+        }
+        restaurants.push(res)
+        this.resid+=1
+       })
+       restaurants.splice(0,1)
+       trip.restaurants=restaurants
+        this.setState(trip)
+        console.log("This is the restaurants",restaurants)
+       
+      }
+  }
+
+  // handleChange = (e) => {
+  //   if(this.isRegisteredForFutureEvent(this.state.trips)===false)
+  //     {
+  //       let venue = this.state.trips;
+  //       var venues=[{}];
+  //       var resid=1
+  //       let value = Array.from(e.target.selectedOptions, option => option.value);
+  //      value.map((val)=>{
+  //       const res={
+  //         id:resid,
+  //         name:val,
+  //         selected:true
+  //       }
+  //       venues.push(res)
+  //       this.resid+=1
+  //      })
+  //      venues.splice(0,1)
+  //      venue.Venues=venues
+  //       this.setState(venue)
+  //       console.log("This is the restaurants",venue.Venues,venues,e.target.selectedOptions,e)
+       
+  //     }
+  // }
 
   handleChangeStatus = (e) => {
     let user = this.state.user;
@@ -294,16 +346,56 @@ export default class TripsForm extends React.Component {
     this.setState({ user });
   };
 
+  handleChangeOutdoorActivities = (e) =>{
+    let trips = this.state.trips;
+    var Selectedtrip=[{}];
+    var resid=1
+    let value = Array.from(e.target.selectedOptions, option => option.value);
+   value.map((val)=>{
+    const res={
+      id:resid,
+      name:val,
+      selected:true
+    }
+    Selectedtrip.push(res)
+    resid+=1
+   })
+   Selectedtrip.splice(0,1)
+   trips.OutdoorActivities=Selectedtrip
+    this.setState(trips)
+    console.log("This is the outdooractivities",trips.OutdoorActivities,value,Selectedtrip) 
+  }
+
+  handleChangeStatus = (e) => {
+    let trip = this.state.trips;
+    var selectedIndooractivities=[{}];
+    var resid=1
+    let value = Array.from(e.target.selectedOptions, option => option.value);
+   value.map((val)=>{
+    const res={
+      id:resid,
+      name:val,
+      selected:true
+    }
+    selectedIndooractivities.push(res)
+    resid+=1
+   })
+   selectedIndooractivities.splice(0,1)
+   trip.IndoorActivities=selectedIndooractivities
+    this.setState(trip)
+    console.log("This is the indooractivities",trip.IndoorActivities,value,selectedIndooractivities)
+  };
 
   render() {
     console.log(this.state);
     const {
-      user,
+      trips,
       showSnackBar,
       snackBarMessage,
       snackBarVariant,
       Cimage,
       Cfile,
+      loading,
       Dimage,
       Dfile
     } = this.state;
@@ -361,19 +453,6 @@ export default class TripsForm extends React.Component {
                           />
                         </div>
                       </div>
-                    ) : user.profileImage && user.profileImage.length ? (
-                      <div className="form-group row">
-                        <label className="control-label col-md-3 col-sm-3"></label>
-                        <div className="col-md-6 col-sm-6">
-                          <img
-                            style={{ marginRight: "5px" }}
-                            width="100"
-                            className="img-fluid"
-                            src={`${user.profileImage}`}
-                            alt="profileImage"
-                          />
-                        </div>
-                      </div>
                     ) : null}
                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
@@ -383,9 +462,9 @@ export default class TripsForm extends React.Component {
                         <input
                           required
                           type="text"
-                          name="name"
+                          name="Name"
                           className="form-control"
-                          value={user.fname}
+                      //    value={user.fname}
                           onChange={this.handleInputChange}
                         />
                       </div>
@@ -398,9 +477,9 @@ export default class TripsForm extends React.Component {
                         <input
                           required
                           type="text"
-                          name="description"
+                          name="Description"
                           className="form-control"
-                          value={user.lname}
+                         // value={user.lname}
                           onChange={this.handleInputChange}
                         />
                       </div>
@@ -410,16 +489,19 @@ export default class TripsForm extends React.Component {
                         Venues
                       </label>
                       <div className="col-md-6 col-sm-6">
-                      <select data-placeholder="Begin typing a name to filter..." multiple class="chosen-select" name="test">
-                        <option>Blue Swan Palace</option>
-                        <option>Boulevard Hall</option>
-                        <option>Bridgewater Manor</option>
-                        <option>Cityplace Events</option>
-                        <option>Creative Affairs</option>
-                        <option>Paradise Point Resort</option>
-                        <option>Gateway Center</option>
-                        <option>Elite Bookings</option>
-                    </select>
+                      {this.state.venues&&
+                          <select
+                          name="Venues"
+                          style={{ marginTop: 8 }}
+                          onChange={this.handleChange}
+                          multiple
+                       >
+                        {this.state.venues.map((ven)=>{
+                          return(
+                        <option id={ven.id} >{ven.Name}</option>
+                        )})
+                    }
+                    </select>}
                       </div>
                     </div>
                      <div className="form-group row">
@@ -430,9 +512,8 @@ export default class TripsForm extends React.Component {
                         <input
                           // required
                           type="time"
-                          name="start time"
+                          name="startTime"
                           className="form-control"
-                          value={user.phone}
                           onChange={this.handleInputChange}
                         />
                       </div>
@@ -445,9 +526,8 @@ export default class TripsForm extends React.Component {
                       <div className="col-md-6 col-sm-6">
                         <input
                           type="time"
-                          name="End Time"
+                          name="endTime"
                           className="form-control"
-                          value={user.credit}
                           onChange={this.handleInputChange}
                         />
                       </div>
@@ -460,29 +540,118 @@ export default class TripsForm extends React.Component {
                       <div className="col-md-6 col-sm-6">
                         <input
                           required
-                          type="time"
-                          name="total time"
+                          type="number"
+                          name="totalTime"
                           className="form-control"
-                          value={user.handicap}
                           onChange={this.handleInputChange}
                         />
                       </div>
                     </div>
                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                        Add Tags
+                        Type of restaurants
+                      </label>
+                      <div className="col-md-6 col-sm-6">
+                      <select
+                        name="restaurants"
+                          style={{ marginTop: 8 }}
+                          onChange={this.handleChangeRestaurants}
+                          multiple
+                        >
+                          <option name="Italian" >Italian</option>
+                          <option name="American">American</option>
+                          <option name="Chinese">Chinese</option>
+                          <option name="Greek">Greek</option>
+                          <option name="Desi">Desi</option>
+                          <option name="British">British</option>
+                          <option name="Jewish">Jewish</option>
+                          <option name="Mexican">Mexican</option>
+                          <option name="African">African</option>
+                          <option name="Latvian">Latvian</option>
+                          <option name="Polish">Polish</option>
+                          <option name="Polish">Russian</option>
+                          <option name="Sweedish">Sweedish</option>
+                          <option name="Peruvian">Peruvian</option>
+                          <option name="Hawaiian">Hawaiian</option>
+                          <option name="Brazilian">Brazilian</option>
+                          <option name="Salvadorian">Salvadorian</option>
+                          <option name="Thai">Thai</option>
+                          <option name="French">French</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">
+                        Indoor Activities
                       </label>
                       <div className="col-md-6 col-sm-6">
                         <select
                           style={{ marginTop: 8 }}
-                          value={user.membership_fee_status}
+                          //value={user.tags}
                           onChange={this.handleChangeStatus}
+                          multiple
                         >
-                          <option name="none">None</option>
-                          <option name="indoor">Indoor</option>
-                          <option name="outdoor">Outdoor</option>
+                          <option name="Cinema">Cinema</option>
+                          <option name="Theatre">Theatre</option>
+                          <option name="Indoor Golf">Indoor Golf</option>
+                          <option name="Swimming">Swimming</option>
+                          <option name="Gym">Gym</option>
+                          <option name="Spa">Spa</option>
+                          <option name="Shuffle Board">Shuffle Board</option>
+                          <option name="Arcade">Arcade</option>
+                          <option name="Ping Pong">Ping Pong</option>
+                          <option name="Darts">Darts</option>
+                          <option name="Escape Room">Escape Room</option>
+                          <option name="Tennis">Tennis</option>
+                          <option name="Virtual Reality">Virtual Reality</option>
+                          <option name="Planet Jump">Planet Jump</option>
+                          <option name="Laser Tag">Laser Tag</option>
+                          <option name="Cooking Class">Cooking Class</option>
+                          <option name="Poetry Night">Poetry Night</option>
+                          <option name="Open Mic">Open Mic</option>
+                          <option name="Pottery">Pottery</option>
+                          <option name="Painting">Painting</option>
+                          <option name="Museum">Museum</option>
                         </select>
                       </div>
+                      
+                    </div>
+                    <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">
+                        Outdoor Activities
+                      </label>
+                      <div className="col-md-6 col-sm-6">
+                        <select
+                          style={{ marginTop: 8 }}
+                          //value={user.tags}
+                          onChange={this.handleChangeOutdoorActivities}
+                          multiple
+                        >
+                          <option name="Hiking">Hiking</option>
+                          <option name="Cycling">Cycling</option>
+                          <option name="Rock Climbing">Rock Climbing</option>
+                          <option name="Fishing">Fishing</option>
+                          <option name="Outdoor Golf">Outdoor Golf</option>
+                          <option name="Amusement Park">Amusement Park</option>
+                          <option name="Picnic">Picnic</option>
+                          <option name="Drive in Movie">Drive in Movie</option>
+                          <option name="Outdoor Concert">Outdoor Concert</option>
+                          <option name="Winery">Winery</option>
+                          <option name="Zoo Park">Zoo Park</option>
+                          <option name="Go Ape">Go Ape</option>
+                          <option name="Boat Ride">Boat Ride</option>
+                          <option name="Sightseeing">Sightseeing</option>
+                          <option name="Whitewater Rafting">Whitewater Rafting</option>
+                          <option name="Camping">Camping</option>
+                          <option name="Paddleboarding">Paddleboarding</option>
+                          <option name="Rockpooling">Rockpooling</option>
+                          <option name="Farmers Market">Farmers Market</option>
+                          <option name="Stargazing">Stargazing</option>
+                          <option name="Horseback Riding">Horseback Riding</option>
+                        </select>
+                      </div>
+                      
                     </div>
 
                     
@@ -494,6 +663,22 @@ export default class TripsForm extends React.Component {
                           className={`btn btn-success btn-lg ${
                             this.state.loading ? "disabled" : ""
                           }`}
+                          onClick={()=>{
+                            if(trips.Name&&trips.Venues&&
+                              (trips.IndoorActivities||trips.OutdoorActivities||trips.restaurants)&&this.state.Dimage!="")
+                            {
+                             this.state.loading=true
+                             this.setState({loading:true})
+                            this.handleAddTrip(this.state.trips)
+                           }
+                           else{
+                             this.setState({
+                               showSnackBar:true,
+                               snackBarMessage:"Please fill the form",
+                               snackBarVariant: "error",
+                             })
+                           }
+                           }}
                         >
                           <i
                             className={`fa fa-spinner fa-pulse ${

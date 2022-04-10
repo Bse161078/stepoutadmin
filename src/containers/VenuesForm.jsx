@@ -10,6 +10,7 @@ import {
 } from "../backend/services/usersService";
 import moment from "moment";
 import { firebase } from "../backend/firebase";
+import '../scss/style.scss'
 import { imageResizeFileUri } from "../static/_imageUtils";
 import { v4 as uuidv4 } from "uuid";
 import SnackBar from "../components/SnackBar";
@@ -20,33 +21,30 @@ import {
 import Select from "react-select";
 import "react-select/dist/react-select.css";
 import { TextField } from "@material-ui/core";
+import { addVenue } from "../backend/services/VenueServices";
 export default class VenuesForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       loading: false,
-      user: {
-        uuid: "",
-        name: "",
-        fname: "",
-        lname: "",
-        email: "",
-        phone: "",
-        handicap: "",
-        profileImage: "",
-        credit:"",
-        card_number: "",
-        user_card_cvv:"",
-        user_card_month:'',
-        user_card_year:'',
-        timestampRegister: new Date(),
-        isActive: true,
-        membership: "Unknown",
-        membership_fee_status:""
+      venue: {
+        id: "",
+        Name: "",
+        endTime:'',
+        Time: "",
+        description: "",
+        IndoorActivities:"",
+        OutdoorActivities:"",
+        address:'',
+        Image:'',
+        Images:[]
       },
+      id:1,
       upcomingEvents: [],
       pastEvents: [],
       image: "",
+      Cimage:[],
+      Dimage:'',
       file: "",
       userId: "",
       description: RichTextEditor.createEmptyValue(),
@@ -58,6 +56,39 @@ export default class VenuesForm extends React.Component {
     this.handleInputChange = this.handleInputChange.bind(this);
     this.postUser = this.postUser.bind(this);
   }
+  uploadImage (evt) {
+    return new  Promise((resolve,reject)=>{
+      console.log(evt);
+      var storage = firebase.storage().ref(`/Venues/`+evt.name);
+      const storageRef=storage.put(evt);
+      storageRef.on("state_changed" , async()=>{
+        let downloadUrl = await storage.getDownloadURL();
+       // this.setState({venue:venue})
+        console.log('hamzaimage',downloadUrl);
+        resolve(downloadUrl)        
+    })
+  
+    })
+}
+uploadCImage = (evt)=>{
+  return new  Promise((resolve,reject)=>{
+  var storage = firebase.storage().ref(`/Venues`);
+    const storageRef=storage.put(evt);
+    storageRef.on("state_changed" , async()=>{
+      let downloadUrl = await storage.getDownloadURL();
+      console.log('hamzaimage',evt);
+      resolve(downloadUrl)  
+  });
+})
+}
+
+  //  uploadCImage = ()=>{
+  //   var storage = firebase.storage()
+  //   if(this.state.Cimage == null)
+  //     return;
+  //   storage.ref('/Venues/Image'+this.state.Cimage.name}).put(this.state.Cimage)
+  //   .on("state_changed" , alert("success") , alert);
+  // }
 
   fetchEvent = () => {
     this.setState({ loading: true });
@@ -149,11 +180,87 @@ export default class VenuesForm extends React.Component {
   handleInputChange(event) {
     const { value, name } = event.target;
 
-    const { user } = this.state;
-    user[name] = value;
-    this.setState({ user });
+    const { venue } = this.state;
+    venue[name] = value;
+    this.setState({ venue });
   }
+handleAddVenue=async(addvenue)=>{
+  
+ let Images=[]
+  const imageUrl=await this.uploadImage(this.state.Dimage);
+  addvenue.Image=imageUrl;
+  const multipleFiles=this.state.Cimage[0];
+  for (let i =0;i<multipleFiles.length;i++)
+  {
+    const imges=await this.uploadImage(multipleFiles[i])
+    Images.push(imges)
+  }
+ 
+  addvenue.Images=Images;
+  this.setState({loading:true})
+  console.log("venue",addvenue)
+  try{
+    const { history } = this.props;
+   const res = await addVenue(addvenue)
+ //this.state.navigate('/users')
+   this.setState({
+    loading: false,
+    showSnackBar: true,
+    snackBarMessage: "Venue Updated!",
+    snackBarVariant: "success",
+  });
+ }
+ catch(e)
+ {
+  this.setState({
+    loading: false,
+    showSnackBar: true,
+    snackBarMessage: "Error updating venue",
+    snackBarVariant: "error",
+  });
+  console.log("err = ",e)
+ }
+}
+  // const { match, history } = this.props;
+  //   const { loading, venue } = this.state;
+  // let image = this.state.Cimage;
+  // let images = this.state.Dimage;
+  // let downloadUrl;
+  // let imageUri;
+  // if (image) {
+  //   imageUri = await imageResizeFileUri({ file: image });
+  //   const storageRef = firebase
+  //     .storage()
+  //     .ref()
+  //     .child("Venues")
+  //     .child(`${uuidv4()}.jpeg`);
+  //   if (imageUri) {
+  //     await storageRef.putString(imageUri, "data_url");
+  //     downloadUrl = await storageRef.getDownloadURL();
+  //   }
+  //   venue.Cimage = downloadUrl;
+  // }
 
+//   addVenue(addvenue)
+//   .then((response) => {
+//     console.log("response:", response);
+//     this.setState({
+//       loading: false,
+//       showSnackBar: true,
+//       snackBarMessage: "User saved successfully",
+//       snackBarVariant: "success",
+//     });
+//   })
+//   .catch((err) => {
+//     this.setState({
+//       loading: false,
+//       showSnackBar: true,
+//       snackBarMessage: "Error creating user",
+//       snackBarVariant: "error",
+//     });
+  
+// })
+//}
   postUser = async (event) => {
     event.preventDefault();
     const { match, history } = this.props;
@@ -235,16 +342,25 @@ export default class VenuesForm extends React.Component {
   };
 
   handleDisplayImage = (event) => {
-    this.setState({
-      Dimage: event.target.files[0],
-      Dile: URL.createObjectURL(event.target.files[0]),
-    });
+  var img = [{}]
+  for(let i=0;i<event.target.files.length;i++)
+  {
+    const newimage=event.target.files[i]
+    newimage["id"] = Math.random()
+    
+    img.push(newimage)
+  }
+  
+  img.splice(0,1)
+  this.state.Cimage.push(img)
+    console.log('target',img,this.state.Cimage)
   };
   handleCarouselImage = (event) => {
+    this.state.Dimage=event.target.files[0]
     this.setState({
-      Cimage: event.target.files[0],
-      Cfile: URL.createObjectURL(event.target.files[0]),
+      Dfile: URL.createObjectURL(event.target.files[0]),
     });
+    console.log("target",event.target.files[0],"targetachieve",this.state.Dimage)
   };
 
 
@@ -278,27 +394,74 @@ export default class VenuesForm extends React.Component {
   }
 
   handleChange = (e) => {
-    console.log("This is the value",e.target.value)
-    if(this.isRegisteredForFutureEvent(this.state.user)===false)
-    {
-    let user = this.state.user;
- 
-    user.membership = e.target.value;
-    this.setState({ user });
+    if(this.isRegisteredForFutureEvent(this.state.venue)===false)
+      {
+        let venue = this.state.venue;
+        var restaurants=[{}];
+        var resid=1
+        let value = Array.from(e.target.selectedOptions, option => option.value);
+       value.map((val)=>{
+        const res={
+          id:resid,
+          name:val,
+          selected:true
+        }
+        restaurants.push(res)
+        this.resid+=1
+       })
+       restaurants.splice(0,1)
+       venue.Restaurants=restaurants
+        this.setState(venue)
+        console.log("This is the restaurants",venue.Restaurants,value,restaurants)
+       
+      }
+  }
+
+  handleChangeOutdoorActivities = (e) =>{
+    let venue = this.state.venue;
+    var restaurants=[{}];
+    var resid=1
+    let value = Array.from(e.target.selectedOptions, option => option.value);
+   value.map((val)=>{
+    const res={
+      id:resid,
+      name:val,
+      selected:true
     }
-  };
+    restaurants.push(res)
+    resid+=1
+   })
+   restaurants.splice(0,1)
+   venue.OutdoorActivities=restaurants
+    this.setState(venue)
+    console.log("This is the outdooractivities",venue.OutdoorActivities,value,restaurants) 
+  }
 
   handleChangeStatus = (e) => {
-    let user = this.state.user;
-    user.membership_fee_status = e.target.value;
-    this.setState({ user });
+    let venue = this.state.venue;
+    var restaurants=[{}];
+    var resid=1
+    let value = Array.from(e.target.selectedOptions, option => option.value);
+   value.map((val)=>{
+    const res={
+      id:resid,
+      name:val,
+      selected:true
+    }
+    restaurants.push(res)
+    resid+=1
+   })
+   restaurants.splice(0,1)
+   venue.IndoorActivities=restaurants
+    this.setState(venue)
+    console.log("This is the indooractivities",venue.IndoorActivities,value,restaurants)
   };
 
 
   render() {
     console.log(this.state);
     const {
-      user,
+      venue,
       showSnackBar,
       snackBarMessage,
       snackBarVariant,
@@ -311,11 +474,15 @@ export default class VenuesForm extends React.Component {
     const isEdit = !!match.params.userId;
     return (
       <div className="row animated fadeIn">
+        {this.state.loading===true&&
+          <div class="loader"></div>
+        }
         {showSnackBar && (
           <SnackBar
             open={showSnackBar}
             message={snackBarMessage}
             variant={snackBarVariant}
+            autoHideDuration={1000}
             onClose={() => this.closeSnackBar()}
           />
         )}
@@ -348,7 +515,7 @@ export default class VenuesForm extends React.Component {
                         />
                       </div>
                       </div>
-                      {Cimage ? (
+                      {Dimage ? (
                       <div className="form-group row">
                         <label className="control-label col-md-3 col-sm-3"></label>
                         <div className="col-md-6 col-sm-6">
@@ -356,12 +523,12 @@ export default class VenuesForm extends React.Component {
                             style={{ marginRight: "5px" }}
                             width="100"
                             className="img-fluid"
-                            src={Cfile}
+                            src={Dfile}
                             alt="profileImage"
                           />
                         </div>
                       </div>
-                    ) : user.profileImage && user.profileImage.length ? (
+                    ) : venue.profileImage && venue.profileImage.length ? (
                       <div className="form-group row">
                         <label className="control-label col-md-3 col-sm-3"></label>
                         <div className="col-md-6 col-sm-6">
@@ -369,20 +536,27 @@ export default class VenuesForm extends React.Component {
                             style={{ marginRight: "5px" }}
                             width="100"
                             className="img-fluid"
-                            src={`${user.profileImage}`}
+                            src={`${venue.profileImage}`}
                             alt="profileImage"
                           />
                         </div>
                       </div>
                     ) : null}
-                      <div className="form-group row">
+                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                        Carousel  Image
+                        Carousel Image
                       </label>
-                      <div className="col-md-6 col-sm-6">
-                      <input type="file" id="files" name="files" multiple/>
+                        <div className="col-md-6 col-sm-6">
+                        <input
+                          type="file"
+                          accept="Dimage/*"
+                          name="profileImage"
+                          multiple
+                          className="form-control"
+                          onChange={this.handleDisplayImage}
+                        />
                       </div>
-                    </div>
+                      </div>
 
                   
 
@@ -394,9 +568,9 @@ export default class VenuesForm extends React.Component {
                         <input
                           required
                           type="text"
-                          name="fname"
+                          name="Name"
                           className="form-control"
-                          value={user.fname}
+                          //value={venue.Name}
                           onChange={this.handleInputChange}
                         />
                       </div>
@@ -409,14 +583,29 @@ export default class VenuesForm extends React.Component {
                         <input
                           required
                           type="time"
-                          name="lname"
+                          name="Time"
                           className="form-control"
-                          value={user.lname}
+                          //value={venue.Time}
                           onChange={this.handleInputChange}
                         />
                       </div>
                     </div>
 
+                    {/* <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">
+                        Total Time
+                      </label>
+                      <div className="col-md-6 col-sm-6">
+                        <input
+                          required
+                          type="text"
+                          name="totalTime"
+                          className="form-control"
+                          //value={venue.totalTime}
+                          onChange={this.handleInputChange}
+                        />
+                      </div>
+                    </div> */}
                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
                         Closing Time
@@ -425,9 +614,9 @@ export default class VenuesForm extends React.Component {
                         <input
                           required
                           type="time"
-                          name="closing time"
+                          name="endTime"
                           className="form-control"
-                          value={user.email}
+                          //value={venue.endTime}
                           onChange={this.handleInputChange}
                         />
                       </div>
@@ -439,11 +628,11 @@ export default class VenuesForm extends React.Component {
                       </label>
                       <div className="col-md-6 col-sm-6">
                         <input
-                          // required
+                          required
                           type="text"
                           name="address"
                           className="form-control"
-                          value={user.phone}
+                         // value={venue.address}
                           onChange={this.handleInputChange}
                         />
                       </div>
@@ -455,16 +644,17 @@ export default class VenuesForm extends React.Component {
                       </label>
                       <div className="col-md-6 col-sm-6">
                         <input
+                          required
                           type="text"
                           name="description"
                           className="form-control"
-                          value={user.credit}
+                       //   value={venue.description}
                           onChange={this.handleInputChange}
                         />
                       </div>
                     </div>
 
-                    <div className="form-group row">
+                    {/* <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
                         Location
                       </label>
@@ -474,47 +664,118 @@ export default class VenuesForm extends React.Component {
                           type="text"
                           name="location"
                           className="form-control"
-                          value={user.handicap}
-                          onChange={this.handleInputChange}
+                          //value={user.handicap}
+                         // onChange={this.handleInputChange}
                         />
                       </div>
-                    </div>
+                    </div> */}
 
                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
                         Type of restaurants
                       </label>
                       <div className="col-md-6 col-sm-6">
-                        <select
+                      <select
+                        name="restaurants"
                           style={{ marginTop: 8 }}
-                          value={user.membership}
+//value={user.restaurants}
                           onChange={this.handleChange}
+                          multiple
                         >
-                           <option name="none">None</option>
-                          <option name="italian" >Italian</option>
-                          <option name="american" >American</option>
-                          <option name="chinese" >Chinese</option>
-                          <option name="greek">Greek</option>
-                          <option name="desi">Desi</option>
+                          <option name="Italian" >Italian</option>
+                          <option name="American">American</option>
+                          <option name="Chinese">Chinese</option>
+                          <option name="Greek">Greek</option>
+                          <option name="Desi">Desi</option>
+                          <option name="British">British</option>
+                          <option name="Jewish">Jewish</option>
+                          <option name="Mexican">Mexican</option>
+                          <option name="African">African</option>
+                          <option name="Latvian">Latvian</option>
+                          <option name="Polish">Polish</option>
+                          <option name="Polish">Russian</option>
+                          <option name="Sweedish">Sweedish</option>
+                          <option name="Peruvian">Peruvian</option>
+                          <option name="Hawaiian">Hawaiian</option>
+                          <option name="Brazilian">Brazilian</option>
+                          <option name="Salvadorian">Salvadorian</option>
+                          <option name="Thai">Thai</option>
+                          <option name="French">French</option>
                         </select>
                       </div>
                     </div>
 
                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                        Add Tags
+                        Indoor Activities
                       </label>
                       <div className="col-md-6 col-sm-6">
                         <select
                           style={{ marginTop: 8 }}
-                          value={user.membership_fee_status}
+                          //value={user.tags}
                           onChange={this.handleChangeStatus}
+                          multiple
                         >
-                          <option name="none">None</option>
-                          <option name="indoor">Indoor</option>
-                          <option name="outdoor">Outdoor</option>
+                          <option name="Cinema">Cinema</option>
+                          <option name="Theatre">Theatre</option>
+                          <option name="Indoor Golf">Indoor Golf</option>
+                          <option name="Swimming">Swimming</option>
+                          <option name="Gym">Gym</option>
+                          <option name="Spa">Spa</option>
+                          <option name="Shuffle Board">Shuffle Board</option>
+                          <option name="Arcade">Arcade</option>
+                          <option name="Ping Pong">Ping Pong</option>
+                          <option name="Darts">Darts</option>
+                          <option name="Escape Room">Escape Room</option>
+                          <option name="Tennis">Tennis</option>
+                          <option name="Virtual Reality">Virtual Reality</option>
+                          <option name="Planet Jump">Planet Jump</option>
+                          <option name="Laser Tag">Laser Tag</option>
+                          <option name="Cooking Class">Cooking Class</option>
+                          <option name="Poetry Night">Poetry Night</option>
+                          <option name="Open Mic">Open Mic</option>
+                          <option name="Pottery">Pottery</option>
+                          <option name="Painting">Painting</option>
+                          <option name="Museum">Museum</option>
                         </select>
                       </div>
+                      
+                    </div>
+                    <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">
+                        Outdoor Activities
+                      </label>
+                      <div className="col-md-6 col-sm-6">
+                        <select
+                          style={{ marginTop: 8 }}
+                          //value={user.tags}
+                          onChange={this.handleChangeOutdoorActivities}
+                          multiple
+                        >
+                          <option name="Hiking">Hiking</option>
+                          <option name="Cycling">Cycling</option>
+                          <option name="Rock Climbing">Rock Climbing</option>
+                          <option name="Fishing">Fishing</option>
+                          <option name="Outdoor Golf">Outdoor Golf</option>
+                          <option name="Amusement Park">Amusement Park</option>
+                          <option name="Picnic">Picnic</option>
+                          <option name="Drive in Movie">Drive in Movie</option>
+                          <option name="Outdoor Concert">Outdoor Concert</option>
+                          <option name="Winery">Winery</option>
+                          <option name="Zoo Park">Zoo Park</option>
+                          <option name="Go Ape">Go Ape</option>
+                          <option name="Boat Ride">Boat Ride</option>
+                          <option name="Sightseeing">Sightseeing</option>
+                          <option name="Whitewater Rafting">Whitewater Rafting</option>
+                          <option name="Camping">Camping</option>
+                          <option name="Paddleboarding">Paddleboarding</option>
+                          <option name="Rockpooling">Rockpooling</option>
+                          <option name="Farmers Market">Farmers Market</option>
+                          <option name="Stargazing">Stargazing</option>
+                          <option name="Horseback Riding">Horseback Riding</option>
+                        </select>
+                      </div>
+                      
                     </div>
 
                     
@@ -526,6 +787,21 @@ export default class VenuesForm extends React.Component {
                           className={`btn btn-success btn-lg ${
                             this.state.loading ? "disabled" : ""
                           }`}
+                          onClick={()=>{
+                            if(this.state.venue.Name&&this.state.venue.address&&this.state.Dimage&&this.state.Cimage!="")
+                            {
+                             this.state.loading=true
+                             this.setState({loading:true})
+                            this.handleAddVenue(this.state.venue)
+                           }
+                           else{
+                             this.setState({
+                               showSnackBar:true,
+                               snackBarMessage:"Please fill the form",
+                               snackBarVariant: "error",
+                             })
+                           }
+                           }}
                         >
                           <i
                             className={`fa fa-spinner fa-pulse ${
@@ -552,3 +828,4 @@ export default class VenuesForm extends React.Component {
     );
   }
 }
+

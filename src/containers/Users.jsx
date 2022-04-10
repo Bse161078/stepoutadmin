@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 import axios from "axios";
 import { CSVLink } from "react-csv";
 // import { Pagination } from "react-bootstrap";
@@ -23,7 +24,7 @@ import { Nav, NavItem, NavLink } from "reactstrap";
 import  {API_END_POINT}  from "../config";
 import Cookie from "js-cookie";
 import { Tooltip } from "@material-ui/core";
-
+import '../scss/style.scss'
 const token = Cookie.get("sneakerlog_access_token");
 
 let globalContext = null;
@@ -45,13 +46,15 @@ export default class Users extends React.Component {
       upcomingEvents: [],
       pastEvents: [],
       pages: 1,
+      search:'',
       q: "",
-      loading: false,
+      loading: true,
       responseMessage: "Loading Users...",
       showSnackBar: false,
       snackBarMessage: "",
       snackBarVariant: "success",
     };
+    this.handleInputChange = this.handleInputChange.bind(this);
   }
 
   // handlePageChange = (pageNumber) => {
@@ -64,9 +67,11 @@ export default class Users extends React.Component {
   //   this.setState({ activePage: pageNumber, users: currentTodos });
   // };
 
-  componentWillMount() {
-    this.fetchUsers();
-    this.fetchEvent();
+   useEffect=()=>{
+    this.fetchUsers()
+  }
+  componentDidMount(){
+    this.fetchUsers()
   }
 
   fetchEvent = () => {
@@ -156,8 +161,8 @@ export default class Users extends React.Component {
         ];
 
         const sortedUsers = response.sort((a, b) => {
-          var nameA = a.lname.toUpperCase();
-          var nameB = b.lname.toUpperCase();
+          var nameA = a.lastname.toUpperCase();
+          var nameB = b.lastname.toUpperCase();
 
           if (nameA < nameB) {
             return -1;
@@ -169,59 +174,10 @@ export default class Users extends React.Component {
           return 0;
         });
 
-        // let tempUsers = [...sortedUsers];
-        // const { activePage } = this.state;
-        // const indexOfLastTodo = activePage * 10;
-        // const indexOfFirstTodo = indexOfLastTodo - 10;
-        // const currentTodos = tempUsers.slice(indexOfFirstTodo, indexOfLastTodo);
-        var executive = [];
-        var members = [];
-        var guests = [];
-        var unknown = [];
-        var toKeep = [];
-        var toDelete = [];
-        sortedUsers.map((item, index) => {
-          if (keepIndex.includes(index + 1)) {
-            toKeep.push(item);
-          } else {
-            toDelete.push(item);
-          }
-          if (
-            item.membership.toLowerCase() == "executive" ||
-            item.membership.toLowerCase() == "paid"
-          ) {
-            executive.push(item);
-          } else if (
-            item.membership.toLowerCase() == "member" ||
-            item.membership.toLowerCase() == "unpaid"
-          ) {
-            members.push(item);
-          } else if (
-            item.membership.toLowerCase() == "Social Guest".toLowerCase() ||
-            item.membership.toLowerCase() == "Golf Guest".toLowerCase()
-          ) {
-            guests.push(item);
-          } else {
-            unknown.push(item);
-          }
-        });
-        console.log("These are all users to keep", toKeep);
-        console.log("These are all users to delete", toDelete);
-        console.log("This is great", executive);
-        console.log("This is members", members);
-        console.log("This is guests", guests);
-        console.log("This is unknown", unknown);
-
         this.setState({
           users: sortedUsers,
           allusers: sortedUsers,
-          executive: executive,
-          members: members,
-          guests: guests,
-          unknown: unknown,
-          // pages: Math.ceil(response.data.length/10),
-          loading: false,
-          responseMessage: "No Users Found",
+          loading:false
         });
       })
       .catch((err) => {
@@ -246,10 +202,12 @@ export default class Users extends React.Component {
       if (result.value) {
         deleteUser(userId)
           .then((response) => {
-            const users = [...this.state.users]; // this.state.users.slice();
+            console.log("deleteuser",response)
+            const users = [...this.state.allusers]; 
+             this.state.allusers.slice();
             let selectedIndex = null;
             users.forEach((user, index) => {
-              if (user.uuid === userId) {
+              if (user.id === userId) {
                 selectedIndex = index;
               }
             });
@@ -259,13 +217,15 @@ export default class Users extends React.Component {
 
             this.setState({
               users: [...users],
+              allusers:[...users],
               showSnackBar: true,
               snackBarMessage: "User deleted successfully",
               snackBarVariant: "success",
             });
             this.fetchUsers();
           })
-          .catch(() => {
+          .catch((e) => {
+            console.log("deleteuser",e)
             this.setState({
               showSnackBar: true,
               snackBarMessage: "Error deleting user",
@@ -572,15 +532,15 @@ export default class Users extends React.Component {
     // localStorage.setItem("userTab", tab);
     globalContext.handleSetUserTab(tab);
   };
-  handleInputChange = (event) => {
-    const { value } = event.target;
-    console.log("THis is target value", value);
-    this.setState({ q: event.target.value });
-    this.FilterFn(event.target.value);
-  };
+  handleInputChange(event) {
+    let search = this.state.search
+    const { value, name } = event.target;
+    this.setState({
+      search:value
+    })
+  }
 
   render() {
-    // console.log(this.state);
     const {
       loading,
       users,
@@ -596,6 +556,15 @@ export default class Users extends React.Component {
 
     return (
       <div class="container my-4" style={{overflow:"auto"}} >
+         {this.state.loading===true&&
+          <div class="loader"></div>
+        }
+        {this.state.showSnackBar&&<SnackBar
+            open={showSnackBar}
+            message={snackBarMessage}
+            variant={snackBarVariant}
+            onClose={() => this.closeSnackBar()}
+          />}
       <div className="row space-1">
                   <div className="col-sm-8">
                     <h3>List of Users</h3>
@@ -616,7 +585,8 @@ export default class Users extends React.Component {
                       <input className="form-control"
                         type="text"
                         name="search"
-                        placeholder="Enter search keyword"
+                        placeholder="Enter users name"
+                        onChange={this.handleInputChange}
                         // onChange={(event) => }q: event.target.value })}
                       />
                       <span className="input-group-btn">
@@ -631,7 +601,7 @@ export default class Users extends React.Component {
                   </div>
                   <div className="col-sm-4"></div>
                 </div>
-      <table id="dtBasicExample" class="table table-striped table-bordered" cellspacing="0" width="100%">
+      <table id="dtBasicExample" class="table table-striped table-bordered"  width={1000} style={{tableLayout:'auto'}} >
         <thead>
           <tr>
             <th class="th-sm">First Name
@@ -646,7 +616,9 @@ export default class Users extends React.Component {
             </th>
             <th class="th-sm">DOB
             </th>
-            <th class="th-sm">Activities
+            <th class="th-sm">IndoorActivities
+            </th>
+            <th class="th-sm">OutdoorActivities
             </th>
             <th class="th-sm">Restaurants
             </th>
@@ -657,15 +629,39 @@ export default class Users extends React.Component {
           </tr>
         </thead>
         <tbody>
+        {this.state.allusers.filter((user)=>(user.firstname+" "+user.lastname).toLowerCase().includes((this.state.search).toLowerCase())).map((users) => {
+          return(
         <tr>
-            <td>Peter </td>
-            <td>Griffin</td>
-            <td>Male</td>
-            <td>Peon</td>
-            <td>California 347a</td>
-            <td>04-12-1998</td>
-            <td>Indoor</td>
-            <td>Chinese</td>
+            <td>{users.firstname} </td>
+            <td>{users.lastname}</td>
+            <td>{users.gender}</td>
+            <td>{users.occupation}</td>
+            <td>{users.updatedTripLocation}</td>
+            <td>{users.dob}</td>
+            <td>{users.IndoorActivities&&users.IndoorActivities.map((activity)=>{
+              return(
+                activity.selected===true&&
+                <li>
+                {activity.name}
+                </li>
+              )
+            })}</td>
+            <td>{users.OutdoorActivities&&users.OutdoorActivities.map((activity)=>{
+              return(
+                activity.selected===true&&
+                <li>
+                {activity.name}
+                </li>
+              )
+            })}</td>
+            <td>{users.Restaurants&&users.Restaurants.map((activity)=>{
+              return(
+                activity.selected===true&&
+                <li>
+              {activity.name}
+              </li>
+              )
+            })}</td>
             <td>
           <Link to={`/events/edit-event`}>
           <Tooltip title="Edit" aria-label="edit">
@@ -683,12 +679,17 @@ export default class Users extends React.Component {
             style={{ cursor: "pointer" }}
             aria-hidden="true"
             onClick={() =>
-              {}
+              {
+                this.removeUser(users.id)
+              }
             }
           ></span>
           </Tooltip>
           </td>
         </tr>
+          )
+  })
+  }
         </tbody>
        
       </table>

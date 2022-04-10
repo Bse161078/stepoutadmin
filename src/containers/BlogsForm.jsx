@@ -4,10 +4,8 @@ import axios from "axios";
 import RichTextEditor from "react-rte";
 import { Button } from "reactstrap";
 import {
-  addUser,
-  updateUser,
-  getUserById,
-} from "../backend/services/usersService";
+  addBlogs
+} from "../backend/services/BlogsService";
 import moment from "moment";
 import { firebase } from "../backend/firebase";
 import { imageResizeFileUri } from "../static/_imageUtils";
@@ -25,12 +23,12 @@ export default class BlogsForm extends React.Component {
     super(props);
     this.state = {
       loading: false,
-      user: {
+      blog: {
         uuid: "",
-        name: "",
-        fname: "",
-        lname: "",
-        email: "",
+        title: "",
+        description: "",
+        img: "",
+        Images: "",
         phone: "",
         handicap: "",
         profileImage: "",
@@ -46,7 +44,8 @@ export default class BlogsForm extends React.Component {
       },
       upcomingEvents: [],
       pastEvents: [],
-      image: "",
+      Cimage: "",
+      Dimage:'',
       file: "",
       userId: "",
       description: RichTextEditor.createEmptyValue(),
@@ -56,87 +55,87 @@ export default class BlogsForm extends React.Component {
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
-    this.postUser = this.postUser.bind(this);
+   // this.postUser = this.postUser.bind(this);
   }
 
-  fetchEvent = () => {
-    this.setState({ loading: true });
-    getEvents()
-      .then((response) => {
-        this.setState({
-          events: response,
-          loading: false,
-          responseMessage: "No Events Found",
-        });
+  // fetchEvent = () => {
+  //   this.setState({ loading: true });
+  //   getEvents()
+  //     .then((response) => {
+  //       this.setState({
+  //         events: response,
+  //         loading: false,
+  //         responseMessage: "No Events Found",
+  //       });
 
-        const upcoming = response.filter((element) => {
-          let date = moment(new Date(element.date.seconds * 1000));
-          let curentDate = new Date();
-          console.log(
-            `${element.name} minutes up:`,
-            date.diff(curentDate, "minutes")
-          );
-          return date.diff(curentDate, "minutes") > 0 && element.status == true;
-        });
-        const past = response.filter((element) => {
-          let date = moment(new Date(element.date.seconds * 1000));
-          let curentDate = new Date();
-          // console.log(
-          //   `${element.name} minutes past:`,
-          //   date.diff(curentDate, "minutes")
-          // );
+  //       const upcoming = response.filter((element) => {
+  //         let date = moment(new Date(element.date.seconds * 1000));
+  //         let curentDate = new Date();
+  //         console.log(
+  //           `${element.name} minutes up:`,
+  //           date.diff(curentDate, "minutes")
+  //         );
+  //         return date.diff(curentDate, "minutes") > 0 && element.status == true;
+  //       });
+  //       const past = response.filter((element) => {
+  //         let date = moment(new Date(element.date.seconds * 1000));
+  //         let curentDate = new Date();
+  //         // console.log(
+  //         //   `${element.name} minutes past:`,
+  //         //   date.diff(curentDate, "minutes")
+  //         // );
 
-          return date.diff(curentDate, "minutes") < 0 || !element.status;
-        });
+  //         return date.diff(curentDate, "minutes") < 0 || !element.status;
+  //       });
 
-        upcoming.sort((a, b) => {
-          var nameA = moment(new Date(a.date.seconds * 1000));
-          // var nameA = a.item_name.charAt(0).toUpperCase();
-          var nameB = moment(new Date(b.date.seconds * 1000));
-          if (nameA.diff(nameB, "minutes") < 0) {
-            return -1;
-          }
-          if (nameA.diff(nameB, "minutes") > 0) {
-            return 1;
-          }
-          // names must be equal
-          return 0;
-        });
+  //       upcoming.sort((a, b) => {
+  //         var nameA = moment(new Date(a.date.seconds * 1000));
+  //         // var nameA = a.item_name.charAt(0).toUpperCase();
+  //         var nameB = moment(new Date(b.date.seconds * 1000));
+  //         if (nameA.diff(nameB, "minutes") < 0) {
+  //           return -1;
+  //         }
+  //         if (nameA.diff(nameB, "minutes") > 0) {
+  //           return 1;
+  //         }
+  //         // names must be equal
+  //         return 0;
+  //       });
 
-        past.sort((a, b) => {
-          var nameA = moment(new Date(a.date.seconds * 1000));
-          // var nameA = a.item_name.charAt(0).toUpperCase();
-          var nameB = moment(new Date(b.date.seconds * 1000));
+  //       past.sort((a, b) => {
+  //         var nameA = moment(new Date(a.date.seconds * 1000));
+  //         // var nameA = a.item_name.charAt(0).toUpperCase();
+  //         var nameB = moment(new Date(b.date.seconds * 1000));
 
-          if (nameA.diff(nameB, "minutes") > 0) {
-            return -1;
-          }
-          if (nameA.diff(nameB, "minutes") < 0) {
-            return 1;
-          }
-          // names must be equal
-          return 0;
-        });
+  //         if (nameA.diff(nameB, "minutes") > 0) {
+  //           return -1;
+  //         }
+  //         if (nameA.diff(nameB, "minutes") < 0) {
+  //           return 1;
+  //         }
+  //         // names must be equal
+  //         return 0;
+  //       });
 
-        this.setState({ upcomingEvents: upcoming, pastEvents: past });
-           getUserById(this.props.match.params.userId)
-        .then((response) => {
-          console.log("user:", response);
-          this.setState({
-            user: response,
-          });
-        })
-        .catch((err) => {
-          window.alert("ERROR!");
-        });
-      })
-      .catch(() => {
-        this.setState({
-          loading: false,
-          responseMessage: "No Events Found...",
-        });
-      });
-  };
+  //       this.setState({ upcomingEvents: upcoming, pastEvents: past });
+  //          getUserById(this.props.match.params.userId)
+  //       .then((response) => {
+  //         console.log("user:", response);
+  //         this.setState({
+  //           user: response,
+  //         });
+  //       })
+  //       .catch((err) => {
+  //         window.alert("ERROR!");
+  //       });
+  //     })
+  //     .catch(() => {
+  //       this.setState({
+  //         loading: false,
+  //         responseMessage: "No Events Found...",
+  //       });
+  //     });
+  // };
 
   componentDidMount() {
     const { match } = this.props;
@@ -149,103 +148,162 @@ export default class BlogsForm extends React.Component {
   handleInputChange(event) {
     const { value, name } = event.target;
 
-    const { user } = this.state;
-    user[name] = value;
-    this.setState({ user });
+    const { blog } = this.state;
+    blog[name] = value;
+    this.setState({ blog });
   }
 
-  postUser = async (event) => {
-    event.preventDefault();
-    const { match, history } = this.props;
-    const { loading, user, image } = this.state;
-    user.name = user.fname + " " + user.lname;
-    if (!loading) {
-      this.setState({ loading: true });
+  // postUser = async (event) => {
+  //   event.preventDefault();
+  //   const { match, history } = this.props;
+  //   const { loading, user, image } = this.state;
+  //   user.name = user.fname + " " + user.lname;
+  //   if (!loading) {
+  //     this.setState({ loading: true });
 
-      let imageFile = image;
+  //     let imageFile = image;
 
-      let downloadUrl;
-      let imageUri;
+  //     let downloadUrl;
+  //     let imageUri;
 
-      if (imageFile) {
-        imageUri = await imageResizeFileUri({ file: imageFile });
+  //     if (imageFile) {
+  //       imageUri = await imageResizeFileUri({ file: imageFile });
 
-        const storageRef = firebase
-          .storage()
-          .ref()
-          .child("Users")
-          .child(`${uuidv4()}.jpeg`);
+  //       const storageRef = firebase
+  //         .storage()
+  //         .ref()
+  //         .child("Users")
+  //         .child(`${uuidv4()}.jpeg`);
 
-        if (imageUri) {
-          await storageRef.putString(imageUri, "data_url");
-          downloadUrl = await storageRef.getDownloadURL();
-        }
-        user.profileImage = downloadUrl;
-      }
+  //       if (imageUri) {
+  //         await storageRef.putString(imageUri, "data_url");
+  //         downloadUrl = await storageRef.getDownloadURL();
+  //       }
+  //       user.profileImage = downloadUrl;
+  //     }
 
-      if (match.params.userId) {
-        let cloneObject = Object.assign({}, user);
-        if(cloneObject.credit)
-        {
+  //     if (match.params.userId) {
+  //       let cloneObject = Object.assign({}, user);
+  //       if(cloneObject.credit)
+  //       {
          
-        }
-        else
-        { cloneObject.credit = 0;
+  //       }
+  //       else
+  //       { cloneObject.credit = 0;
 
-        }
-        updateUser(match.params.userId, cloneObject)
-          .then((response) => {
-            this.setState({
-              loading: false,
-              showSnackBar: true,
-              snackBarMessage: "User updated successfully",
-              snackBarVariant: "success",
-            });
-          })
-          .catch((err) => {
-            console.log("Error:", err);
-            this.setState({
-              loading: false,
-              showSnackBar: true,
-              snackBarMessage: "Error updating user",
-              snackBarVariant: "error",
-            });
-          });
-      } else {
-        addUser(user)
-          .then((response) => {
-            console.log("response:", response);
-            this.setState({
-              loading: false,
-              showSnackBar: true,
-              snackBarMessage: "User saved successfully",
-              snackBarVariant: "success",
-            });
-          })
-          .catch((err) => {
-            this.setState({
-              loading: false,
-              showSnackBar: true,
-              snackBarMessage: "Error creating user",
-              snackBarVariant: "error",
-            });
-          });
-      }
+  //       }
+  //       updateUser(match.params.userId, cloneObject)
+  //         .then((response) => {
+  //           this.setState({
+  //             loading: false,
+  //             showSnackBar: true,
+  //             snackBarMessage: "User updated successfully",
+  //             snackBarVariant: "success",
+  //           });
+  //         })
+  //         .catch((err) => {
+  //           console.log("Error:", err);
+  //           this.setState({
+  //             loading: false,
+  //             showSnackBar: true,
+  //             snackBarMessage: "Error updating user",
+  //             snackBarVariant: "error",
+  //           });
+  //         });
+  //     } else {
+  //       addUser(user)
+  //         .then((response) => {
+  //           console.log("response:", response);
+  //           this.setState({
+  //             loading: false,
+  //             showSnackBar: true,
+  //             snackBarMessage: "User saved successfully",
+  //             snackBarVariant: "success",
+  //           });
+  //         })
+  //         .catch((err) => {
+  //           this.setState({
+  //             loading: false,
+  //             showSnackBar: true,
+  //             snackBarMessage: "Error creating user",
+  //             snackBarVariant: "error",
+  //           });
+  //         });
+  //     }
+  //   }
+  // };
+
+  uploadImage (evt) {
+    return new  Promise((resolve,reject)=>{
+      console.log(evt);
+      var storage = firebase.storage().ref(`/Blogs/`+evt.name);
+      const storageRef=storage.put(evt);
+      storageRef.on("state_changed" , async()=>{
+        let downloadUrl = await storage.getDownloadURL();
+       // this.setState({venue:venue})
+        console.log('hamzaimage',downloadUrl);
+        resolve(downloadUrl)        
+    })
+  
+    })
+}
+
+  handleAddBlogs=async(addvenue)=>{
+  
+    let Images=[]
+     const imageUrl=await this.uploadImage(this.state.Dimage);
+     addvenue.img=imageUrl;
+     for (let i =0;i<this.state.Cimage.length;i++)
+     {
+       const imges=await this.uploadImage(this.state.Cimage[i])
+       Images.push(imges)
+     }
+    
+     addvenue.Images=Images;
+     this.setState({loading:true})
+     console.log("venue",addvenue)
+     try{
+       const { history } = this.props;
+      const res = await addBlogs(addvenue)
+    //this.state.navigate('/users')
+      this.setState({
+       loading: false,
+       showSnackBar: true,
+       snackBarMessage: "Blogs Updated!",
+       snackBarVariant: "success",
+     });
     }
-  };
+    catch(e)
+    {
+     this.setState({
+       loading: false,
+       showSnackBar: true,
+       snackBarMessage: "Error updating blogs",
+       snackBarVariant: "error",
+     });
+     console.log("err = ",e)
+    }
+   }
 
   handleDisplayImage = (event) => {
-    this.setState({
-      Dimage: event.target.files[0],
-      Dile: URL.createObjectURL(event.target.files[0]),
-    });
-  };
-  handleCarouselImage = (event) => {
-    this.setState({
-      Cimage: event.target.files[0],
-      Cfile: URL.createObjectURL(event.target.files[0]),
-    });
-  };
+    var img = [{}]
+    for(let i=0;i<event.target.files.length;i++)
+    {
+      const newimage=event.target.files[i]
+      newimage["id"] = Math.random()
+      img.push(newimage)
+    }
+    img.splice(0,1)
+    this.state.Cimage=img
+    console.log('target',img,this.state.Cimage)
+    };
+    handleCarouselImage = (event) => {
+      this.state.Dimage=event.target.files[0]
+      this.setState({
+        Dfile: URL.createObjectURL(event.target.files[0]),
+      });
+      console.log("target",event.target.files[0],"targetachieve",this.state.Dimage)
+    };
 
 
   closeSnackBar = () => {
@@ -294,16 +352,16 @@ export default class BlogsForm extends React.Component {
     this.setState({ user });
   };
 
-
   render() {
     console.log(this.state);
     const {
-      user,
+      blog,
       showSnackBar,
       snackBarMessage,
       snackBarVariant,
       Cimage,
       Cfile,
+      loading,
       Dimage,
       Dfile
     } = this.state;
@@ -316,6 +374,7 @@ export default class BlogsForm extends React.Component {
             open={showSnackBar}
             message={snackBarMessage}
             variant={snackBarVariant}
+            autoHideDuration={1000}
             onClose={() => this.closeSnackBar()}
           />
         )}
@@ -344,7 +403,7 @@ export default class BlogsForm extends React.Component {
                           type="text"
                           name="title"
                           className="form-control"
-                          value={user.fname}
+                          //value={user.fname}
                           onChange={this.handleInputChange}
                         />
                       </div>
@@ -359,7 +418,7 @@ export default class BlogsForm extends React.Component {
                           type="text"
                           name="description"
                           className="form-control"
-                          value={user.fname}
+                          //value={user.fname}
                           onChange={this.handleInputChange}
                         />
                       </div>
@@ -378,7 +437,7 @@ export default class BlogsForm extends React.Component {
                         />
                       </div>
                       </div>
-                      {Cimage ? (
+                      {Dimage ? (
                       <div className="form-group row">
                         <label className="control-label col-md-3 col-sm-3"></label>
                         <div className="col-md-6 col-sm-6">
@@ -386,12 +445,12 @@ export default class BlogsForm extends React.Component {
                             style={{ marginRight: "5px" }}
                             width="100"
                             className="img-fluid"
-                            src={Cfile}
+                            src={Dfile}
                             alt="profileImage"
                           />
                         </div>
                       </div>
-                    ) : user.profileImage && user.profileImage.length ? (
+                    ) : blog.profileImage && blog.profileImage.length ? (
                       <div className="form-group row">
                         <label className="control-label col-md-3 col-sm-3"></label>
                         <div className="col-md-6 col-sm-6">
@@ -399,7 +458,7 @@ export default class BlogsForm extends React.Component {
                             style={{ marginRight: "5px" }}
                             width="100"
                             className="img-fluid"
-                            src={`${user.profileImage}`}
+                            src={`${blog.profileImage}`}
                             alt="profileImage"
                           />
                         </div>
@@ -407,12 +466,19 @@ export default class BlogsForm extends React.Component {
                     ) : null}
                       <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                        Carousel  Image
+                        Carousel Image
                       </label>
-                      <div className="col-md-6 col-sm-6">
-                      <input type="file" id="files" name="files" multiple/>
+                        <div className="col-md-6 col-sm-6">
+                        <input
+                          type="file"
+                          accept="Cimage/*"
+                          name="profileImage"
+                          className="form-control"
+                          multiple
+                          onChange={this.handleDisplayImage}
+                        />
                       </div>
-                    </div>
+                      </div>
                     <div className="ln_solid"></div>
                     <div className="form-group row">
                       <div className="col-md-6 col-sm-6 offset-md-3">
@@ -420,6 +486,22 @@ export default class BlogsForm extends React.Component {
                           className={`btn btn-success btn-lg ${
                             this.state.loading ? "disabled" : ""
                           }`}
+                          onClick={()=>{
+                            if(this.state.blog.title&&this.state.blog.description&&this.state.Dimage&&this.state.Cimage!="")
+                            {
+                             this.state.loading=true
+                             this.setState({loading:true})
+                            this.handleAddBlogs(this.state.blog)
+                            
+                           }
+                           else{
+                             this.setState({
+                               showSnackBar:true,
+                               snackBarMessage:"Please fill the form",
+                               snackBarVariant: "error",
+                             })
+                           }
+                           }}
                         >
                           <i
                             className={`fa fa-spinner fa-pulse ${

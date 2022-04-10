@@ -1,49 +1,17 @@
 import firebase from "firebase";
-
-// const config = {
-//     apiKey: "AIzaSyBS7sW8y4EL12VVw2iFxzeWLccqmZG6BD0",
-//     authDomain: "sneakerlog-c7664.firebaseapp.com",
-//     databaseURL: "https://sneakerlog-c7664.firebaseio.com",
-//     projectId: "sneakerlog-c7664",
-//     storageBucket: "sneakerlog-c7664.appspot.com",
-//     messagingSenderId: "657981798987",
-//     appId: "1:657981798987:web:b910a2849ef0e30ab22bce"
-//   };
-
-
-
 const config = {
   apiKey: "AIzaSyDAFQrPtUQuxIyfwvMWzZaq1kaqCvL4Ehk",
   authDomain: "react-native-step-out.firebaseapp.com",
   projectId: "react-native-step-out",
+  databaseURL:"gs://react-native-step-out.appspot.com/",
   storageBucket: "react-native-step-out.appspot.com",
   messagingSenderId: "902770175125",
   appId: "1:902770175125:web:71aba1bf2c174f89bfbf9c",
   measurementId: "G-2ZP98N36GT"
 };
-
-
-// const config = {
-
-//   apiKey: "AIzaSyAzpJWqF1QM-ky4jYGs9qXbl9qLZLgAw1U",
-
-//   authDomain: "nuga-test.firebaseapp.com",
-
-//   projectId: "nuga-test",
-
-//   storageBucket: "nuga-test.appspot.com",
-
-//   messagingSenderId: "648610325258",
-
-//   appId: "1:648610325258:web:8a6a2b0b92f2033b2a90f3",
-
-//   measurementId: "G-77SK58XF0T"
-
-// };
-
-
 firebase.initializeApp(config);
 const db = firebase.firestore();
+var storage = firebase.storage();
 const auth = firebase.auth();
 
 export { firebase, db, auth };

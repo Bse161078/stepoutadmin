@@ -118,7 +118,7 @@ class Sidebar extends Component {
 			return (
 				<NavItem key={key} className={classes.item}  >
 					{isExternal(url) ? (
-						<RsNavLink href={url} className={classes.link}style={{backgroundColor:'#0AC2CC'}} active onClick={(e)=>{
+						<RsNavLink href={url} className={classes.link} active onClick={(e)=>{
 							console.log("navLinkClicked")
 						}}>
 							{item.icon ? <i className={classes.icon}></i> : null}

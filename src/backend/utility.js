@@ -3,13 +3,13 @@ import firebase from "firebase";
 
 export async function connectFirebase() {
     const firebaseConfig = {
-      apiKey: "AIzaSyAzpJWqF1QM-ky4jYGs9qXbl9qLZLgAw1U",
-      authDomain: "nuga-test.firebaseapp.com",
-      projectId: "nuga-test",
-      storageBucket: "nuga-test.appspot.com",
-      messagingSenderId: "648610325258",
-      appId: "1:648610325258:web:8a6a2b0b92f2033b2a90f3",
-      measurementId: "G-77SK58XF0T"
+      apiKey: "AIzaSyDAFQrPtUQuxIyfwvMWzZaq1kaqCvL4Ehk",
+      authDomain: "react-native-step-out.firebaseapp.com",
+      projectId: "react-native-step-out",
+      storageBucket: "react-native-step-out.appspot.com",
+      messagingSenderId: "902770175125",
+      appId: "1:902770175125:web:71aba1bf2c174f89bfbf9c",
+      measurementId: "G-2ZP98N36GT"
     };
   // Initialize Firebase
   if (!firebase.apps.length) {
