@@ -21,9 +21,11 @@ export default class Trips extends React.Component {
       search:''
     };
     this.handleInputChange = this.handleInputChange.bind(this);
+    console.log("alltripsss",this.state.allTrips)
   }
   componentDidMount(){
     this.fetchTrips()
+    localStorage.setItem("trip","")
   }
   removeTrip(tripId, index) {
     Swal.fire({
@@ -136,7 +138,7 @@ export default class Trips extends React.Component {
                   </div>
                   {/* <div className="col-sm-4"></div> */}
                   <div className="col-sm-2 pull-right mobile-space" >
-                    <Link to="/Trips/TripsForm">
+                    <Link to="/Trips/AddTrip">
                       <button type="button" className="btn btn-success">
                         Add new trips
                       </button>
@@ -204,24 +206,26 @@ export default class Trips extends React.Component {
           return(
         <tr>
           <td>{trip.Name}</td>
-          <td>{trip.Rating}</td>
+          <td>{trip.Rating&&trip.Rating}</td>
           <td><img src={trip.Image} class="d-block w-100"  alt="Your Image"/></td>
-          <td>
+          
           <td>
           {trip.Venues&&trip.Venues.map((venue)=>{
             return(
-            <li>Name : {venue.Name}
+            <ul> 
             <li>
-            Address : {venue.Address}
-            </li>
-            <img src= {venue.Image} height="50%" class="d-block w-100"/>
+           <li> {venue.Name}</li> 
             
+            <li> {venue.Address} </li>
+            <li> {"From "+venue.startTime+" To "+venue.endTime} </li>
+             
+           <img src= {venue.Image} height="50%" class="d-block w-100"/>
             </li>
-                    )
-                              })}
+            </ul>
+                  )
+             })}
+            </td>
             
-            </td>
-            </td>
             <td>
              {trip.startTime}
             </td>
@@ -229,41 +233,47 @@ export default class Trips extends React.Component {
             {trip.endTime}
             </td>
             <td>
-            {trip.endTime}
+            {trip.totalTime+"minutes"}
             </td>
-            <td> {trip.Reviews.map((review)=>{
+            <td> {trip.Reviews&&trip.Reviews.map((review)=>{
             return(
-            <li>
-                Review : {review.Review}
-                <li>
-                Rating : {review.Rating}
-                </li>
-            </li>
+            <ul>
+               <li>  {review.Review}</li>
+                
+            </ul>
               
             )
                  })}</td>
                  <td> {trip.restaurants&&trip.restaurants.map((res)=>{
             return(
-                    <p>{res.name}</p>  
-              
+              <ul>
+                    <li>{res.name}</li>  
+             </ul>
                   )
                  })}</td>
                  <td> {trip.IndoorActivities&&trip.IndoorActivities.map((res)=>{
             return(
-                     <p>{res.name}</p> 
+              <ul>
+                     <li>{res.name}</li> 
+             </ul>
                 )
                  })}</td>
                  <td> {trip.OutdoorActivities&&trip.OutdoorActivities.map((res)=>{
             return(
-                     <p>{res.name}</p> 
-              
+              <ul>
+                     <li>{res.name}</li> 
+             </ul>
                  )
                  })}</td>
             <td>
               
               
-          <Link to={`/events/edit-event`}>
-          <Tooltip title="Edit" aria-label="edit">
+          <Link to={`/Trips/EditTrip`}>
+          <Tooltip title="Edit" aria-label="edit"
+          onClick={()=>{
+            localStorage.setItem("trip",JSON.stringify(trip))
+          }}
+          >
             <span
               className="fa fa-edit"
               aria-hidden="true"

@@ -17,6 +17,7 @@ export default class Notifications extends React.Component {
         title: "",
         message: "",
       },
+      user:[],
       executive: [],
       members: [],
       guests: [],
@@ -32,60 +33,9 @@ export default class Notifications extends React.Component {
     getUsers()
       .then((response) => {
         console.log("############", response);
-
-        const sortedUsers = response.sort((a, b) => {
-          var nameA = a.lname.toUpperCase();
-          var nameB = b.lname.toUpperCase();
-
-          if (nameA < nameB) {
-            return -1;
-          }
-          if (nameA > nameB) {
-            return 1;
-          }
-          // names must be equal
-          return 0;
-        });
-
-        // let tempUsers = [...sortedUsers];
-        // const { activePage } = this.state;
-        // const indexOfLastTodo = activePage * 10;
-        // const indexOfFirstTodo = indexOfLastTodo - 10;
-        // const currentTodos = tempUsers.slice(indexOfFirstTodo, indexOfLastTodo);
-        var executive = [];
-        var members = [];
-        var guests = [];
-        var unknown = [];
-        sortedUsers.map((item) => {
-          // console.log("THis is greate",item.membership.toLowerCase())
-          if (
-            item.membership.toLowerCase() == "executive" ||
-            item.membership.toLowerCase() == "paid"
-          ) {
-            executive.push(item);
-          } else if (
-            item.membership.toLowerCase() == "member" ||
-            item.membership.toLowerCase() == "unpaid"
-          ) {
-            members.push(item);
-          } else if (
-            item.membership.toLowerCase() == "Social Guest".toLowerCase() ||  item.membership.toLowerCase() == "Golf Guest".toLowerCase()
-          ) {
-            guests.push(item);
-          } else {
-            unknown.push(item);
-          }
-        });
-        console.log("This is great", executive);
-        console.log("This is members", members);
-        console.log("This is guests", guests);
-        console.log("This is unknown", unknown);
-
+         var user=this.state.user
         this.setState({
-          executive: executive,
-          members: members,
-          guests: guests,
-          unknown: unknown,
+          user:response,
           // pages: Math.ceil(response.data.length/10),
           loading: false,
           responseMessage: "No Users Found",
@@ -166,7 +116,7 @@ export default class Notifications extends React.Component {
 
   postNotification = async (event,tok) => {
     var TokenArray = [];
-
+   // TokenArray.push
     // paidParticipants,
     // unPaidParticipants,
     // withdrawnParticipants,
@@ -176,43 +126,43 @@ export default class Notifications extends React.Component {
     var members = [];
     var guests = [];
     var unknown = [];
-    if(this.state.notification.executive)
-    {
-      this.state.executive.map(
-        (item)=>{
-          TokenArray.push(item.fcmToken)
-        }
-      )
-    }
-    if(this.state.notification.members)
-    {
-      this.state.members.map(
-        (item)=>{
-          TokenArray.push(item.fcmToken)
-        }
-      )
-    }
-    if(this.state.notification.guests)
-    {
-      this.state.guests.map(
-        (item)=>{
-          TokenArray.push(item.fcmToken)
-        }
-      )
-    }
-    if(this.state.notification.unknown)
-    {
-      this.state.unknown.map(
-        (item)=>{
-          TokenArray.push(item.fcmToken)
-        }
-      )
-    }
-    if(TokenArray.length<=0)
-    {
-      alert("Please Click at least on checkbox");
-      return
-    }
+    // if(this.state.notification.executive)
+    // {
+    //   this.state.executive.map(
+    //     (item)=>{
+    //       TokenArray.push(item.fcmToken)
+    //     }
+    //   )
+    // }
+    // if(this.state.notification.members)
+    // {
+    //   this.state.members.map(
+    //     (item)=>{
+    //       TokenArray.push(item.fcmToken)
+    //     }
+    //   )
+    // }
+    // if(this.state.notification.guests)
+    // {
+    //   this.state.guests.map(
+    //     (item)=>{
+    //       TokenArray.push(item.fcmToken)
+    //     }
+    //   )
+    // }
+    // if(this.state.notification.unknown)
+    // {
+    //   this.state.unknown.map(
+    //     (item)=>{
+    //       TokenArray.push(item.fcmToken)
+    //     }
+    //   )
+    // }
+    // if(TokenArray.length<=0)
+    // {
+    //   TokenArray;
+    //   return
+    // }
 
     
     event.preventDefault();
@@ -305,83 +255,24 @@ export default class Notifications extends React.Component {
                         Message
                       </label>
                       <div className="col-md-6 col-sm-6">
-                        <input
+                      <textarea name="message" id="message" rows="15" cols="80"
+                      value={notification.message}
+                      onChange={this.handleInputChange}>
+                        Write stuff here...
+                        </textarea>
+
+                        {/* <input
                           required
                           type="text"
                           name="message"
-                          maxLength="80"
+                          rows="25" cols="80"
                           className="form-control"
                           value={notification.message}
                           onChange={this.handleInputChange}
-                        />
+                        /> */}
                       </div>
                     </div>
  
-                    <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">
-                        Executive
-                      </label>
-                      <div className="col-md-6 col-sm-6">
-                        <input
-                          // required
-                          type="checkbox"
-                          name="executive"
-                          maxLength="80"
-                          className="form-control"
-                          value={this.state.notification.executive}
-                          onChange={this.handleNotificationCheckboxChange}
-                        />
-                      </div>
-                      </div>
-                      <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">
-                        Member
-                      </label>
-                      <div className="col-md-6 col-sm-6">
-                        <input
-                          // required
-                          type="checkbox"
-                          name="members"
-                          maxLength="80"
-                          className="form-control"
-                          value={this.state.notification.members}
-                          onChange={this.handleNotificationCheckboxChange}
-                        />
-                      </div>
-                      </div>
-                      <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">
-                       Guest
-                      </label>
-                      <div className="col-md-6 col-sm-6">
-                        <input
-                          // required
-                          type="checkbox"
-                          name="guests"
-                          maxLength="80"
-                          className="form-control"
-                          value={this.state.notification.guests}
-                          onChange={this.handleNotificationCheckboxChange}
-                        />
-                      </div>
-                      </div>
-                      <div className="form-group row">
-                      <label className="control-label col-md-3 col-sm-3">
-                        Unknown
-                      </label>
-                      <div className="col-md-6 col-sm-6">
-                        <input
-                          // required
-                          type="checkbox"
-                          name="unknown"
-                          maxLength="80"
-                          className="form-control"
-                          value={this.state.notification.unknown}
-                          onChange={this.handleNotificationCheckboxChange}
-                        />
-                      </div>
-           
-                    </div>
 
                     <div className="ln_solid" />
                     <div className="form-group row">

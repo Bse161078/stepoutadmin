@@ -75,6 +75,7 @@ export default class Blogs extends React.Component {
   }
   componentDidMount(){
     this.fetchBlogs()
+    localStorage.setItem("blog","")
   }
   fetchBlogs = () => {
     getBlogs()
@@ -151,7 +152,7 @@ export default class Blogs extends React.Component {
                   </div>
                   {/* <div className="col-sm-4"></div> */}
                   <div className="col-sm-2 pull-right mobile-space">
-                    <Link to="/Blogs/BlogsForm">
+                    <Link to="/Blogs/AddBlogs">
                       <button type="button" className="btn btn-success">
                         Add new Blogs
                       </button>
@@ -216,8 +217,12 @@ export default class Blogs extends React.Component {
             </Slider>
               </td>
             <td>
-          <Link to={`/events/edit-event`}>
-          <Tooltip title="Edit" aria-label="edit">
+          <Link to={`/Blogs/EditBlogs`}>
+          <Tooltip title="Edit" aria-label="edit"
+          onClick={()=>{
+            localStorage.setItem("blog",JSON.stringify(blog))
+          }}
+          >
             <span
               className="fa fa-edit"
               aria-hidden="true"

@@ -7,6 +7,7 @@ export class Trips {
       this.endTime = x.endTime;
       this.id = x.id;
       this.Image=x.Image;
+      this.Description=x.Description;
       this.startTime = x.startTime;
       this.totalTime = x.totalTime;
       this.restaurants = x.restaurants
@@ -26,6 +27,7 @@ export class Trips {
         Venues: data["Venues"] ? data["Venues"] : "",
         Name: data["Name"] ? data["Name"] : "",
         Rating: data["Rating"] ? data["Rating"] : "",
+        Description:data["Description"] ? data["Description"] : "",
         Reviews: data["Reviews"] ? data["Reviews"] : "",
         totalTime: data["totalTime"] ? data["totalTime"] : "",
         startTime: data["startTime"] ? data["startTime"] : "",

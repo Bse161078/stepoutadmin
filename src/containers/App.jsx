@@ -60,8 +60,8 @@ import Blogs from "./Blogs";
 import Trips from "./Trips";
 import TripsForm from "./TripsForm";
 import VenuesForm from "./VenuesForm";
-
-
+import Reservations from "./Reservations"
+import TripReservation from "./TripReservation"
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -127,17 +127,32 @@ class App extends React.Component {
                     />
                     <Route
                         exact={true}
-                        path="/Blogs/BlogsForm"
+                        path="/Blogs/AddBlogs"
+                        component={BlogsForm}
+                    />
+                     <Route
+                        exact={true}
+                        path="/Blogs/EditBlogs"
                         component={BlogsForm}
                     />
                     <Route
                         exact={true}
-                        path="/Trips/TripsForm"
+                        path="/Trips/AddTrip"
+                        component={TripsForm}
+                    />
+                    <Route
+                        exact={true}
+                        path="/Trips/EditTrip"
                         component={TripsForm}
                     />
                   <Route
                     exact={true}
                     path="/Venues/AddVenue"
+                    component={VenuesForm}
+                  />
+                    <Route
+                    exact={true}
+                    path="/Venues/EditVenue"
                     component={VenuesForm}
                   />
                   <Route
@@ -147,10 +162,14 @@ class App extends React.Component {
                   />
                    <Route
                     exact={true}
-                    path="/user/userForm"
+                    path="/User/AddUser"
                     component={UserForm}
                   />
-
+                    <Route
+                    exact={true}
+                    path="/User/EditUser"
+                    component={UserForm}
+                  />
                   <Route exact={true} path="/admin" component={Admins} />
                   <Route
                     exact={true}
@@ -167,6 +186,11 @@ class App extends React.Component {
                     exact={true}
                     path="/notifications"
                     component={Notifications}
+                  />
+                  <Route
+                    exact={true}
+                    path="/Stats"
+                    component={Stats}
                   />
 
                   <Route exact={true} path="/brands" component={Brands} />
@@ -266,6 +290,16 @@ class App extends React.Component {
                     exact={true}
                     path="/privacy-policy"
                     component={PrivacyPolicyForm}
+                  />
+                  <Route
+                    exact={true}
+                    path="/reservations"
+                    component={Reservations}
+                  />
+                  <Route
+                    exact={true}
+                    path="/trip-reservations"
+                    component={TripReservation}
                   />
                   {/* <Route exact={true} path="/privacy-policy/privacy-policy-form" component={PrivacyPolicyForm}/> */}
                   {/* <Route exact={true} path="/privacy-policy/edit-privacy-policy/:privacyPolicyId" component={PrivacyPolicyForm}/> */}

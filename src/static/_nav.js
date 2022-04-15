@@ -1,10 +1,6 @@
 export default {
   items: [
-    // {
-    // 	name: "Stats",
-    // 	url: "/",
-    // 	icon: "icon-chart",
-    // },
+    
     // {
     //   name: 'Admins',
     //   url: '/admin',
@@ -40,6 +36,11 @@ export default {
       url: "/Users",
       icon: "icon-user",
     },
+    {
+    	name: "Stats",
+    	url: "/Stats",
+    	icon: "icon-chart",
+    },
     // {
     //   name: "Mert Link",
     //   url: "/merit-form",
@@ -52,11 +53,11 @@ export default {
     //   url: "/users",
     //   icon: "icon-user",
     // },
-    // {
-    //   name: "Notifications",
-    //   url: "/notifications",
-    //   icon: "icon-bell",
-    //},
+     {
+      name: "Notifications",
+      url: "/notifications",
+      icon: "icon-bell",
+    },
     // {
     //   name: 'News',
     //   url: '/news',
@@ -73,11 +74,17 @@ export default {
     //   url: '/gallery',
     //   icon: 'icon-picture',
     // },
-    // {
-    //   name: "Privacy Policy",
-    //   url: "/privacy-policy",
-    //   icon: "icon-key",
-    // },
+    
+    {
+      name: "Reservation",
+      url: "/reservations",
+      icon: "icon-calendar",
+    },
+    {
+      name: "Trip Reservation",
+      url: "/trip-reservations",
+      icon: "icon-calendar",
+    },
     // {
     //   name: "Terms of Service",
     //   url: "/terms-service",
@@ -94,10 +101,15 @@ export default {
     //   icon: "icon-globe ",
     // },
     {
+      name: "Privacy Policy",
+      url: "/privacy-policy",
+      icon: "icon-key",
+    },
+    {
       name: "Logout",
       url: "/logout",
       icon: "icon-logout",
-      // variant: "red",
+       variant: "red",
     }
   ],
 };

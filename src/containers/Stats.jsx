@@ -1,10 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import {getBrands} from "../backend/services/brandService"
-import {getEvents} from "../backend/services/eventService"
+import {getTrips} from "../backend/services/TripsService"
+import {getBlogs} from "../backend/services/BlogsService"
 import {getUsers} from "../backend/services/usersService"
+import {getVenues} from "../backend/services/VenueServices"
 import {getSneakersReleaseDates} from "../backend/services/sneakerReleaseService"
+import { DatePicker } from '@material-ui/pickers';
 
 // import {Pagination} from 'react-bootstrap';
 // import LineChart from '../components/LineChart'
@@ -17,13 +19,13 @@ export default class Area extends React.Component {
     super(props);
 
     this.state = {
-      brands: [],
-      events: [],
+      trips: [],
+      blogs: [],
       users: [],
-      releaseDates: []
+      venues: []
     }
+    console.log("blogs",this.state.blogs,"trips",this.state.trips)
   }
-
   componentWillMount() {
       getUsers()
       .then(response => {
@@ -31,28 +33,28 @@ export default class Area extends React.Component {
           users: response,
         })
       })
-      getBrands()
+      getTrips()
       .then(response => {
         this.setState({
-          brands: response,
+          trips: response,
         })
       })
-      getEvents()
+      getBlogs()
       .then(response => {
         this.setState({
-          events: response,
+          blogs: response,
         })
       })
-      getSneakersReleaseDates()
+      getVenues()
       .then(response => {
         this.setState({
-          releaseDates: response,
+          venues: response,
         })
       })
   }
 
   render() {
-    const { users, brands, events, releaseDates } = this.state;
+    const { users, trips, blogs, venues } = this.state;
     return (
       <div className="row">
         <div className="col-12">
@@ -74,26 +76,29 @@ export default class Area extends React.Component {
                 <h5>{brands.length ? brands.length : "Fetching brands..."}</h5>
               </div> */}
              <div className='col-sm-6 my-3'>
-                <h3 className='space-1'>Total Events</h3>
-                <h5>{events.length ? events.length : "Fetching events..."}</h5>
+                <h3 className='space-1'>Total Trips</h3>
+                <h5>{trips.length ? trips.length : "Fetching trips..."}</h5>
               </div>
               <div className='col-sm-6 my-3'>
-                <h3 className='space-1'>Paid Users</h3>
-                <h5>{brands.length ? brands.length : "Fetching brands..."}</h5>
+                <h3 className='space-1'>Total Blogs</h3>
+                <h5>{blogs.length ? blogs.length : "Fetching blogs..."}</h5>
               </div>
               <div className='col-sm-6 my-3'>
-                <h3 className='space-1'>Upcoming Events</h3>
-                <h5>0</h5>
+                <h3 className='space-1'>Total Venues</h3>
+                <h5>{venues.length ? venues.length:"Fetching venues..."}</h5>
               </div>
-              <div className='col-sm-6 my-3'>
+              <div>
+                
+              </div>
+              {/* <div className='col-sm-6 my-3'>
                 <h3 className='space-1'>Un Paid Users</h3>
                 <h5>{brands.length ? brands.length : "Fetching brands..."}</h5>
-              </div>
+              </div> */}
               
-              <div className='col-sm-6 my-3'>
+              {/* <div className='col-sm-6 my-3'>
                 <h3 className='space-1'>Past Events</h3>
                 <h5>{brands.length ? brands.length : "Fetching brands..."}</h5>
-              </div>
+              </div> */}
               {/* <div className='col-sm-6 my-3'>
                 <h3 className='space-1'>Total Products</h3>
                 <h5>0</h5>
@@ -102,7 +107,7 @@ export default class Area extends React.Component {
                 <h3 className='space-1'>Sneaker Releases</h3>
                 <h5>{releaseDates.length ? releaseDates.length : "Fetching elease dates..."}</h5>
               </div> */}
-            </div>
+             </div>
         </div>
       </div>
     );

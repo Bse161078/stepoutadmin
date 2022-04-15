@@ -14,38 +14,50 @@ import '../scss/style.scss'
 import { imageResizeFileUri } from "../static/_imageUtils";
 import { v4 as uuidv4 } from "uuid";
 import SnackBar from "../components/SnackBar";
-
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import Slider from "react-slick";
 import {
   getEvents,
 } from "../backend/services/eventService";
 import Select from "react-select";
 import "react-select/dist/react-select.css";
 import { TextField } from "@material-ui/core";
-import { addVenue } from "../backend/services/VenueServices";
+import { addVenue,updateVenue } from "../backend/services/VenueServices";
 export default class VenuesForm extends React.Component {
   constructor(props) {
+    const editVenue = localStorage.getItem("venue")!=''?JSON.parse(localStorage.getItem("venue")):'';
+    console.log("editvenue",editVenue)
+    let location = window.location.href
     super(props);
     this.state = {
       loading: false,
       venue: {
-        id: "",
-        Name: "",
-        endTime:'',
-        Time: "",
-        description: "",
-        IndoorActivities:"",
-        OutdoorActivities:"",
-        address:'',
-        Image:'',
-        Images:[]
+        id: editVenue.id?editVenue.id:'',
+        Name: editVenue.Name?editVenue.Name:'',
+        endTime:editVenue.endTime?editVenue.endTime:'',
+        Time: editVenue.Time?editVenue.Time:"",
+        Restaurants:editVenue.Restaurants?editVenue.Restaurants:'',
+        Description: editVenue.Description?editVenue.Description:"",
+        IndoorActivities:editVenue.IndoorActivities?editVenue.IndoorActivities:"",
+        OutdoorActivities:editVenue.OutdoorActivities?editVenue.OutdoorActivities:"",
+        Address:editVenue.Address?editVenue.Address:'',
+        Image:editVenue.Image?editVenue.Image:'',
+        Images:editVenue.Images?editVenue.Images:[]
       },
-      id:1,
+      restaurants:editVenue.Restaurants?editVenue.Restaurants:'',
+      indooractivity:editVenue.IndoorActivities?editVenue.IndoorActivities:"",
+      outdooractivity:editVenue.OutdoorActivities?editVenue.OutdoorActivities:"",
+      resId:1,
+      indoorId:1,
+      outdoorId:1,
       upcomingEvents: [],
       pastEvents: [],
       image: "",
-      Cimage:[],
-      Dimage:'',
-      file: "",
+      Cimage:editVenue.Images?editVenue.Images:[],
+      Dimage:editVenue.Image?editVenue.Image:'',
+      Dfile:editVenue.Image?editVenue.Image:'',
+      Cfile: editVenue.Images?editVenue.Images:[],
       userId: "",
       description: RichTextEditor.createEmptyValue(),
       showSnackBar: false,
@@ -55,6 +67,7 @@ export default class VenuesForm extends React.Component {
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.postUser = this.postUser.bind(this);
+    console.log("venue",this.state.venue)
   }
   uploadImage (evt) {
     return new  Promise((resolve,reject)=>{
@@ -81,14 +94,6 @@ uploadCImage = (evt)=>{
   });
 })
 }
-
-  //  uploadCImage = ()=>{
-  //   var storage = firebase.storage()
-  //   if(this.state.Cimage == null)
-  //     return;
-  //   storage.ref('/Venues/Image'+this.state.Cimage.name}).put(this.state.Cimage)
-  //   .on("state_changed" , alert("success") , alert);
-  // }
 
   fetchEvent = () => {
     this.setState({ loading: true });
@@ -184,12 +189,56 @@ uploadCImage = (evt)=>{
     venue[name] = value;
     this.setState({ venue });
   }
+  handleEditVenue=async(addvenue)=>{
+    let Images=[]
+
+    if(addvenue.Image==='')
+    {
+    const imageUrl=await this.uploadImage(this.state.Dimage);
+    addvenue.Image=imageUrl;
+    }
+    else if(addvenue.Images==='')
+    {
+    
+    const multipleFiles=this.state.Cimage;
+    console.log("multiplefiles",multipleFiles)
+    for (let i =0;i<multipleFiles.length;i++)
+    {
+      const imges=await this.uploadImage(multipleFiles[i])
+      Images.push(imges)
+    }
+   
+    addvenue.Images=Images;
+  }
+    this.setState({loading:true})
+    console.log("venue",addvenue)
+    try{
+      const { history } = this.props;
+     const res = await updateVenue( addvenue.id,addvenue)
+     this.setState({
+      loading: false,
+      showSnackBar: true,
+      snackBarMessage: "Venue Updated!",
+      snackBarVariant: "success",
+    });
+   }
+   catch(e)
+   {
+    this.setState({
+      loading: false,
+      showSnackBar: true,
+      snackBarMessage: "Error updating venue",
+      snackBarVariant: "error",
+    });
+    console.log("err = ",e)
+   }
+  }
 handleAddVenue=async(addvenue)=>{
   
- let Images=[]
+  let Images=[]
   const imageUrl=await this.uploadImage(this.state.Dimage);
   addvenue.Image=imageUrl;
-  const multipleFiles=this.state.Cimage[0];
+  const multipleFiles=this.state.Cimage;
   for (let i =0;i<multipleFiles.length;i++)
   {
     const imges=await this.uploadImage(multipleFiles[i])
@@ -206,7 +255,7 @@ handleAddVenue=async(addvenue)=>{
    this.setState({
     loading: false,
     showSnackBar: true,
-    snackBarMessage: "Venue Updated!",
+    snackBarMessage: "Venue Created!",
     snackBarVariant: "success",
   });
  }
@@ -215,52 +264,12 @@ handleAddVenue=async(addvenue)=>{
   this.setState({
     loading: false,
     showSnackBar: true,
-    snackBarMessage: "Error updating venue",
+    snackBarMessage: "Error creating venue",
     snackBarVariant: "error",
   });
   console.log("err = ",e)
  }
 }
-  // const { match, history } = this.props;
-  //   const { loading, venue } = this.state;
-  // let image = this.state.Cimage;
-  // let images = this.state.Dimage;
-  // let downloadUrl;
-  // let imageUri;
-  // if (image) {
-  //   imageUri = await imageResizeFileUri({ file: image });
-  //   const storageRef = firebase
-  //     .storage()
-  //     .ref()
-  //     .child("Venues")
-  //     .child(`${uuidv4()}.jpeg`);
-  //   if (imageUri) {
-  //     await storageRef.putString(imageUri, "data_url");
-  //     downloadUrl = await storageRef.getDownloadURL();
-  //   }
-  //   venue.Cimage = downloadUrl;
-  // }
-
-//   addVenue(addvenue)
-//   .then((response) => {
-//     console.log("response:", response);
-//     this.setState({
-//       loading: false,
-//       showSnackBar: true,
-//       snackBarMessage: "User saved successfully",
-//       snackBarVariant: "success",
-//     });
-//   })
-//   .catch((err) => {
-//     this.setState({
-//       loading: false,
-//       showSnackBar: true,
-//       snackBarMessage: "Error creating user",
-//       snackBarVariant: "error",
-//     });
-  
-// })
-//}
   postUser = async (event) => {
     event.preventDefault();
     const { match, history } = this.props;
@@ -343,23 +352,43 @@ handleAddVenue=async(addvenue)=>{
 
   handleDisplayImage = (event) => {
   var img = [{}]
+  var cimg = [{}]
   for(let i=0;i<event.target.files.length;i++)
   {
     const newimage=event.target.files[i]
     newimage["id"] = Math.random()
-    
+    cimg.push(URL.createObjectURL(event.target.files[i]))
     img.push(newimage)
   }
-  
-  img.splice(0,1)
-  this.state.Cimage.push(img)
-    console.log('target',img,this.state.Cimage)
+  cimg.splice(0,1)
+  this.state.Cfile=cimg
+    img.splice(0,1)
+    this.state.Cimage=img
+    console.log('targetCimage',this.state.Cimage)
+    this.state.venue.Images=""
+    this.setState(prevState => ({
+      venue:{
+        ...prevState.venue,
+        Images:''
+      }
+    })
+     )
+    console.log("cimage",this.state.venue,this.state.Cimage)
   };
   handleCarouselImage = (event) => {
     this.state.Dimage=event.target.files[0]
     this.setState({
       Dfile: URL.createObjectURL(event.target.files[0]),
     });
+    this.state.venue.Image=""
+    this.setState(prevState => ({
+      venue:{
+        ...prevState.venue,
+        Image:''
+      }
+    })
+     )
+     console.log("dimage",this.state.venue)
     console.log("target",event.target.files[0],"targetachieve",this.state.Dimage)
   };
 
@@ -411,6 +440,7 @@ handleAddVenue=async(addvenue)=>{
        })
        restaurants.splice(0,1)
        venue.Restaurants=restaurants
+       this.state.restaurants=''
         this.setState(venue)
         console.log("This is the restaurants",venue.Restaurants,value,restaurants)
        
@@ -433,6 +463,7 @@ handleAddVenue=async(addvenue)=>{
    })
    restaurants.splice(0,1)
    venue.OutdoorActivities=restaurants
+   this.state.outdooractivity=''
     this.setState(venue)
     console.log("This is the outdooractivities",venue.OutdoorActivities,value,restaurants) 
   }
@@ -453,6 +484,7 @@ handleAddVenue=async(addvenue)=>{
    })
    restaurants.splice(0,1)
    venue.IndoorActivities=restaurants
+   this.state.indooractivity=''
     this.setState(venue)
     console.log("This is the indooractivities",venue.IndoorActivities,value,restaurants)
   };
@@ -468,8 +500,12 @@ handleAddVenue=async(addvenue)=>{
       Cimage,
       Cfile,
       Dimage,
-      Dfile
+      Dfile,
+      restaurants,
+      indooractivity,
+      outdooractivity
     } = this.state;
+    var {indoorId,outdoorId,resId} =this.state
     const { match, history } = this.props;
     const isEdit = !!match.params.userId;
     return (
@@ -508,7 +544,7 @@ handleAddVenue=async(addvenue)=>{
                         <div className="col-md-6 col-sm-6">
                         <input
                           type="file"
-                          accept="Cimage/*"
+                          accept="Dimage/*"
                           name="profileImage"
                           className="form-control"
                           onChange={this.handleCarouselImage}
@@ -528,20 +564,8 @@ handleAddVenue=async(addvenue)=>{
                           />
                         </div>
                       </div>
-                    ) : venue.profileImage && venue.profileImage.length ? (
-                      <div className="form-group row">
-                        <label className="control-label col-md-3 col-sm-3"></label>
-                        <div className="col-md-6 col-sm-6">
-                          <img
-                            style={{ marginRight: "5px" }}
-                            width="100"
-                            className="img-fluid"
-                            src={`${venue.profileImage}`}
-                            alt="profileImage"
-                          />
-                        </div>
-                      </div>
-                    ) : null}
+                       ) 
+                        : null}
                      <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
                         Carousel Image
@@ -549,17 +573,30 @@ handleAddVenue=async(addvenue)=>{
                         <div className="col-md-6 col-sm-6">
                         <input
                           type="file"
-                          accept="Dimage/*"
-                          name="profileImage"
+                          accept="Cimage/*"
+                          name="Cimage"
                           multiple
                           className="form-control"
                           onChange={this.handleDisplayImage}
                         />
                       </div>
                       </div>
+                      {Cimage ? (
+                      <div className="form-group row">
+                        <label className="control-label col-md-3 col-sm-3"></label>
+                        <div className="col-md-6 col-sm-6">
+                        <Slider style={{width:"100px"}} arrows={false} infinite={true} adaptiveHeight={true} autoplaySpeed={2000} autoplay={true}  touchMove={true} dots={true}>
+                          {Cfile&&Cfile.map((cimage)=>{
+                          return(
+                          <img src={cimage} class="d-block w-100" alt="Wild Landscape"/>
 
-                  
-
+                          )
+                          })}
+                          </Slider>
+                        </div>
+                      </div>
+                       ) 
+                        : null}
                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
                          Name
@@ -570,7 +607,7 @@ handleAddVenue=async(addvenue)=>{
                           type="text"
                           name="Name"
                           className="form-control"
-                          //value={venue.Name}
+                          value={venue.Name}
                           onChange={this.handleInputChange}
                         />
                       </div>
@@ -585,7 +622,7 @@ handleAddVenue=async(addvenue)=>{
                           type="time"
                           name="Time"
                           className="form-control"
-                          //value={venue.Time}
+                          value={venue.Time}
                           onChange={this.handleInputChange}
                         />
                       </div>
@@ -616,7 +653,7 @@ handleAddVenue=async(addvenue)=>{
                           type="time"
                           name="endTime"
                           className="form-control"
-                          //value={venue.endTime}
+                          value={venue.endTime}
                           onChange={this.handleInputChange}
                         />
                       </div>
@@ -630,9 +667,9 @@ handleAddVenue=async(addvenue)=>{
                         <input
                           required
                           type="text"
-                          name="address"
+                          name="Address"
                           className="form-control"
-                         // value={venue.address}
+                          value={venue.Address}
                           onChange={this.handleInputChange}
                         />
                       </div>
@@ -643,15 +680,26 @@ handleAddVenue=async(addvenue)=>{
                         Description 
                       </label>
                       <div className="col-md-6 col-sm-6">
+                      <textarea  required
+                          type="text"
+                          name="Description"
+                          className="form-control"
+                          value={venue.Description}
+                          rows="8"
+                          onChange={this.handleInputChange}>
+                        Write stuff here...
+                        </textarea>
+                        </div>
+                      {/* <div className="col-md-6 col-sm-6">
                         <input
                           required
                           type="text"
-                          name="description"
+                          name="Description"
                           className="form-control"
-                       //   value={venue.description}
+                          value={venue.Description}
                           onChange={this.handleInputChange}
                         />
-                      </div>
+                      </div> */}
                     </div>
 
                     {/* <div className="form-group row">
@@ -676,12 +724,18 @@ handleAddVenue=async(addvenue)=>{
                       </label>
                       <div className="col-md-6 col-sm-6">
                       <select
-                        name="restaurants"
+                          name="restaurants"
                           style={{ marginTop: 8 }}
-//value={user.restaurants}
+                          //value={venue.restaurants}
                           onChange={this.handleChange}
                           multiple
                         >
+                          {
+                            restaurants&&restaurants.map((res)=>{
+                              return(
+                              <option selected disabled >{res.name}</option>
+                              )  })
+                          }
                           <option name="Italian" >Italian</option>
                           <option name="American">American</option>
                           <option name="Chinese">Chinese</option>
@@ -711,32 +765,39 @@ handleAddVenue=async(addvenue)=>{
                       </label>
                       <div className="col-md-6 col-sm-6">
                         <select
+                          name="IndoorActivities"
                           style={{ marginTop: 8 }}
-                          //value={user.tags}
+                          //value={venue.IndoorActivities}
                           onChange={this.handleChangeStatus}
                           multiple
                         >
-                          <option name="Cinema">Cinema</option>
-                          <option name="Theatre">Theatre</option>
-                          <option name="Indoor Golf">Indoor Golf</option>
-                          <option name="Swimming">Swimming</option>
-                          <option name="Gym">Gym</option>
-                          <option name="Spa">Spa</option>
-                          <option name="Shuffle Board">Shuffle Board</option>
-                          <option name="Arcade">Arcade</option>
-                          <option name="Ping Pong">Ping Pong</option>
-                          <option name="Darts">Darts</option>
-                          <option name="Escape Room">Escape Room</option>
-                          <option name="Tennis">Tennis</option>
-                          <option name="Virtual Reality">Virtual Reality</option>
-                          <option name="Planet Jump">Planet Jump</option>
-                          <option name="Laser Tag">Laser Tag</option>
-                          <option name="Cooking Class">Cooking Class</option>
-                          <option name="Poetry Night">Poetry Night</option>
-                          <option name="Open Mic">Open Mic</option>
-                          <option name="Pottery">Pottery</option>
-                          <option name="Painting">Painting</option>
-                          <option name="Museum">Museum</option>
+                          {
+                            indooractivity&&indooractivity.map((indooractivity)=>{
+                              return(
+                              <option selected disabled >{indooractivity.name}</option>
+                              )  })
+                          }
+                          <option name="Cinema"  >Cinema</option>
+                          <option name="Theatre" >Theatre</option>
+                          <option name="Indoor Golf" >Indoor Golf</option>
+                          <option name="Swimming" >Swimming</option>
+                          <option name="Gym" >Gym</option>
+                          <option name="Spa" >Spa</option>
+                          <option name="Shuffle Board" >Shuffle Board</option>
+                          <option name="Arcade" >Arcade</option>
+                          <option name="Ping Pong" >Ping Pong</option>
+                          <option name="Darts" >Darts</option>
+                          <option name="Escape Room" >Escape Room</option>
+                          <option name="Tennis" >Tennis</option>
+                          <option name="Virtual Reality" >Virtual Reality</option>
+                          <option name="Planet Jump" >Planet Jump</option>
+                          <option name="Laser Tag" >Laser Tag</option>
+                          <option name="Cooking Class" >Cooking Class</option>
+                          <option name="Poetry Night" >Poetry Night</option>
+                          <option name="Open Mic" >Open Mic</option>
+                          <option name="Pottery" >Pottery</option>
+                          <option name="Painting" >Painting</option>
+                          <option name="Museum" >Museum</option>
                         </select>
                       </div>
                       
@@ -747,12 +808,19 @@ handleAddVenue=async(addvenue)=>{
                       </label>
                       <div className="col-md-6 col-sm-6">
                         <select
+                          name="OutdoorActivities"
                           style={{ marginTop: 8 }}
-                          //value={user.tags}
+                          //value={venue.OutdoorActivities}
                           onChange={this.handleChangeOutdoorActivities}
                           multiple
                         >
-                          <option name="Hiking">Hiking</option>
+                          {
+                            outdooractivity&&outdooractivity.map((outdooractivity)=>{
+                              return(
+                              <option selected disabled >{outdooractivity.name}</option>
+                              )  })
+                          }
+                          <option name="Hiking" >Hiking</option>
                           <option name="Cycling">Cycling</option>
                           <option name="Rock Climbing">Rock Climbing</option>
                           <option name="Fishing">Fishing</option>
@@ -788,12 +856,21 @@ handleAddVenue=async(addvenue)=>{
                             this.state.loading ? "disabled" : ""
                           }`}
                           onClick={()=>{
-                            if(this.state.venue.Name&&this.state.venue.address&&this.state.Dimage&&this.state.Cimage!="")
-                            {
+
+                            if(this.state.venue.Name&&this.state.venue.Address&&this.state.Dimage&&
+                              this.state.Cimage!=""){
+                           if(window.location.href.includes("AddVenue"))
+                           {
                              this.state.loading=true
                              this.setState({loading:true})
-                            this.handleAddVenue(this.state.venue)
+                             this.handleAddVenue(this.state.venue)
                            }
+                          else if(window.location.href.includes('EditVenue'))
+                          {
+                             this.state.loading=true
+                             this.setState({loading:true})
+                             this.handleEditVenue(this.state.venue)
+                          }}
                            else{
                              this.setState({
                                showSnackBar:true,

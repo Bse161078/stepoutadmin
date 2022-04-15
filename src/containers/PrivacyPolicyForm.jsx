@@ -31,8 +31,8 @@ export default class PrivacyPolicyForm extends React.Component {
         console.log(response);
         this.setState({
           policy: response,
-          description: RichTextEditor.createValueFromString(response[0].privacyPolicy, 'html'),
-          previousContent : RichTextEditor.createValueFromString(response[0].privacyPolicy, 'html'),
+          description: RichTextEditor.createValueFromString('', 'html'),
+          previousContent : RichTextEditor.createValueFromString('', 'html'),
         });
       });
   }
@@ -117,16 +117,14 @@ export default class PrivacyPolicyForm extends React.Component {
                     id="demo-form2"
                     data-parsley-validate
                     className="form-horizontal form-label-left"
-                    onSubmit={this.postPrivacyPolicy}
+                   // onSubmit={this.postPrivacyPolicy}
                   >
 
                   <div className="col-md-12 col-sm-12">
                     <RichTextEditor
                       value={description}
                       toolbarConfig={toolbarConfig}
-                      onChange={(e) => {
-                        this.setDescription(e);
-                      }}
+                      
                     />
                   </div>
 
@@ -137,7 +135,7 @@ export default class PrivacyPolicyForm extends React.Component {
                           <i className={`fa fa-spinner fa-pulse ${this.state.loading ? '' : 'd-none'}`} /> Update
                         </Button>
                         <Button
-                          onClick={() => this.revertChanges()}
+                          onClick={() => history.push('/Venues')}
                           className={`mx-3 btn btn-danger btn-lg`}>
                           Cancel
                         </Button>

@@ -23,29 +23,33 @@ import "react-select/dist/react-select.css";
 import { TextField } from "@material-ui/core";
 import { add } from "lodash";
 import { findRenderedDOMComponentWithClass } from "react-dom/test-utils";
+import Users from "./Users";
 export default class UserForm extends React.Component {
   constructor(props) {
-    
+    const editUser = localStorage.getItem("user")!=''?JSON.parse(localStorage.getItem("user")):'';
     super(props);
     this.state = {
       loading: false,
       user: {
-        id :"id" + Math.random().toString(16).slice(2,9),
-        firstname: "",
-        lastname: "",
-        email: "",
-        gender: "",
-        occupation: "",
+        id :editUser.id?editUser.id:'',
+        firstname: editUser.firstname?editUser.firstname:"",
+        lastname: editUser.lastname?editUser.lastname:"",
+        email: editUser.email?editUser.email:"",
+        gender: editUser.gender?editUser.gender:"",
+        occupation: editUser.occupation?editUser.occupation:"",
         signup_stage: "1",
-        dob:"",
-        Restaurants: [{id:0}],
-        IndoorActivities:[{id:0}],
-        OutdoorActivities:[{id:0}],
-        updatedTripLocation:"",
-        username:''
+        dob:editUser.dob?editUser.dob:"",
+        Restaurants: editUser.Restaurants?editUser.Restaurants:[{id:0}],
+        IndoorActivities:editUser.IndoorActivities?editUser.IndoorActivities:[{id:0}],
+        OutdoorActivities:editUser.OutdoorActivities?editUser.OutdoorActivities:[{id:0}],
+        updatedTripLocation:editUser.updatedTripLocation?editUser.updatedTripLocation:"",
+        username:editUser.username?editUser.username:''
       },
       upcomingEvents: [],
       pastEvents: [],
+        restaurant: editUser.Restaurants?editUser.Restaurants:'',
+        indooractivity:editUser.IndoorActivities?editUser.IndoorActivities:'',
+        outdooractivity:editUser.OutdoorActivities?editUser.OutdoorActivities:'',
       image: "",
    //   navigate:useNavigate(),
       file: "",
@@ -83,10 +87,6 @@ export default class UserForm extends React.Component {
         const past = response.filter((element) => {
           let date = moment(new Date(element.date.seconds * 1000));
           let curentDate = new Date();
-          // console.log(
-          //   `${element.name} minutes past:`,
-          //   date.diff(curentDate, "minutes")
-          // );
 
           return date.diff(curentDate, "minutes") < 0 || !element.status;
         });
@@ -156,8 +156,34 @@ export default class UserForm extends React.Component {
     user[name] = value;
     this.setState({ user });
   }
+  EditUser = async (user) =>{
+    
+  }
+  EditUser = async (user) => {
+    try{
+     const { history } = this.props;
+    const res = await updateUser(user.id,user)
+    console.log("addUser",res)
+  //  this.state.navigate('/users')
+    this.setState({
+     loading: false,
+     showSnackBar: true,
+     snackBarMessage: "User Updated!",
+     snackBarVariant: "success",
+   });
+  }
+  catch(e)
+  {
+   this.setState({
+     loading: false,
+     showSnackBar: true,
+     snackBarMessage: "Error updating user",
+     snackBarVariant: "error",
+   });
+    console.log("addUsererror",e)
+  }
+ }
  CreateUser = async (user) => {
-  this.setState({loading:true})
    try{
     const { history } = this.props;
    const res = await addUser(user)
@@ -166,7 +192,7 @@ export default class UserForm extends React.Component {
    this.setState({
     loading: false,
     showSnackBar: true,
-    snackBarMessage: "User Updated!",
+    snackBarMessage: "User Created!",
     snackBarVariant: "success",
   });
  }
@@ -175,7 +201,7 @@ export default class UserForm extends React.Component {
   this.setState({
     loading: false,
     showSnackBar: true,
-    snackBarMessage: "Error updating user",
+    snackBarMessage: "Error creating user",
     snackBarVariant: "error",
   });
    console.log("addUsererror",e)
@@ -196,32 +222,9 @@ export default class UserForm extends React.Component {
       let downloadUrl;
       let imageUri;
 
-      // if (imageFile) {
-      //   imageUri = await imageResizeFileUri({ file: imageFile });
-
-      //   const storageRef = firebase
-      //     .storage()
-      //     .ref()
-      //     .child("Users")
-      //     .child(`${uuidv4()}.jpeg`);
-
-      //   if (imageUri) {
-      //     await storageRef.putString(imageUri, "data_url");
-      //     downloadUrl = await storageRef.getDownloadURL();
-      //   }
-      //   user.profileImage = downloadUrl;
-      // }
-
       if (match.params.userId) {
         let cloneObject = Object.assign({}, user);
-        // if(cloneObject.credit)
-        // {
-         
-        // }
-        // else
-        // { cloneObject.credit = 0;
-
-        // }
+        
         updateUser(match.params.userId, cloneObject)
           .then((response) => {
             this.setState({
@@ -323,6 +326,7 @@ export default class UserForm extends React.Component {
        })
        restaurants.splice(0,1)
         user.Restaurants=restaurants
+        this.state.restaurant=''
         this.setState(user)
         console.log("This is the restaurants",user.Restaurants,value,restaurants)
        
@@ -343,6 +347,7 @@ export default class UserForm extends React.Component {
     this.state.id+=1
    })
     restaurants.splice(0,1)
+    this.state.outdooractivity=''
     user.OutdoorActivities=restaurants
     this.setState(user)
     console.log("This is the indooractivities",user.OutdoorActivities,value,restaurants) 
@@ -364,7 +369,8 @@ export default class UserForm extends React.Component {
    })
     restaurants.splice(0,1)
     user.IndoorActivities=restaurants
-    this.setState(user)
+    this.state.indooractivity=''
+    this.setState({user})
     console.log("This is the indooractivities",user.IndoorActivities,value,restaurants)
   };
 
@@ -379,7 +385,10 @@ export default class UserForm extends React.Component {
       Cimage,
       Cfile,
       Dimage,
-      Dfile
+      Dfile,
+      outdooractivity,
+      indooractivity,
+      restaurant
     } = this.state;
     const { match, history } = this.props;
     const isEdit = !!match.params.userId;
@@ -526,12 +535,12 @@ export default class UserForm extends React.Component {
                         Gender
                       </label>
                       <div className="col-md-6 col-sm-6">
-                        <input type="radio" id="male" name="gender" value="Male"
+                        <input type="radio" id="male" name="gender" checked={user.gender==='Male'?true:false} value={"Male"}
 
                          onChange={this.handleInputChange}
                       />
                         <label for="male">Male</label>
-                        <input type="radio" id="female" name="gender"  value="Female"
+                        <input type="radio" id="female" name="gender" checked={user.gender==='Female'?true:false}  value={"Female"}
                        onChange={this.handleInputChange}
                       />
                         <label for="female">Female</label>
@@ -550,7 +559,13 @@ export default class UserForm extends React.Component {
                           onChange={this.handleChange}
                           multiple
                         >
-                          
+                          {
+                            restaurant&&restaurant.map((res)=>{
+                              return(
+                                <option disabled>{res.name}</option>
+                              )
+                            })
+                          }
                           <option name="Italian" >Italian</option>
                           <option name="American">American</option>
                           <option name="Chinese">Chinese</option>
@@ -585,6 +600,13 @@ export default class UserForm extends React.Component {
                           onChange={this.handleChangeStatus}
                           multiple
                         >
+                          {
+                            indooractivity&&indooractivity.map((res)=>{
+                              return(
+                                <option disabled>{res.name}</option>
+                              )
+                            })
+                          }
                           <option name="Cinema">Cinema</option>
                           <option name="Theatre">Theatre</option>
                           <option name="Indoor Golf">Indoor Golf</option>
@@ -621,6 +643,13 @@ export default class UserForm extends React.Component {
                           onChange={this.handleChangeOutdoorActivities}
                           multiple
                         >
+                          {
+                            outdooractivity&&outdooractivity.map((res)=>{
+                              return(
+                                <option disabled>{res.name}</option>
+                              )
+                            })
+                          }
                           <option name="Hiking">Hiking</option>
                           <option name="Cycling">Cycling</option>
                           <option name="Rock Climbing">Rock Climbing</option>
@@ -657,16 +686,35 @@ export default class UserForm extends React.Component {
                             this.state.loading ? "disabled" : ""
                           }`}
                           onClick={() =>
-                            this.state.user.email&&this.state.user.firstname&&
-                            this.state.user.lastname&&this.state.user.gender&&this.state.user.dob!=''?
-                            this.CreateUser(user)
-                           :this.setState({
+                            {if(this.state.user.email&&this.state.user.firstname&&
+                            this.state.user.lastname&&this.state.user.gender&&this.state.user.dob!='')
+                            {
+                              if(window.location.href.includes("AddUser"))
+                              {
+                               this.CreateUser(user)
+                               this.setState({
+                                loading: true
+                               })
+                              }
+                              else
+                              {
+                                this.EditUser(user)
+                                this.setState({
+                                  loading: true
+                                 })
+                              }
+                            }
+                            else
+                            {
+                              this.setState({
                             loading: false,
                             showSnackBar: true,
                             snackBarMessage: "Please fill the form",
                             snackBarVariant: "error",
                           })
+                        }
                           }
+                        }
                         >
                           <i
                             className={`fa fa-spinner fa-pulse ${

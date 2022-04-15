@@ -1,14 +1,13 @@
 export class Venue {
     constructor(x) {
-      this.Address = x.address;
-      this.Description = x.description;
+      this.Address = x.Address;
+      this.Description = x.Description;
       this.Image = x.Image;
       this.Images = x.Images;
       this.Name = x.Name;
       this.Rating = x.Rating;
       this.Reviews = x.Reviews;
       this.Time = x.Time;
-      this.totalTime=x.totalTime;
       this.Restaurants = x.Restaurants;
       this.IndoorActivities = x.IndoorActivities;
       this.OutdoorActivities = x.OutdoorActivities;
@@ -23,15 +22,14 @@ export class Venue {
   
       return new Venue({
         id: doc.id,
-        address: data["address"] ? data["address"] : "",
-        description: data["description"] ? data["description"] : "",
+        Address: data["Address"] ? data["Address"] : "",
+        Description: data["Description"] ? data["Description"] : "",
         Image: data["Image"] ? data["Image"] : "",
         Images: data["Images"] ? data["Images"] : "",
         Name: data["Name"] ? data["Name"] : "",
         Rating: data["Rating"] ? data["Rating"] : "",
         Reviews: data["Reviews"] ? data["Reviews"] : "",
         Time: data["Time"] ? data["Time"] : "",
-        totalTime: data["totalTime"] ? data["totalTime"] : "",
         Restaurants: data["Restaurants"] ? data["Restaurants"] : "",
         IndoorActivities: data["IndoorActivities"] ? data["IndoorActivities"] : "",
         OutdoorActivities: data["OutdoorActivities"] ? data["OutdoorActivities"] : "",

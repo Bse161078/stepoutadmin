@@ -45,6 +45,7 @@ export default class Users extends React.Component {
       selectedIndex: [],
       upcomingEvents: [],
       pastEvents: [],
+      Restaurants:[],
       pages: 1,
       search:'',
       q: "",
@@ -69,9 +70,11 @@ export default class Users extends React.Component {
 
    useEffect=()=>{
     this.fetchUsers()
+    localStorage.setItem("user","")
   }
   componentDidMount(){
     this.fetchUsers()
+    localStorage.setItem("user","")
   }
 
   fetchEvent = () => {
@@ -571,8 +574,9 @@ export default class Users extends React.Component {
                   </div>
                   {/* <div className="col-sm-4"></div> */}
                   <div className="col-sm-2 pull-right mobile-space">
-                    <Link to="/user/userForm">
-                      <button type="button" className="btn btn-success">
+                    <Link to="User/AddUser">
+                      <button type="button" className="btn btn-success"
+                      >
                         Add new Users
                       </button>
                     </Link>
@@ -663,8 +667,12 @@ export default class Users extends React.Component {
               )
             })}</td>
             <td>
-          <Link to={`/events/edit-event`}>
-          <Tooltip title="Edit" aria-label="edit">
+          <Link to={`/User/EditUser`}>
+          <Tooltip title="Edit" aria-label="edit"
+          onClick={()=>{
+            localStorage.setItem("user",JSON.stringify(users))
+          }}
+          >
             <span
               className="fa fa-edit"
               aria-hidden="true"

@@ -5,8 +5,6 @@ import { getVenues,deleteVenue } from '../backend/services/VenueServices';
 import SnackBar from "../components/SnackBar";
 import Swal from "sweetalert2";
 import '../scss/style.scss'
-import AliceCarousel from 'react-alice-carousel';
-import "react-alice-carousel/lib/alice-carousel.css";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
@@ -33,7 +31,7 @@ export default class Venues extends React.Component {
   
   componentDidMount(){
     this.fetchVenue()
-
+    localStorage.setItem("venue","")
   }
   handleInputChange(event) {
     const { value, name } = event.target;
@@ -62,6 +60,7 @@ export default class Venues extends React.Component {
           allVenue: response,
           loading:false
         });
+        
         console.log('allvenuebynamee',this.state.allVenue)
       })
       .catch((err) => {
@@ -206,6 +205,8 @@ export default class Venues extends React.Component {
       <table  width={1000} style={{tableLayout:'auto'}} class="table table-striped table-bordered"  >
         <thead>
           <tr>
+          <th class="th-sm">Name
+            </th>
             <th class="th-sm" >Address
             </th>
             <th class="th-sm">Description
@@ -213,8 +214,6 @@ export default class Venues extends React.Component {
             <th class="th-sm">Display Image
             </th>
             <th class="th-sm">Carousel Image
-            </th>
-            <th class="th-sm">Name
             </th>
             <th class="th-sm">Opening time
             </th>
@@ -242,10 +241,9 @@ export default class Venues extends React.Component {
         .map((venue) => {
           return(
         <tr >
+          <td>{venue.Name}</td>
           <td>{venue.Address}</td>
-
-          <td 
-          >{venue.Description}</td>
+          <td>{venue.Description}</td>
           <td><img src={venue.Image} class="d-block w-100" alt="Your Image"/></td>
           <td>
             
@@ -258,28 +256,37 @@ export default class Venues extends React.Component {
             })}
             </Slider>
             </td>
-          <td>{venue.Name}</td>
           <td>{venue.Time}</td>
           <td>{venue.endTime}</td>
           {/* <td>{venue.Rating}</td> */}
           <td>{venue.IndoorActivities&&venue.IndoorActivities.map((res)=>{
             return(
-              <li>{res.name}</li>
+              <ul>
+                <li>{res.name}</li>
+              </ul>
             )
           })}</td>
           <td>{venue.Restaurants&&venue.Restaurants.map((res)=>{
             return(
+              <ul>
               <li>{res.name}</li>
+              </ul>
             )
           })}</td>
-           <td>{venue.OutdoorActivities&&venue.OutdoorActivities.map((res)=>{
+           <td>{venue.OutdoorActivities!=''&&venue.OutdoorActivities.map((res)=>{
             return(
+              <ul>
               <li>{res.name}</li>
+              </ul>
             )
           })}</td>
           <td>
-          <Link to={`/events/edit-event`}>
-          <Tooltip title="Edit" aria-label="edit">
+          <Link to={`/Venues/EditVenue`}>
+          <Tooltip title="Edit" aria-label="edit"
+          onClick={()=>{
+            localStorage.setItem("venue",JSON.stringify(venue))
+          }}
+          >
             <span
               className="fa fa-edit"
               aria-hidden="true"

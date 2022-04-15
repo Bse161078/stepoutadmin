@@ -11,7 +11,7 @@ import {
 import {
   getVenues,
 } from "../backend/services/VenueServices"
-import {addTrip} from '../backend/services/TripsService'
+import {addTrip,updateTrip} from '../backend/services/TripsService'
 import moment from "moment";
 import { firebase } from "../backend/firebase";
 import { imageResizeFileUri } from "../static/_imageUtils";
@@ -25,53 +25,164 @@ import Select from "react-select";
 import "react-select/dist/react-select.css";
 import { TextField } from "@material-ui/core";
 export default class TripsForm extends React.Component {
+  
   constructor(props) {
+    const editTrip=localStorage.getItem("trip")!=""?JSON.parse(localStorage.getItem('trip')):''
     super(props);
     this.state = {
       loading: true,
       trips: {
-        Description: "",
-        Name: "",
-        Venues: "",
-        startTime: "",
-        endTime: "",
-        Rating: "",
-        totalTime: "",
-        Reviews:[],
-        restaurants:'',
-        Image:'',
-        IndoorActivities:'',
-        OutdoorActivities:''
+        id:editTrip.id?editTrip.id:'',
+        Description: editTrip.Description?editTrip.Description:"",
+        Name: editTrip.Name?editTrip.Name:"",
+        Venues: editTrip.Venues?editTrip.Venues:[],
+        startTime: editTrip.startTime?editTrip.startTime:"",
+        endTime: editTrip.endTime?editTrip.endTime:"",
+        totalTime: editTrip.totalTime?editTrip.totalTime:"",
+        restaurants:editTrip.restaurants?editTrip.restaurants:'',
+        Image:editTrip.Image?editTrip.Image:'',
+        IndoorActivities:editTrip.IndoorActivities?editTrip.IndoorActivities:'',
+        OutdoorActivities:editTrip.OutdoorActivities?editTrip.OutdoorActivities:''
       },
+      restaurants:editTrip.restaurants?editTrip.restaurants:'',
+      indooractivity:editTrip.IndoorActivities?editTrip.IndoorActivities:"",
+      outdooractivity:editTrip.OutdoorActivities?editTrip.OutdoorActivities:"",
+      CountTime:-1,
       upcomingEvents: [],
       pastEvents: [],
       image: "",
-      file: "",
+      Dfile: editTrip.Image?editTrip.Image:"",
       venues:[{}],
-      Dimage:'',
+      Dimage:editTrip.Image?editTrip.Image:'',
+      Cimage:'',
       userId: "",
-      description: RichTextEditor.createEmptyValue(),
       showSnackBar: false,
       snackBarMessage: "",
       snackBarVariant: "success",
+    
     };
-
+    console.log("trips",editTrip)
     this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleInputChanges = this.handleInputChanges.bind(this);
+    this.handleInputChangess = this.handleInputChangess.bind(this);
+
    // this.postUser = this.postUser.bind(this);
   }
   componentDidMount(){
     this.fetchVenues()
-    console.log("venue")
   }
   componentWillMount()
   {
     this.fetchVenues()
-    console.log("venue")
+  }
+  onVenueStartTimeChange(e) {
+    var trips=this.state.trips
+    const id=e.target.id
+    var  venue= this.state.trips.Venues
+    var timeSplit = e.target.value.split(':'),
+    hours,
+    minutes,
+    meridian;
+  hours = timeSplit[0];
+  minutes = timeSplit[1];
+  if (hours > 12) {
+    meridian = 'PM';
+    hours -= 12;
+  } else if (hours < 12) {
+    meridian = 'AM';
+    if (hours == 0) {
+      hours = 12;
+    }
+  } else {
+    meridian = 'PM';
+  }
+  venue[id].startTime=hours + ':' + minutes + ' ' + meridian
+  this.setState({trips})
+  console.log("startTime", venue[id],id,this.state.trips.startTime)
+  }
+  onVenueEndTimeChange(e) {
+    var trips=this.state.trips
+    const id=e.target.id
+    var  venue= this.state.trips.Venues
+    var timeSplit = e.target.value.split(':'),
+    hours,
+    minutes,
+    meridian;
+  hours = timeSplit[0];
+  minutes = timeSplit[1];
+  if (hours > 12) {
+    meridian = 'PM';
+    hours -= 12;
+  } else if (hours < 12) {
+    meridian = 'AM';
+    if (hours == 0) {
+      hours = 12;
+    }
+  } else {
+    meridian = 'PM';
+  }
+  venue[id].endTime=hours + ':' + minutes + ' ' + meridian
+  // if(id===0)
+  // {
+  // trips.endTime=hours + ':' + minutes + ' ' + meridian
+  // }
+  this.setState({trips})
+  console.log("startTime", venue[id],this.state.trips.endTime)
+  }
+  onEndTimeChange(e){
+    var trips = this.state.trips
+    var timeSplit = e.target.value.split(':'),
+      hours,
+      minutes,
+      meridian;
+    hours = timeSplit[0];
+    minutes = timeSplit[1];
+    if (hours > 12) {
+      meridian = 'PM';
+      hours -= 12;
+    } else if (hours < 12) {
+      meridian = 'AM';
+      if (hours == 0) {
+        hours = 12;
+      }
+    } else {
+      meridian = 'PM';
+    }
+    trips.endTime = hours + ':' + minutes + ' ' + meridian
+    this.setState({
+      trips
+  })
+  
+    console.log("startTimeeee",this.state.trips.endTime)
+  }
+   onStartTimeChange(e) {
+    var trips = this.state.trips
+    var timeSplit = e.target.value.split(':'),
+      hours,
+      minutes,
+      meridian;
+    hours = timeSplit[0];
+    minutes = timeSplit[1];
+    if (hours > 12) {
+      meridian = 'PM';
+      hours -= 12;
+    } else if (hours < 12) {
+      meridian = 'AM';
+      if (hours == 0) {
+        hours = 12;
+      }
+    } else {
+      meridian = 'PM';
+    }
+    trips.startTime = hours + ':' + minutes + ' ' + meridian
+    this.setState({
+      trips
+  })
+    console.log("startTimeeee",this.state.trips.startTime)
   }
   fetchVenues = () => {
     this.setState({ loading: true });
        getVenues()
-     
       .then((response) => {
         this.setState({
           venues: response,
@@ -114,7 +225,65 @@ export default class TripsForm extends React.Component {
     trips[name] = value;
     this.setState({ trips });
   }
+  handleInputChanges(event) {
+    const { value, id } = event.target;
+    const { trips } = this.state;
+    trips.Venues[id].endTime = value;
+    this.setState({ trips });
+    this.differenceTripsTime()
+    console.log("Venuesww",trips.Venues[id])
+   
+      this.state.trips.endTime=value
+      this.setState({
+        trips
+      })
+    
+    console.log("tripsendtime")
 
+
+  }
+  handleInputChangess(event) {
+    const { value, id } = event.target;
+    const { trips } = this.state;
+    trips.Venues[id].startTime = value;
+    this.setState({ trips });
+    this.differenceTripsTime()
+    if(id==0)
+    {
+      this.state.trips.startTime=value
+      this.setState({
+        trips
+      })
+      console.log("tripsstarttime",this.state.trips.startTime,value)
+    }
+    console.log("Venuesww",trips.Venues[id],id)
+
+  }
+ handleEditTrip = async(trip)=>{
+   if(trip.Image==='')
+   {
+      const img =await this.uploadImage(this.state.Dimage)
+      trip.Image=img
+   }
+  updateTrip(trip.id,trip)
+        .then((response) => {
+          this.setState({
+            loading: false,
+            showSnackBar: true,
+            snackBarMessage: "Trip Updated successfully",
+            snackBarVariant: "success",
+          });
+        })
+        .catch((err) => {
+          console.log("Error:", err);
+          this.setState({
+            loading: false,
+            showSnackBar: true,
+            snackBarMessage: "Error updating trip",
+            snackBarVariant: "error",
+          });
+        });
+ }
   handleAddTrip=async(trip)=>{
     const img =await this.uploadImage(this.state.Dimage)
     trip.Image=img
@@ -225,11 +394,18 @@ export default class TripsForm extends React.Component {
     });
   };
   handleCarouselImage = (event) => {
-    this.state.Dimage=event.target.files[0]
+    //this.state.Dimage=event.target.files[0]
     this.setState({
-      Cimage: event.target.files[0],
-      Cfile: URL.createObjectURL(event.target.files[0]),
+      Dimage: event.target.files[0],
+      Dfile: URL.createObjectURL(event.target.files[0]),
     });
+    this.setState(prevState => ({
+      trips:{
+        ...prevState.trips,
+        Image:''
+      }
+    })
+     )
   };
 
 
@@ -263,11 +439,10 @@ export default class TripsForm extends React.Component {
   }
 
   handleChange = (e) => {
-    if(this.isRegisteredForFutureEvent(this.state.trips)===false)
-      {
+  
         let trip = this.state.trips;
         var venues=[{}];
-        var resid=1
+        var resid=0
         let value = Array.from(e.target.selectedOptions, option => option.id);
        value.map((val)=>{
          for(let i=0;i<this.state.venues.length;i++)
@@ -277,9 +452,14 @@ export default class TripsForm extends React.Component {
              const resvenue={
                Name:this.state.venues[i].Name,
                Address:this.state.venues[i].Address,
-               Image:this.state.venues[i].Image
+               Image:this.state.venues[i].Image,
+               venueId:this.state.venues[i].id,
+               id:resid,
+               startTime:'',
+               endTime:''
              }
              venues.push(resvenue)
+             resid+=1
            }
          
          }
@@ -289,11 +469,11 @@ export default class TripsForm extends React.Component {
         this.setState(trip)
         console.log("This is the restaurants",trip.Venues,venues)
        
-      }
+      
   }
 
   handleChangeRestaurants = (e) => {
-    if(this.isRegisteredForFutureEvent(this.state.venue)===false)
+    if(this.isRegisteredForFutureEvent(this.state.trips)===false)
       {
         let trip = this.state.trips;
         var restaurants=[{}];
@@ -310,6 +490,7 @@ export default class TripsForm extends React.Component {
        })
        restaurants.splice(0,1)
        trip.restaurants=restaurants
+       this.state.restaurants=''
         this.setState(trip)
         console.log("This is the restaurants",restaurants)
        
@@ -355,16 +536,19 @@ export default class TripsForm extends React.Component {
     const res={
       id:resid,
       name:val,
-      selected:true
+      selected:true,
     }
     Selectedtrip.push(res)
     resid+=1
    })
    Selectedtrip.splice(0,1)
    trips.OutdoorActivities=Selectedtrip
+   this.state.outdooractivity=''
     this.setState(trips)
+    this.differenceTripsTime()
     console.log("This is the outdooractivities",trips.OutdoorActivities,value,Selectedtrip) 
   }
+
 
   handleChangeStatus = (e) => {
     let trip = this.state.trips;
@@ -382,23 +566,113 @@ export default class TripsForm extends React.Component {
    })
    selectedIndooractivities.splice(0,1)
    trip.IndoorActivities=selectedIndooractivities
+   this.state.indooractivity=''
     this.setState(trip)
     console.log("This is the indooractivities",trip.IndoorActivities,value,selectedIndooractivities)
   };
+  parseTime(cTime)
+  {
+    if (cTime == '') return null;
+    var d = new Date();
+    var time = cTime.match(/(\d+)(:(\d\d))?\s*(p?)/);
+    d.setHours( parseInt(time[1]) + ( ( parseInt(time[1]) < 12 && time[4] ) ? 12 : 0) );
+    d.setMinutes( parseInt(time[3]) || 0 );
+    d.setSeconds(0, 0);
+    return d;
+  }
+  differenceTripsTime = () =>{
+    var diffrencetime=0;
+      this.state.trips.Venues.map((e)=>{
+        if(e.startTime!=""&&e.endTime!="")
+        {
+          
+        const startTime = this.parseTime(e.startTime)
+        const endTime = this.parseTime(e.endTime)
+        diffrencetime += (endTime-startTime)/(1000*60) 
+        console.log("difference time",diffrencetime)
+        }
+      })
+      this.state.trips.totalTime=diffrencetime
 
+  }
+  differenceVenuesTime = () =>{
+    this.state.trips.map((e)=>{
+      if(e.startTime!=""&&e.endTime!="")
+      {
+      const startTime = this.parseTime(e.startTime)
+      const endTime = this.parseTime(e.endTime)
+      const diffrencetime = (endTime-startTime)/(1000*60)
+      const time = diffrencetime/60
+      console.log("difference time",e.startTime,e.endTime,diffrencetime)
+      }
+    })
+}
   render() {
-    console.log(this.state);
+    console.log(this.state,"hamza");
+    
+    let Container=[];
+    // for(let i=0;i<){
+    //   Container.push()
+    // }
+    
+  
     const {
       trips,
       showSnackBar,
       snackBarMessage,
       snackBarVariant,
-      Cimage,
-      Cfile,
-      loading,
       Dimage,
-      Dfile
+      indooractivity,
+      outdooractivity,
+      restaurants,
+      Dfile,
+      editTrip,
+      loading,
     } = this.state;
+    let {CountTime}=this.state
+    const XyxContainer=trips?.Venues?.length>0?trips.Venues.map((s)=>
+    {CountTime=CountTime+1 
+      console.log("VENUES",this.state.venues) 
+      return(
+                  <div>
+                     <div className="form-group row">
+                     <label className="control-label col-md-3 col-sm-3">
+                      {s.Name} Start Time
+                      </label>
+                      <div className="col-md-6 col-sm-6">
+                        <input
+                          // required
+                          type="time"
+                          id={CountTime}
+                          name="startTime"
+                          className="form-control"
+                          value={s.startTime}
+                          onChange={this.handleInputChangess}
+                        />
+                      </div>
+                      </div>
+                      <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">
+                      {s.Name} End Time
+                      </label>
+                      <div className="col-md-6 col-sm-6">
+                        <input
+                          type="time"
+                          id={CountTime}
+                          name="endTime"
+                          className="form-control"
+                          value={s.endTime}
+                          onChange={this.handleInputChanges}
+                        />
+                      </div>
+                      </div>
+                    
+    </div>)
+    
+    }
+                      
+    ):''
+    console.log("tripsEdit ",trips)
     const { match, history } = this.props;
     const isEdit = !!match.params.userId;
     return (
@@ -411,6 +685,7 @@ export default class TripsForm extends React.Component {
             onClose={() => this.closeSnackBar()}
           />
         )}
+        
         <div className="col-12">
           <div className="row">
             <div className="col-md-12 col-sm-12">
@@ -433,14 +708,14 @@ export default class TripsForm extends React.Component {
                         <div className="col-md-6 col-sm-6">
                         <input
                           type="file"
-                          accept="Cimage/*"
+                          accept="Dimage/*"
                           name="profileImage"
                           className="form-control"
                           onChange={this.handleCarouselImage}
                         />
                       </div>
                       </div>
-                      {Cimage ? (
+                      {Dimage ? (
                       <div className="form-group row">
                         <label className="control-label col-md-3 col-sm-3"></label>
                         <div className="col-md-6 col-sm-6">
@@ -448,7 +723,7 @@ export default class TripsForm extends React.Component {
                             style={{ marginRight: "5px" }}
                             width="100"
                             className="img-fluid"
-                            src={Cfile}
+                            src={Dfile}
                             alt="profileImage"
                           />
                         </div>
@@ -464,7 +739,7 @@ export default class TripsForm extends React.Component {
                           type="text"
                           name="Name"
                           className="form-control"
-                      //    value={user.fname}
+                          value={trips.Name}
                           onChange={this.handleInputChange}
                         />
                       </div>
@@ -474,15 +749,26 @@ export default class TripsForm extends React.Component {
                         Description
                       </label>
                       <div className="col-md-6 col-sm-6">
+                      <textarea  required
+                          type="text"
+                          name="Description"
+                          className="form-control"
+                          rows="8"
+                          value={trips.Description}
+                          onChange={this.handleInputChange}>
+                        Write stuff here...
+                        </textarea>
+                        </div>
+                      {/* <div className="col-md-6 col-sm-6">
                         <input
                           required
                           type="text"
                           name="Description"
                           className="form-control"
-                         // value={user.lname}
+                         value={trips.Description}
                           onChange={this.handleInputChange}
                         />
-                      </div>
+                      </div> */}
                     </div>
                      <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
@@ -495,18 +781,34 @@ export default class TripsForm extends React.Component {
                           style={{ marginTop: 8 }}
                           onChange={this.handleChange}
                           multiple
+                          //value={trips.Venues}
                        >
-                        {this.state.venues.map((ven)=>{
+                         {
+                        trips.Venues&&trips.Venues.map((ven)=>{
+                          return(
+                        <option id={ven.id} selected disabled >{ven.Name}</option>
+                        )})
+                    }
+                        {
+                        this.state.venues.map((ven)=>{
                           return(
                         <option id={ven.id} >{ven.Name}</option>
                         )})
                     }
                     </select>}
                       </div>
+                  
                     </div>
+                   
+                    { 
+                     trips.Venues&&
+                     XyxContainer
+                      
+                    }
+                   
                      <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                        Start Time
+                       Trip Start Time
                       </label>
                       <div className="col-md-6 col-sm-6">
                         <input
@@ -514,6 +816,7 @@ export default class TripsForm extends React.Component {
                           type="time"
                           name="startTime"
                           className="form-control"
+                          value={trips.startTime}
                           onChange={this.handleInputChange}
                         />
                       </div>
@@ -521,13 +824,14 @@ export default class TripsForm extends React.Component {
 
                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                        End Time 
+                       Trip End Time 
                       </label>
                       <div className="col-md-6 col-sm-6">
                         <input
                           type="time"
                           name="endTime"
                           className="form-control"
+                          value={trips.endTime}
                           onChange={this.handleInputChange}
                         />
                       </div>
@@ -542,6 +846,7 @@ export default class TripsForm extends React.Component {
                           required
                           type="number"
                           name="totalTime"
+                          value={trips.totalTime}
                           className="form-control"
                           onChange={this.handleInputChange}
                         />
@@ -553,11 +858,18 @@ export default class TripsForm extends React.Component {
                       </label>
                       <div className="col-md-6 col-sm-6">
                       <select
-                        name="restaurants"
+                          name="restaurants"
+                         // value={trips.restaurants}
                           style={{ marginTop: 8 }}
                           onChange={this.handleChangeRestaurants}
                           multiple
                         >
+                            {
+                        restaurants&&restaurants.map((res)=>{
+                          return(
+                        <option  selected disabled >{res.name}</option>
+                        )})
+                    }
                           <option name="Italian" >Italian</option>
                           <option name="American">American</option>
                           <option name="Chinese">Chinese</option>
@@ -587,11 +899,18 @@ export default class TripsForm extends React.Component {
                       </label>
                       <div className="col-md-6 col-sm-6">
                         <select
+                          name="IndoorActivities"
                           style={{ marginTop: 8 }}
-                          //value={user.tags}
+                          //value={trips.IndoorActivities}
                           onChange={this.handleChangeStatus}
                           multiple
                         >
+                            {
+                        indooractivity&&indooractivity.map((indoor)=>{
+                          return(
+                        <option  selected disabled >{indoor.name}</option>
+                        )})
+                    }
                           <option name="Cinema">Cinema</option>
                           <option name="Theatre">Theatre</option>
                           <option name="Indoor Golf">Indoor Golf</option>
@@ -624,10 +943,16 @@ export default class TripsForm extends React.Component {
                       <div className="col-md-6 col-sm-6">
                         <select
                           style={{ marginTop: 8 }}
-                          //value={user.tags}
+                          //value={trips.OutdoorActivities}
                           onChange={this.handleChangeOutdoorActivities}
                           multiple
                         >
+                            {
+                        outdooractivity&&outdooractivity.map((outdoor)=>{
+                          return(
+                        <option  selected disabled >{outdoor.name}</option>
+                        )})
+                    }
                           <option name="Hiking">Hiking</option>
                           <option name="Cycling">Cycling</option>
                           <option name="Rock Climbing">Rock Climbing</option>
@@ -667,10 +992,19 @@ export default class TripsForm extends React.Component {
                             if(trips.Name&&trips.Venues&&
                               (trips.IndoorActivities||trips.OutdoorActivities||trips.restaurants)&&this.state.Dimage!="")
                             {
+                              if(window.location.href.includes("AddTrip"))
+                              {
                              this.state.loading=true
                              this.setState({loading:true})
-                            this.handleAddTrip(this.state.trips)
-                           }
+                             this.handleAddTrip(trips)
+                             }
+                             else
+                             {
+                              this.state.loading=true
+                              this.setState({loading:true})
+                              this.handleEditTrip(trips)
+                             }
+                          }
                            else{
                              this.setState({
                                showSnackBar:true,

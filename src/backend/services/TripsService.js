@@ -37,6 +37,6 @@ export const addTrip = async function (data) {
     await db.collection("Trips").doc(id).delete();
   };
   export const updateTrip = async function (id, data) {
-    //   console.log("Edit data:", data);
+       console.log("Edit data:", data);
     await db.collection("Trips").doc(id).set(data, { merge: true });
   };
