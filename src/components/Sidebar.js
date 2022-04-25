@@ -3,22 +3,24 @@ import { NavLink } from "react-router-dom";
 import { Badge, Nav, NavItem, NavLink as RsNavLink } from "reactstrap";
 import classNames from "classnames";
 import nav from "../static/_nav";
-import SidebarFooter from "./SidebarFooter";
-import SidebarForm from "./SidebarForm";
-import SidebarHeader from "./SidebarHeader";
+import navSubscriber from "../static/_navSubscriber";
+
 import SidebarMinimizer from "./SidebarMinimizer";
 
 import HasRole from "../hoc/HasRole";
 
 class Sidebar extends Component {
+
+	
 	constructor(props) {
 		super(props);
-
+		this.state = {
+			subscriberPortal: localStorage.getItem('subscriber'),
+		}
 		this.handleClick = this.handleClick.bind(this);
 		this.activeRoute = this.activeRoute.bind(this);
 		this.hideMobile = this.hideMobile.bind(this);
 	}
-
 	handleClick(e) {
 		e.preventDefault();
 		e.target.parentElement.classList.toggle("open");
@@ -44,12 +46,6 @@ class Sidebar extends Component {
             document.body.classList.toggle("sidebar-mobile-show");
         }
 	}
-
-
-	// todo Sidebar nav secondLevel
-	// secondLevelActive(routeName) {
-	//   return this.props.location.pathname.indexOf(routeName) > -1 ? "nav nav-second-level collapse in" : "nav nav-second-level collapse";
-	// }
 
 	render() {
 		const props = this.props;
@@ -80,7 +76,6 @@ class Sidebar extends Component {
 				</li>
 			);
 		};
-
 		// nav list divider
 		const divider = (divider, key) => {
 			const classes = classNames("divider", divider.class);
@@ -168,6 +163,7 @@ class Sidebar extends Component {
 		};
 
 		// nav type
+
 		const navType = (item, idx) => (item.title ? title(item, idx) : item.divider ? divider(item, idx) : item.label ? navLabel(item, idx) : item.children ? navDropdown(item, idx) : navItem(item, idx));
 
 		// nav list
@@ -179,16 +175,18 @@ class Sidebar extends Component {
 			const link = url ? url.substring(0, 4) : "";
 			return link === "http";
 		};
+		console.log("subscribernav",navSubscriber,nav)
 
 		// sidebar-nav root
 		return (
 			<div className="sidebar">
-				<SidebarHeader />
-				<SidebarForm />
 				<nav className="sidebar-nav">
-					<Nav>{navList(nav.items)}</Nav>
+					{
+						this.state.subscriberPortal==="true"?
+					<Nav>{navList(navSubscriber.items)}</Nav>:
+					<Nav>{navList( nav.items)}</Nav>
+					}
 				</nav>
-				<SidebarFooter />
 				<SidebarMinimizer />
 			</div>
 		);

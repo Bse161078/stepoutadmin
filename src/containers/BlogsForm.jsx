@@ -13,9 +13,7 @@ import { imageResizeFileUri } from "../static/_imageUtils";
 import { v4 as uuidv4 } from "uuid";
 import SnackBar from "../components/SnackBar";
 
-import {
-  getEvents,
-} from "../backend/services/eventService";
+
 import Select from "react-select";
 import "react-select/dist/react-select.css";
 import "slick-carousel/slick/slick.css";
@@ -35,6 +33,7 @@ export default class BlogsForm extends React.Component {
         description: editBlog.description?editBlog.description:"",
         img: editBlog.img?editBlog.img:"",
         Images: editBlog.Images?editBlog.Images:"",
+        Videos:editBlog.Videos?editBlog.Videos:[],
       },
       upcomingEvents: [],
       pastEvents: [],
@@ -42,7 +41,9 @@ export default class BlogsForm extends React.Component {
       Dimage:editBlog.img?editBlog.img:'',
       Dfile: editBlog.img?editBlog.img:"",
       Cimage:editBlog.Images?editBlog.Images:[],
-      Cfile:editBlog.Images?editBlog.Images:[],
+      cImageFile:editBlog.Images?editBlog.Images:[],
+      cVideoFile:editBlog.Videos?editBlog.Videos:[],
+      Videos:editBlog.Videos?editBlog.Videos:[],
       userId: "",
       description: RichTextEditor.createEmptyValue(),
       showSnackBar: false,
@@ -85,21 +86,29 @@ export default class BlogsForm extends React.Component {
   
   handleEditBlog=async(addvenue)=>{
     let Images=[]
+    let Videos=[]
     if(addvenue.img==='')
     {
     const imageUrl=await this.uploadImage(this.state.Dimage);
     addvenue.img=imageUrl;
     }
     const upload = this.state.Cimage
-    if(addvenue.Images==='')
+    if(addvenue.Images===''||addvenue.Videos==='')
     {
     for (let i =0;i<this.state.Cimage.length;i++)
     {
       const imges=await this.uploadImage(upload[i])
       Images.push(imges)
     }
+    for (let i =0;i<this.state.Videos.length;i++)
+    {
+      const imges=await this.uploadImage(this.state.Videos[i])
+      Videos.push(imges)
+    }
     addvenue.Images=Images;
+    addvenue.Videos=Videos
   }
+
     console.log("venue",addvenue)
     try{
       const { history } = this.props;
@@ -127,15 +136,26 @@ export default class BlogsForm extends React.Component {
   handleAddBlogs=async(addvenue)=>{
   
     let Images=[]
-     const imageUrl=await this.uploadImage(this.state.Dimage);
-     addvenue.img=imageUrl;
-     for (let i =0;i<this.state.Cimage.length;i++)
-     {
-       const imges=await this.uploadImage(this.state.Cimage[i])
-       Images.push(imges)
-     }
+     let Videos=[]
+  if(this.state.Cimage||this.state.Videos)
+  {
+  const imageUrl=await this.uploadImage(this.state.Dimage);
+  addvenue.img=imageUrl;
+  const multipleFiles=this.state.Cimage;
+  for (let i =0;i<multipleFiles.length;i++)
+  {
+    const imges=await this.uploadImage(multipleFiles[i])
+    Images.push(imges)
+  }
+  for (let i =0;i<this.state.Videos.length;i++)
+  {
+    const vid=await this.uploadImage(this.state.Videos[i])
+    Videos.push(vid)
+  }
+}
     
      addvenue.Images=Images;
+     addvenue.Videos=Videos;
      this.setState({loading:true})
      console.log("venue",addvenue)
      try{
@@ -164,22 +184,39 @@ export default class BlogsForm extends React.Component {
   handleDisplayImage = (event) => {
     var img = [{}]
     var cimg = [{}]
+    var vid = [{}]
+    var cVid = [{}]
     for(let i=0;i<event.target.files.length;i++)
     {
-      const newimage=event.target.files[i]
-      newimage["id"] = Math.random()
-      cimg.push(URL.createObjectURL(event.target.files[i]))
-      img.push(newimage)
+      if(event.target.files[i].type.includes("video"))
+    {
+      const newvid=event.target.files[i]
+      newvid["id"] = Math.random()
+      cVid.push(URL.createObjectURL(event.target.files[i]))
+      vid.push(newvid)
+    }
+    else{
+    const newimage=event.target.files[i]
+    newimage["id"] = Math.random()
+    cimg.push(URL.createObjectURL(event.target.files[i]))
+    img.push(newimage)
+  }
     }
     cimg.splice(0,1)
-    this.state.Cfile=cimg
+    cVid.splice(0,1)
+  this.state.cVideoFile=cVid
+   this.state.cImageFile=cimg
+   vid.splice(0,1)
+   this.state.Videos=vid
     img.splice(0,1)
     this.state.Cimage=img
     this.state.blog.Images=''
+    this.state.blog.Videos=''
     this.setState(prevState => ({
       venue:{
         ...prevState.venue,
-        Images:''
+        Images:'',
+        Videos:''
       }
     }))
     console.log('target',img,this.state.Cimage,this.state.Cfile)
@@ -248,7 +285,8 @@ export default class BlogsForm extends React.Component {
       snackBarMessage,
       snackBarVariant,
       Cimage,
-      Cfile,
+      cImageFile,
+      cVideoFile,
       loading,
       Dimage,
       Dfile
@@ -301,19 +339,19 @@ export default class BlogsForm extends React.Component {
                          Description
                       </label>
                       <div className="col-md-6 col-sm-6">
-                        <input
-                          required
+                      <textarea  required
                           type="text"
                           name="description"
                           className="form-control"
                           value={blog.description}
+                          rows="8"
                           onChange={this.handleInputChange}
                         />
                       </div>
                     </div>
                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                        Display Image
+                        Main Display Image
                       </label>
                         <div className="col-md-6 col-sm-6">
                         <input
@@ -341,7 +379,7 @@ export default class BlogsForm extends React.Component {
                     ) : null}
                       <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                        Carousel Image
+                      Quality Carousel Images and Videos
                       </label>
                         <div className="col-md-6 col-sm-6">
                         <input
@@ -359,9 +397,15 @@ export default class BlogsForm extends React.Component {
                         <label className="control-label col-md-3 col-sm-3"></label>
                         <div className="col-md-6 col-sm-6">
                         <Slider style={{width:"100px"}} arrows={false} infinite={true} adaptiveHeight={true} autoplaySpeed={2000} autoplay={true}  touchMove={true} dots={true}>
-                          {Cfile&&Cfile.map((cimage)=>{
+                          {cImageFile&&cImageFile.map((cimage)=>{
                           return(
                           <img src={cimage} class="d-block w-100" alt="Wild Landscape"/>
+
+                          )
+                          })}
+                          {cVideoFile&&cVideoFile.map((cimage)=>{
+                          return(
+                          <video src={cimage} class="d-block w-100" alt="Wild Landscape"/>
 
                           )
                           })}
@@ -378,7 +422,7 @@ export default class BlogsForm extends React.Component {
                             this.state.loading ? "disabled" : ""
                           }`}
                           onClick={()=>{
-                            if(this.state.blog.title&&this.state.blog.description&&this.state.Dimage&&this.state.Cimage!="")
+                            if(this.state.blog.title&&this.state.blog.description&&this.state.Dimage!="")
                             {
                               if(window.location.href.includes("AddBlogs"))
                               {

@@ -5,6 +5,7 @@ export class Blogs {
       this.title = x.title;
       this.id = x.id;
       this.Images=x.Images;
+      this.Videos=x.Videos;
       this.img=x.img;
     }
   
@@ -17,6 +18,7 @@ export class Blogs {
         id: doc.id,
         date: data["date"] ? data["date"] : "",
         Images: data["Images"] ? data["Images"] : "",
+        Videos: data["Videos"] ? data["Videos"] : "",
         description: data["description"] ? data["description"] : "",
         title: data["title"] ? data["title"] : "",
         img: data["img"] ? data["img"] : "",

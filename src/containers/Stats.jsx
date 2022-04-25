@@ -5,8 +5,6 @@ import {getTrips} from "../backend/services/TripsService"
 import {getBlogs} from "../backend/services/BlogsService"
 import {getUsers} from "../backend/services/usersService"
 import {getVenues} from "../backend/services/VenueServices"
-import {getSneakersReleaseDates} from "../backend/services/sneakerReleaseService"
-import { DatePicker } from '@material-ui/pickers';
 
 // import {Pagination} from 'react-bootstrap';
 // import LineChart from '../components/LineChart'

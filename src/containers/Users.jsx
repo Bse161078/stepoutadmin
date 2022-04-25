@@ -14,7 +14,6 @@ import {
   updateMemberShipPaymentStatusUser,
 } from "../backend/services/usersService";
 import moment from "moment";
-import { getEvents } from "../backend/services/eventService";
 import SnackBar from "../components/SnackBar";
 import { RootConsumer } from "../backend/Context";
 import Swal from "sweetalert2";
@@ -77,74 +76,7 @@ export default class Users extends React.Component {
     localStorage.setItem("user","")
   }
 
-  fetchEvent = () => {
-    this.setState({ loading: true });
-    getEvents()
-      .then((response) => {
-        this.setState({
-          events: response,
-          loading: false,
-          responseMessage: "No Users Found",
-        });
 
-        const upcoming = response.filter((element) => {
-          let date = moment(new Date(element.date.seconds * 1000));
-          let curentDate = new Date();
-          console.log(
-            `${element.name} minutes up:`,
-            date.diff(curentDate, "minutes")
-          );
-          return date.diff(curentDate, "minutes") > 0 && element.status == true;
-        });
-        const past = response.filter((element) => {
-          let date = moment(new Date(element.date.seconds * 1000));
-          let curentDate = new Date();
-          // console.log(
-          //   `${element.name} minutes past:`,
-          //   date.diff(curentDate, "minutes")
-          // );
-
-          return date.diff(curentDate, "minutes") < 0 || !element.status;
-        });
-
-        upcoming.sort((a, b) => {
-          var nameA = moment(new Date(a.date.seconds * 1000));
-          // var nameA = a.item_name.charAt(0).toUpperCase();
-          var nameB = moment(new Date(b.date.seconds * 1000));
-          if (nameA.diff(nameB, "minutes") < 0) {
-            return -1;
-          }
-          if (nameA.diff(nameB, "minutes") > 0) {
-            return 1;
-          }
-          // names must be equal
-          return 0;
-        });
-
-        past.sort((a, b) => {
-          var nameA = moment(new Date(a.date.seconds * 1000));
-          // var nameA = a.item_name.charAt(0).toUpperCase();
-          var nameB = moment(new Date(b.date.seconds * 1000));
-
-          if (nameA.diff(nameB, "minutes") > 0) {
-            return -1;
-          }
-          if (nameA.diff(nameB, "minutes") < 0) {
-            return 1;
-          }
-          // names must be equal
-          return 0;
-        });
-
-        this.setState({ upcomingEvents: upcoming, pastEvents: past });
-      })
-      .catch(() => {
-        this.setState({
-          loading: false,
-          responseMessage: "No Users Found...",
-        });
-      });
-  };
 
   fetchUsers = () => {
     getUsers()
@@ -574,7 +506,7 @@ export default class Users extends React.Component {
                   </div>
                   {/* <div className="col-sm-4"></div> */}
                   <div className="col-sm-2 pull-right mobile-space">
-                    <Link to="User/AddUser">
+                    <Link to="Users/AddUser">
                       <button type="button" className="btn btn-success"
                       >
                         Add new Users
@@ -667,7 +599,7 @@ export default class Users extends React.Component {
               )
             })}</td>
             <td>
-          <Link to={`/User/EditUser`}>
+          <Link to={`/Users/EditUser`}>
           <Tooltip title="Edit" aria-label="edit"
           onClick={()=>{
             localStorage.setItem("user",JSON.stringify(users))

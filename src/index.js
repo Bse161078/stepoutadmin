@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import createHistory from 'history/createBrowserHistory';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-
+import 'antd/dist/antd.css';
 import { Provider } from 'react-redux';
 import { syncHistoryWithStore } from 'react-router-redux';
 import configureStore from './store';

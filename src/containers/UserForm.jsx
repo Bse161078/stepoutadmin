@@ -15,15 +15,15 @@ import { imageResizeFileUri } from "../static/_imageUtils";
 import { v4 as uuidv4 } from "uuid";
 import SnackBar from "../components/SnackBar";
 import '../scss/style.scss'
-import {
-  getEvents,
-} from "../backend/services/eventService";
 import Select from "react-select";
 import "react-select/dist/react-select.css";
 import { TextField } from "@material-ui/core";
 import { add } from "lodash";
 import { findRenderedDOMComponentWithClass } from "react-dom/test-utils";
 import Users from "./Users";
+import SelectOutdoorActivities from "./SelectOutoorActivities";
+import SelectIndoorActivities from "./SelectIndoorActivities";
+import SelectRestaurants from "./SelectRestaurants";
 export default class UserForm extends React.Component {
   constructor(props) {
     const editUser = localStorage.getItem("user")!=''?JSON.parse(localStorage.getItem("user")):'';
@@ -65,99 +65,10 @@ export default class UserForm extends React.Component {
     this.postUser = this.postUser.bind(this);
   }
 
-  fetchEvent = () => {
-    this.setState({ loading: true });
-    getEvents()
-      .then((response) => {
-        this.setState({
-          events: response,
-          loading: false,
-          responseMessage: "No Events Found",
-        });
-
-        const upcoming = response.filter((element) => {
-          let date = moment(new Date(element.date.seconds * 1000));
-          let curentDate = new Date();
-          console.log(
-            `${element.name} minutes up:`,
-            date.diff(curentDate, "minutes")
-          );
-          return date.diff(curentDate, "minutes") > 0 && element.status == true;
-        });
-        const past = response.filter((element) => {
-          let date = moment(new Date(element.date.seconds * 1000));
-          let curentDate = new Date();
-
-          return date.diff(curentDate, "minutes") < 0 || !element.status;
-        });
-
-        upcoming.sort((a, b) => {
-          var nameA = moment(new Date(a.date.seconds * 1000));
-          // var nameA = a.item_name.charAt(0).toUpperCase();
-          var nameB = moment(new Date(b.date.seconds * 1000));
-          if (nameA.diff(nameB, "minutes") < 0) {
-            return -1;
-          }
-          if (nameA.diff(nameB, "minutes") > 0) {
-            return 1;
-          }
-          // names must be equal
-          return 0;
-        });
-
-        past.sort((a, b) => {
-          var nameA = moment(new Date(a.date.seconds * 1000));
-          // var nameA = a.item_name.charAt(0).toUpperCase();
-          var nameB = moment(new Date(b.date.seconds * 1000));
-
-          if (nameA.diff(nameB, "minutes") > 0) {
-            return -1;
-          }
-          if (nameA.diff(nameB, "minutes") < 0) {
-            return 1;
-          }
-          // names must be equal
-          return 0;
-        });
-
-        this.setState({ upcomingEvents: upcoming, pastEvents: past });
-           getUserById(this.props.match.params.userId)
-        .then((response) => {
-          console.log("user:", response);
-          this.setState({
-            user: response,
-          });
-        })
-        .catch((err) => {
-          window.alert("ERROR!");
-        });
-      })
-      .catch(() => {
-        this.setState({
-          loading: false,
-          responseMessage: "No Events Found...",
-        });
-      });
-  };
 
   componentDidMount() {
     const { match } = this.props;
     console.log("this.props", this.props);
-    
-    if (match.params.userId)
-   
-        this.fetchEvent()
-  }
-
-  handleInputChange(event) {
-    const { value, name } = event.target;
-
-    const { user } = this.state;
-    user[name] = value;
-    this.setState({ user });
-  }
-  EditUser = async (user) =>{
-    
   }
   EditUser = async (user) => {
     try{
@@ -288,32 +199,13 @@ export default class UserForm extends React.Component {
     }
   };
 
-  isRegisteredForFutureEvent= (user)=>{
-    if(this.state.upcomingEvents)
-    {
-      console.log("THese are upcoming events",this.state.upcomingEvents)
-      this.state.upcomingEvents.map(
-        (event)=>{
-          event.participants.map(
-            (participants)=>{
-              if(participants.userId===user.uuid){
-                var message = "Membership of "+user.name+" can not be changed he is participant of future events";
-                alert(message)
-                return true;
-              }
-            }
-          )
-        }
-      )
-    }
-    return false
-  }
+  
   handleChange = (e) => {
     if(this.isRegisteredForFutureEvent(this.state.user)===false)
       {
         let user = this.state.user;
         var restaurants=[{}];
-        let value = Array.from(e.target.selectedOptions, option => option.value);
+        let value = Array.from(e, option => option);
        value.map((val)=>{
         const res={
           id:this.state.id,
@@ -335,7 +227,7 @@ export default class UserForm extends React.Component {
   handleChangeOutdoorActivities = (e) =>{
     let user = this.state.user;
     var restaurants=[{}];
-    let value = Array.from(e.target.selectedOptions, option => option.value);
+    let value = Array.from(e, option => option);
    value.map((val)=>{
     const res={
       id:this.state.id,
@@ -356,7 +248,7 @@ export default class UserForm extends React.Component {
   handleChangeStatus = (e) => {
     let user = this.state.user;
     var restaurants=[{}];
-    let value = Array.from(e.target.selectedOptions, option => option.value);
+    let value = Array.from(e, option => option);
    value.map((val)=>{
     const res={
       id:this.state.id,
@@ -552,40 +444,9 @@ export default class UserForm extends React.Component {
                         Type of restaurants
                       </label>
                       <div className="col-md-6 col-sm-6">
-                      <select
-                        name="restaurants"
-                          style={{ marginTop: 8 }}
-                          //value={user.Restaurants}
-                          onChange={this.handleChange}
-                          multiple
-                        >
-                          {
-                            restaurant&&restaurant.map((res)=>{
-                              return(
-                                <option disabled>{res.name}</option>
-                              )
-                            })
-                          }
-                          <option name="Italian" >Italian</option>
-                          <option name="American">American</option>
-                          <option name="Chinese">Chinese</option>
-                          <option name="Greek">Greek</option>
-                          <option name="Desi">Desi</option>
-                          <option name="British">British</option>
-                          <option name="Jewish">Jewish</option>
-                          <option name="Mexican">Mexican</option>
-                          <option name="African">African</option>
-                          <option name="Latvian">Latvian</option>
-                          <option name="Polish">Polish</option>
-                          <option name="Polish">Russian</option>
-                          <option name="Sweedish">Sweedish</option>
-                          <option name="Peruvian">Peruvian</option>
-                          <option name="Hawaiian">Hawaiian</option>
-                          <option name="Brazilian">Brazilian</option>
-                          <option name="Salvadorian">Salvadorian</option>
-                          <option name="Thai">Thai</option>
-                          <option name="French">French</option>
-                        </select>
+                      <SelectRestaurants onSelectRestaurants={this.handleChange} 
+                     selected={user.Restaurants}
+                     />
                       </div>
                     </div>
 
@@ -594,41 +455,9 @@ export default class UserForm extends React.Component {
                         Indoor Activities
                       </label>
                       <div className="col-md-6 col-sm-6">
-                        <select
-                          style={{ marginTop: 8 }}
-                          //value={user.tags}
-                          onChange={this.handleChangeStatus}
-                          multiple
-                        >
-                          {
-                            indooractivity&&indooractivity.map((res)=>{
-                              return(
-                                <option disabled>{res.name}</option>
-                              )
-                            })
-                          }
-                          <option name="Cinema">Cinema</option>
-                          <option name="Theatre">Theatre</option>
-                          <option name="Indoor Golf">Indoor Golf</option>
-                          <option name="Swimming">Swimming</option>
-                          <option name="Gym">Gym</option>
-                          <option name="Spa">Spa</option>
-                          <option name="Shuffle Board">Shuffle Board</option>
-                          <option name="Arcade">Arcade</option>
-                          <option name="Ping Pong">Ping Pong</option>
-                          <option name="Darts">Darts</option>
-                          <option name="Escape Room">Escape Room</option>
-                          <option name="Tennis">Tennis</option>
-                          <option name="Virtual Reality">Virtual Reality</option>
-                          <option name="Planet Jump">Planet Jump</option>
-                          <option name="Laser Tag">Laser Tag</option>
-                          <option name="Cooking Class">Cooking Class</option>
-                          <option name="Poetry Night">Poetry Night</option>
-                          <option name="Open Mic">Open Mic</option>
-                          <option name="Pottery">Pottery</option>
-                          <option name="Painting">Painting</option>
-                          <option name="Museum">Museum</option>
-                        </select>
+                      <SelectIndoorActivities onSelectIndoorActivity={this.handleChangeStatus}
+                        selected={user.IndoorActivities}
+                        />
                       </div>
                       
                     </div>
@@ -637,41 +466,9 @@ export default class UserForm extends React.Component {
                         Outdoor Activities
                       </label>
                       <div className="col-md-6 col-sm-6">
-                        <select
-                          style={{ marginTop: 8 }}
-                          //value={user.tags}
-                          onChange={this.handleChangeOutdoorActivities}
-                          multiple
-                        >
-                          {
-                            outdooractivity&&outdooractivity.map((res)=>{
-                              return(
-                                <option disabled>{res.name}</option>
-                              )
-                            })
-                          }
-                          <option name="Hiking">Hiking</option>
-                          <option name="Cycling">Cycling</option>
-                          <option name="Rock Climbing">Rock Climbing</option>
-                          <option name="Fishing">Fishing</option>
-                          <option name="Outdoor Golf">Outdoor Golf</option>
-                          <option name="Amusement Park">Amusement Park</option>
-                          <option name="Picnic">Picnic</option>
-                          <option name="Drive in Movie">Drive in Movie</option>
-                          <option name="Outdoor Concert">Outdoor Concert</option>
-                          <option name="Winery">Winery</option>
-                          <option name="Zoo Park">Zoo Park</option>
-                          <option name="Go Ape">Go Ape</option>
-                          <option name="Boat Ride">Boat Ride</option>
-                          <option name="Sightseeing">Sightseeing</option>
-                          <option name="Whitewater Rafting">Whitewater Rafting</option>
-                          <option name="Camping">Camping</option>
-                          <option name="Paddleboarding">Paddleboarding</option>
-                          <option name="Rockpooling">Rockpooling</option>
-                          <option name="Farmers Market">Farmers Market</option>
-                          <option name="Stargazing">Stargazing</option>
-                          <option name="Horseback Riding">Horseback Riding</option>
-                        </select>
+                      <SelectOutdoorActivities onSelectOutdoorActivity={this.handleChangeOutdoorActivities}
+                        selected={user.OutdoorActivities}
+                        />
                       </div>
                       
                     </div>

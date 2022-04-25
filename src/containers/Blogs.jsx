@@ -113,6 +113,7 @@ export default class Blogs extends React.Component {
      this.setState({
        showSnackBar:false
      })
+    
    }
    handleInputChange(event) {
     const { value, name } = event.target;
@@ -152,7 +153,7 @@ export default class Blogs extends React.Component {
                   </div>
                   {/* <div className="col-sm-4"></div> */}
                   <div className="col-sm-2 pull-right mobile-space">
-                    <Link to="/Blogs/AddBlogs">
+                    <Link to="/Blogs/AddBlog">
                       <button type="button" className="btn btn-success">
                         Add new Blogs
                       </button>
@@ -214,10 +215,16 @@ export default class Blogs extends React.Component {
               
                )
               })}
+              {blog.Videos&&blog.Videos.map((cimage)=>{
+              return(
+              <video src={cimage} class="d-block w-100" alt="Wild Landscape"height="70%"width="60%"/>
+              
+               )
+              })}
             </Slider>
               </td>
             <td>
-          <Link to={`/Blogs/EditBlogs`}>
+          <Link to={`/Blogs/EditBlog`}>
           <Tooltip title="Edit" aria-label="edit"
           onClick={()=>{
             localStorage.setItem("blog",JSON.stringify(blog))

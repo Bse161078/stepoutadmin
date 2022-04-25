@@ -8,6 +8,7 @@ import {
   updateUser,
   getUserById,
 } from "../backend/services/usersService";
+import MultiSelect from "react-multi-select-component";
 import {
   getVenues,
 } from "../backend/services/VenueServices"
@@ -18,19 +19,21 @@ import { imageResizeFileUri } from "../static/_imageUtils";
 import { NIL, v4 as uuidv4 } from "uuid";
 import SnackBar from "../components/SnackBar";
 
-import {
-  getEvents,
-} from "../backend/services/eventService";
 import Select from "react-select";
 import "react-select/dist/react-select.css";
 import { TextField } from "@material-ui/core";
+import SelectIndoorActivities from "./SelectIndoorActivities";
+import SelectOutdoorActivities from "./SelectOutoorActivities";
+import SelectRestaurants from "./SelectRestaurants";
 export default class TripsForm extends React.Component {
   
   constructor(props) {
     const editTrip=localStorage.getItem("trip")!=""?JSON.parse(localStorage.getItem('trip')):''
     super(props);
+    const value=editTrip.Venues?editTrip.Venues.map((val)=>val.Name):''
     this.state = {
       loading: true,
+      selected:value?value:[],
       trips: {
         id:editTrip.id?editTrip.id:'',
         Description: editTrip.Description?editTrip.Description:"",
@@ -44,6 +47,9 @@ export default class TripsForm extends React.Component {
         IndoorActivities:editTrip.IndoorActivities?editTrip.IndoorActivities:'',
         OutdoorActivities:editTrip.OutdoorActivities?editTrip.OutdoorActivities:''
       },
+      options:editTrip?.Venues?.map((val)=>[
+        val.Name
+       ]),
       restaurants:editTrip.restaurants?editTrip.restaurants:'',
       indooractivity:editTrip.IndoorActivities?editTrip.IndoorActivities:"",
       outdooractivity:editTrip.OutdoorActivities?editTrip.OutdoorActivities:"",
@@ -184,6 +190,7 @@ export default class TripsForm extends React.Component {
     this.setState({ loading: true });
        getVenues()
       .then((response) => {
+        this.state.venues=response
         this.setState({
           venues: response,
           loading: false,
@@ -478,7 +485,7 @@ export default class TripsForm extends React.Component {
         let trip = this.state.trips;
         var restaurants=[{}];
         var resid=1
-        let value = Array.from(e.target.selectedOptions, option => option.value);
+        let value = Array.from(e, option => option);
        value.map((val)=>{
         const res={
           id:resid,
@@ -521,17 +528,11 @@ export default class TripsForm extends React.Component {
   //     }
   // }
 
-  handleChangeStatus = (e) => {
-    let user = this.state.user;
-    user.membership_fee_status = e.target.value;
-    this.setState({ user });
-  };
-
   handleChangeOutdoorActivities = (e) =>{
     let trips = this.state.trips;
     var Selectedtrip=[{}];
     var resid=1
-    let value = Array.from(e.target.selectedOptions, option => option.value);
+    let value = Array.from(e, option => option);
    value.map((val)=>{
     const res={
       id:resid,
@@ -554,7 +555,7 @@ export default class TripsForm extends React.Component {
     let trip = this.state.trips;
     var selectedIndooractivities=[{}];
     var resid=1
-    let value = Array.from(e.target.selectedOptions, option => option.value);
+    let value = Array.from(e, option => option);
    value.map((val)=>{
     const res={
       id:resid,
@@ -622,17 +623,22 @@ export default class TripsForm extends React.Component {
       snackBarMessage,
       snackBarVariant,
       Dimage,
+      selected,
       indooractivity,
       outdooractivity,
       restaurants,
       Dfile,
       editTrip,
       loading,
+      venues
     } = this.state;
+    console.log(this.state)
+  const options = venues&&venues.map((trip,index)=>{
+      return{label:trip.Name,value:trip.Name}
+                    })
     let {CountTime}=this.state
     const XyxContainer=trips?.Venues?.length>0?trips.Venues.map((s)=>
-    {CountTime=CountTime+1 
-      console.log("VENUES",this.state.venues) 
+    {CountTime=CountTime+1  
       return(
                   <div>
                      <div className="form-group row">
@@ -672,7 +678,6 @@ export default class TripsForm extends React.Component {
     }
                       
     ):''
-    console.log("tripsEdit ",trips)
     const { match, history } = this.props;
     const isEdit = !!match.params.userId;
     return (
@@ -703,7 +708,7 @@ export default class TripsForm extends React.Component {
                   >
                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                        Display Image
+                      Main Display Image
                       </label>
                         <div className="col-md-6 col-sm-6">
                         <input
@@ -731,7 +736,7 @@ export default class TripsForm extends React.Component {
                     ) : null}
                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
-                         Name
+                        Buisness Name
                       </label>
                       <div className="col-md-6 col-sm-6">
                         <input
@@ -776,26 +781,20 @@ export default class TripsForm extends React.Component {
                       </label>
                       <div className="col-md-6 col-sm-6">
                       {this.state.venues&&
-                          <select
-                          name="Venues"
-                          style={{ marginTop: 8 }}
-                          onChange={this.handleChange}
-                          multiple
-                          //value={trips.Venues}
-                       >
-                         {
-                        trips.Venues&&trips.Venues.map((ven)=>{
-                          return(
-                        <option id={ven.id} selected disabled >{ven.Name}</option>
-                        )})
-                    }
-                        {
-                        this.state.venues.map((ven)=>{
-                          return(
-                        <option id={ven.id} >{ven.Name}</option>
-                        )})
-                    }
-                    </select>}
+                      
+                          <MultiSelect
+                          options={options}
+                          selected={selected}
+                          onChange={(e)=>this.setState({selected:e})}
+                          labelledBy={"Select"}
+                       />
+                    //     {
+                    //     trips.Venues&&trips.Venues.map((ven)=>{
+                    //       return(
+                    //     <option id={ven.id} selected disabled >{ven.Name}</option>
+                    //     )})
+                    // }
+                      }   
                       </div>
                   
                     </div>
@@ -857,39 +856,9 @@ export default class TripsForm extends React.Component {
                         Type of restaurants
                       </label>
                       <div className="col-md-6 col-sm-6">
-                      <select
-                          name="restaurants"
-                         // value={trips.restaurants}
-                          style={{ marginTop: 8 }}
-                          onChange={this.handleChangeRestaurants}
-                          multiple
-                        >
-                            {
-                        restaurants&&restaurants.map((res)=>{
-                          return(
-                        <option  selected disabled >{res.name}</option>
-                        )})
-                    }
-                          <option name="Italian" >Italian</option>
-                          <option name="American">American</option>
-                          <option name="Chinese">Chinese</option>
-                          <option name="Greek">Greek</option>
-                          <option name="Desi">Desi</option>
-                          <option name="British">British</option>
-                          <option name="Jewish">Jewish</option>
-                          <option name="Mexican">Mexican</option>
-                          <option name="African">African</option>
-                          <option name="Latvian">Latvian</option>
-                          <option name="Polish">Polish</option>
-                          <option name="Polish">Russian</option>
-                          <option name="Sweedish">Sweedish</option>
-                          <option name="Peruvian">Peruvian</option>
-                          <option name="Hawaiian">Hawaiian</option>
-                          <option name="Brazilian">Brazilian</option>
-                          <option name="Salvadorian">Salvadorian</option>
-                          <option name="Thai">Thai</option>
-                          <option name="French">French</option>
-                        </select>
+                      <SelectRestaurants onSelectRestaurants={this.handleChangeRestaurants}
+                        selected={trips.restaurants}
+                        />
                       </div>
                     </div>
 
@@ -898,41 +867,9 @@ export default class TripsForm extends React.Component {
                         Indoor Activities
                       </label>
                       <div className="col-md-6 col-sm-6">
-                        <select
-                          name="IndoorActivities"
-                          style={{ marginTop: 8 }}
-                          //value={trips.IndoorActivities}
-                          onChange={this.handleChangeStatus}
-                          multiple
-                        >
-                            {
-                        indooractivity&&indooractivity.map((indoor)=>{
-                          return(
-                        <option  selected disabled >{indoor.name}</option>
-                        )})
-                    }
-                          <option name="Cinema">Cinema</option>
-                          <option name="Theatre">Theatre</option>
-                          <option name="Indoor Golf">Indoor Golf</option>
-                          <option name="Swimming">Swimming</option>
-                          <option name="Gym">Gym</option>
-                          <option name="Spa">Spa</option>
-                          <option name="Shuffle Board">Shuffle Board</option>
-                          <option name="Arcade">Arcade</option>
-                          <option name="Ping Pong">Ping Pong</option>
-                          <option name="Darts">Darts</option>
-                          <option name="Escape Room">Escape Room</option>
-                          <option name="Tennis">Tennis</option>
-                          <option name="Virtual Reality">Virtual Reality</option>
-                          <option name="Planet Jump">Planet Jump</option>
-                          <option name="Laser Tag">Laser Tag</option>
-                          <option name="Cooking Class">Cooking Class</option>
-                          <option name="Poetry Night">Poetry Night</option>
-                          <option name="Open Mic">Open Mic</option>
-                          <option name="Pottery">Pottery</option>
-                          <option name="Painting">Painting</option>
-                          <option name="Museum">Museum</option>
-                        </select>
+                      <SelectIndoorActivities onSelectIndoorActivity={this.handleChangeStatus}
+                        selected={trips.IndoorActivities}
+                        />
                       </div>
                       
                     </div>
@@ -941,40 +878,9 @@ export default class TripsForm extends React.Component {
                         Outdoor Activities
                       </label>
                       <div className="col-md-6 col-sm-6">
-                        <select
-                          style={{ marginTop: 8 }}
-                          //value={trips.OutdoorActivities}
-                          onChange={this.handleChangeOutdoorActivities}
-                          multiple
-                        >
-                            {
-                        outdooractivity&&outdooractivity.map((outdoor)=>{
-                          return(
-                        <option  selected disabled >{outdoor.name}</option>
-                        )})
-                    }
-                          <option name="Hiking">Hiking</option>
-                          <option name="Cycling">Cycling</option>
-                          <option name="Rock Climbing">Rock Climbing</option>
-                          <option name="Fishing">Fishing</option>
-                          <option name="Outdoor Golf">Outdoor Golf</option>
-                          <option name="Amusement Park">Amusement Park</option>
-                          <option name="Picnic">Picnic</option>
-                          <option name="Drive in Movie">Drive in Movie</option>
-                          <option name="Outdoor Concert">Outdoor Concert</option>
-                          <option name="Winery">Winery</option>
-                          <option name="Zoo Park">Zoo Park</option>
-                          <option name="Go Ape">Go Ape</option>
-                          <option name="Boat Ride">Boat Ride</option>
-                          <option name="Sightseeing">Sightseeing</option>
-                          <option name="Whitewater Rafting">Whitewater Rafting</option>
-                          <option name="Camping">Camping</option>
-                          <option name="Paddleboarding">Paddleboarding</option>
-                          <option name="Rockpooling">Rockpooling</option>
-                          <option name="Farmers Market">Farmers Market</option>
-                          <option name="Stargazing">Stargazing</option>
-                          <option name="Horseback Riding">Horseback Riding</option>
-                        </select>
+                      <SelectOutdoorActivities onSelectOutdoorActivity={this.handleChangeOutdoorActivities}
+                        selected={trips.OutdoorActivities}
+                        />
                       </div>
                       
                     </div>

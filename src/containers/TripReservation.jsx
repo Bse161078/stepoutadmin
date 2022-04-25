@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Scheduler } from "@aldabil/react-scheduler";
-import {getTripReservation,addTripReservation} from '../backend/services/reservationService'
+import {getTripReservation,addTripReservation,
+        deleteTripReservation,updateTripReservation} from '../backend/services/reservationService'
 import SnackBar from '../components/SnackBar';
 import { getUsers } from "../backend/services/usersService"
 import { getTrips } from "../backend/services/TripsService"
@@ -25,12 +26,14 @@ export default class TripReservation extends Component {
       }
 formateReservation(response)
 {
-    const reservations=(response).map((reservation,index)=>{
+    const res = response.filter((fil)=>fil.status?fil.status!="cancel":'')
+    console.log("responsefilterreservation",res)
+    const reservations=(res).map((reservation,index)=>{
         return{
-                      event_id: index,
-                      title: "Trip Reservation # "+(++index),
-                      start: new Date(moment(reservation.start).format("YYYY/M/D 01:00")),
-                      end: new Date( moment(reservation.start).format("YYYY/M/D 24:00")),
+                      event_id: reservation.id,
+                      title: reservation.title?reservation.title:"Trip Reservation # "+(++index),
+                      start: new Date(moment(new Date(reservation.start).toString()).format("YYYY/M/D")),
+                      end: new Date( moment(new Date(reservation.end).toString()).format("YYYY/M/D")),
          }
     });
     
@@ -68,6 +71,7 @@ Field()
         value:trip.id
     }
  })
+
    const res =  [
         {
           name: "user_id",
@@ -82,6 +86,13 @@ Field()
           // Should provide options with type:"select"
           options: tripopt,
           config: { label: "Trip", required: true, errMsg: "Plz Select Trip" }
+        },{
+          name:"status",
+          type:"select",
+          options:[{text:"Cancel",value:"cancel"},
+                   {text:"Pending",value:"pending"},
+                    {text:"Passed",value:"passed"}],
+          config:{label:"Status",required:true,errMsg:"Plz Select Status"}
         }
     ]   
     return res;
@@ -183,27 +194,99 @@ fetchUser = () => {
      })
     
    }
-   handleTripReservation(e)
+   async handleDelete(deleteId){
+    this.state.loading=true
+
+    try{
+      const res = await deleteTripReservation(deleteId)
+      this.setState({
+        loading:false,
+        snackBarMessage:"Trip Reservation Deleted Successfully",
+        snackBarVariant:"success",
+        showSnackBar:true
+      })
+      this.fetchReservation()
+    }
+    catch(e)
+    {
+      this.setState({
+        loading:false,
+        snackBarMessage: "Couldn't Delete Trip Reservation",
+        snackBarVariant:"success",
+        showSnackBar:true
+      })
+    }
+   }
+
+   async handleTripReservation(event,action)
    {
-       console.log("onconfirm",e)
-    // addTripReservation(trip)
-    //       .then((response) => {
-    //         this.setState({
-    //           loading: false,
-    //           showSnackBar: true,
-    //           snackBarMessage: "Trip Created successfully",
-    //           snackBarVariant: "success",
-    //         });
-    //       })
-    //       .catch((err) => {
-    //         console.log("Error:", err);
-    //         this.setState({
-    //           loading: false,
-    //           showSnackBar: true,
-    //           snackBarMessage: "Error creating trip",
-    //           snackBarVariant: "error",
-    //         });
-    //       });
+    this.state.loading=true
+     const tempEvent = {
+      ...event,
+       event_id:event.event_id || Math.random(),
+       start:new Date(event.start).toString(),
+       end:new Date(event.end).toString(),
+
+     }
+       console.log("onconfirm",event,action)
+       if(action==='create')
+{
+        try{
+          const res = await addTripReservation(tempEvent)
+            this.setState({
+              loading:false,
+              snackBarMessage:"Trip Reservation Created",
+              snackBarVariant:"success",
+              showSnackBar:true
+            })
+            this.fetchReservation()
+        }
+        catch(err)
+        {
+          console.log("err",err)
+          this.setState({
+            loading:false,
+            snackBarMessage:"Trip Reservation Error",
+            snackBarVariant:"error",
+            showSnackBar:true
+          })
+        }}
+        else if(action==="edit")
+        {
+         try{
+           const res = await updateTripReservation(event.event_id,event)
+             this.setState({
+               loading:false,
+               snackBarMessage:"Trip Reservation Updated",
+               snackBarVariant:"success",
+               showSnackBar:true
+             })
+             this.fetchReservation()
+         }
+         catch(err)
+         {
+           console.log("err",err)
+           this.setState({
+             loading:false,
+             snackBarMessage:"Update Trip Reservation Error",
+             snackBarVariant:"error",
+             showSnackBar:true
+           })
+         }
+        }
+       return new Promise((res, rej) => {
+        setTimeout(() => {
+          res({
+            ...event,
+            start:new Date(event.start),
+            end:new Date(event.end),
+            event_id: event.event_id || Math.random()
+          });
+        }, 1000);
+        
+        
+      });
+
    }
     componentDidMount()
     {
@@ -230,21 +313,22 @@ fetchUser = () => {
             open={showSnackBar}
             message={snackBarMessage}
             variant={snackBarVariant}
-            onClose={() =>
-            this.closeSnackBar()}
+            autoHideDuration={1000}
+            onClose={() => this.closeSnackBar()}
           />}
           <div className="x_title">
           <h2>Trip Reservations</h2>
           </div>
               {
                 <Scheduler
-                view="week"
+                view="month"
                 month= {this.formatMonth()}
                 week={this.formatWeek()}
                 day= {this.formatWeek()}
                 events={reservations}
                 fields={this.Field()}
-                //onConfirm={this.handleTripReservation}
+                onConfirm={this.handleTripReservation.bind(this)}
+                onDelete={this.handleDelete.bind(this)}
                 />
               }
                

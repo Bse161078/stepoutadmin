@@ -14,9 +14,9 @@ export class Reservation {
 
         return new Reservation({
             id: doc.id,
-            status: data['status'] ? data['status'] : '',
-            start: data['date'] ? data['date'] : '',
-            end: data['date'] ? data['date'] : '',
+            status: data['status'] ? data['status'] :data['title'],
+            start: data['date'] ? data['date'] : data['start'],
+            end: data['date'] ? data['date'] : data['end'],
         });
     }
 

@@ -80,6 +80,7 @@ export const addTripReservation = async function (data) {
   };
   export const deleteTripReservation = async function (id) {
     await db.collection("TripReservations").doc(id).delete();
+    console.log("deleteid",id)
   };
   export const updateTripReservation = async function (id, data) {
        console.log("Edit data:", data);

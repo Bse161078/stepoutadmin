@@ -23,7 +23,8 @@ import { signInWithEmail } from "../backend/services/authService";
 import sneaker from "../public/img/logo.png";
 import golf from "../public/img/logo.png";
 import firebase from "firebase";
-
+import SnackBar from "../components/SnackBar";
+import MultiSelect from "react-multi-select-component";
 const style = {
   logoWrapper: {
     width: "70%",
@@ -37,6 +38,7 @@ const style = {
 };
 
 class Login extends Component {
+  
   constructor(props) {
     super(props);
 
@@ -45,6 +47,10 @@ class Login extends Component {
       email: "",
       password: "",
       loading: false,
+      selected:"Admins",
+      showSnackBar: false,
+      snackBarMessage: "",
+      snackBarVariant: "success",
     };
   }
 
@@ -54,10 +60,15 @@ class Login extends Component {
       this.props.history.push("/");
     }
   }
+  handleSelect(e){
+    this.setState({
+      selected:e.target.value
+    })
+    console.log("select",e.target.value,this.state.selected)
 
+  }
   submit = async () => {
     const { email, password } = this.state;
-    this.props.history.push("/");
 
     if (!this.state.loading) {
       this.setState({ loading: true });
@@ -70,56 +81,127 @@ class Login extends Component {
         email,
         password,
         this.onSigninSuccess
-      );
 
-      // if (!!signInResult) {
-      //   console.log("signInResult:", signInResult);
-      //   Cookie.set("sneakerlog_access_token", { expires: 14 });
-      //   this.props.history.push("/events");
-      // } else {
-      //   this.setState({ loading: false });
-      // }
-      // .then(response => {
-      //       Cookie.set('sneakerlog_access_token', `${token}`, { expires: 14 })
-      //       this.props.history.push("/");
-      // })
-      // .catch(error => {
-      //   this.setState({ loading: false });
-      // });
+      );
+      this.setState({ loading: false});
     }
   };
 
   onSigninSuccess = (userId) => {
+    console.log("signin".userId)
+  if(this.state.selected.includes("Subs"))
+  {
     if (userId) {
       firebase
         .firestore()
-        .collection("Admins")
+        .collection("SubscriberVenue")
         .doc(userId)
         .get()
         .then((doc) => {
           if (doc.exists) {
-            // console.log("Document data:", doc.data());
-             console.log("signInResult:", userId);
+              localStorage.setItem("Sid",userId)
+              console.log("subscribevenue")
+              localStorage.setItem("subscriber",true)
+             this.setState({
+              loading:false,
+              showSnackBar:true,
+              snackBarMessage:"You are authorized",
+              snackBarVariant:'success'
+            })
             Cookie.set("sneakerlog_access_token", { expires: 14 });
-            this.props.history.push("/Venues");
-          } else {
+            this.props.history.push("/Venue");
+            
+
+          } 
+          else
+           {
             // doc.data() will be undefined in this case
-            Cookie.set("sneakerlog_access_token", { expires: 14 });
-            this.props.history.push("/Venues");
-            // console.log("No such document!");
-            // this.setState({ loading: false });
-            // alert("You are not authorized to access");
-          }
+            this.setState({
+              loading:false,
+              showSnackBar:true,
+              snackBarMessage:"You are not authorized to access",
+              snackBarVariant:'error'
+            })
+             }   // this.setState({ loading: false });
+            
         })
         .catch(function (error) {
           console.log("Error getting document:", error);
         });
+      }
+    }
+    else
+    {
+      if (userId) {
+        firebase
+          .firestore()
+          .collection("SubscriberVenue")
+          .doc(userId)
+          .get()
+          .then((doc) => {
+            if (doc.exists) {
+
+               //console.log("Document data:", doc.data());
+               this.setState({
+                loading:false,
+                showSnackBar:true,
+                snackBarMessage:"You are not authorized",
+                snackBarVariant:'error'
+              })
+              Cookie.set("sneakerlog_access_token", { expires: 14 });                
+            } 
+            else
+             {
+              // doc.data() will be undefined in this case
+              console.log("adminePanel")
+
+              //    alert("You are not authorized to access");
+                 Cookie.set("sneakerlog_access_token", { expires: 14 });
+                 this.props.history.push("/Venues");
+                 this.setState({
+                   loading:false,
+                   showSnackBar:true,
+                   snackBarMessage:"You are authorized",
+                   snackBarVariant:'success'
+                 })
+               }   // this.setState({ loading: false });
+              
+          })
+          .catch(function (error) {
+            console.log("Error getting document:", error);
+          });
+        }
+
+       
+              // console.log("Document data:", doc.data());
+              
+              // doc.data() will be undefined in this case
+           
+        
     }
   };
+  closeSnackBar = () => {
+    this.setState({ showSnackBar: false });
+  };
+
 
   render() {
+    const options = [
+      {label:"Admin",value:"admin"},
+       {value:'Subscriber',label:"subscriber"},
+    ]
+    const {selected,showSnackBar,snackBarMessage,snackBarVariant}=this.state
     return (
       <div className="app flex-row align-items-center animated fadeIn login">
+        {showSnackBar && (
+          <SnackBar
+            open={showSnackBar}
+            message={snackBarMessage}
+            variant={snackBarVariant}
+            autoHideDuration={1000}
+            onClose={() => this.closeSnackBar()}
+          />
+        )}
         <Container>
           <Row className="justify-content-center">
             <Col md="8">
@@ -165,6 +247,13 @@ class Login extends Component {
                           }
                         />
                       </InputGroup>
+                      <div style={{marginBottom:10}}>
+                        <select class="form-select" value={this.state.selected} 
+                        onChange={this.handleSelect.bind(this)} >
+                          <option value="Admins">Admin</option>
+                          <option value="Subscribers">Subscriber</option>
+                          </select>
+                      </div>
                       <Row>
                         <Col xs="6">
                           <Button

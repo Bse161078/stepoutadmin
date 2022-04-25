@@ -1,6 +1,5 @@
 import React from "react";
 import { Button } from "reactstrap";
-import { addNotification } from "../backend/services/eventService";
 import {
   getUsers,
 } from "../backend/services/usersService";
@@ -114,84 +113,84 @@ export default class Notifications extends React.Component {
   //   }
   // };
 
-  postNotification = async (event,tok) => {
-    var TokenArray = [];
-   // TokenArray.push
-    // paidParticipants,
-    // unPaidParticipants,
-    // withdrawnParticipants,
-    // paidWaitingParticipants,
-    // unPaidWaitingParticipants
-    var executive = [];
-    var members = [];
-    var guests = [];
-    var unknown = [];
-    // if(this.state.notification.executive)
-    // {
-    //   this.state.executive.map(
-    //     (item)=>{
-    //       TokenArray.push(item.fcmToken)
-    //     }
-    //   )
-    // }
-    // if(this.state.notification.members)
-    // {
-    //   this.state.members.map(
-    //     (item)=>{
-    //       TokenArray.push(item.fcmToken)
-    //     }
-    //   )
-    // }
-    // if(this.state.notification.guests)
-    // {
-    //   this.state.guests.map(
-    //     (item)=>{
-    //       TokenArray.push(item.fcmToken)
-    //     }
-    //   )
-    // }
-    // if(this.state.notification.unknown)
-    // {
-    //   this.state.unknown.map(
-    //     (item)=>{
-    //       TokenArray.push(item.fcmToken)
-    //     }
-    //   )
-    // }
-    // if(TokenArray.length<=0)
-    // {
-    //   TokenArray;
-    //   return
-    // }
+  // postNotification = async (event,tok) => {
+  //   var TokenArray = [];
+  //  // TokenArray.push
+  //   // paidParticipants,
+  //   // unPaidParticipants,
+  //   // withdrawnParticipants,
+  //   // paidWaitingParticipants,
+  //   // unPaidWaitingParticipants
+  //   var executive = [];
+  //   var members = [];
+  //   var guests = [];
+  //   var unknown = [];
+  //   // if(this.state.notification.executive)
+  //   // {
+  //   //   this.state.executive.map(
+  //   //     (item)=>{
+  //   //       TokenArray.push(item.fcmToken)
+  //   //     }
+  //   //   )
+  //   // }
+  //   // if(this.state.notification.members)
+  //   // {
+  //   //   this.state.members.map(
+  //   //     (item)=>{
+  //   //       TokenArray.push(item.fcmToken)
+  //   //     }
+  //   //   )
+  //   // }
+  //   // if(this.state.notification.guests)
+  //   // {
+  //   //   this.state.guests.map(
+  //   //     (item)=>{
+  //   //       TokenArray.push(item.fcmToken)
+  //   //     }
+  //   //   )
+  //   // }
+  //   // if(this.state.notification.unknown)
+  //   // {
+  //   //   this.state.unknown.map(
+  //   //     (item)=>{
+  //   //       TokenArray.push(item.fcmToken)
+  //   //     }
+  //   //   )
+  //   // }
+  //   // if(TokenArray.length<=0)
+  //   // {
+  //   //   TokenArray;
+  //   //   return
+  //   // }
 
     
-    event.preventDefault();
-    const { match, history } = this.props;
-    const { loading, notification, image } = this.state;
-    if (!loading) {
-      this.setState({ loading: true });
-      notification.TokenArray = JSON.stringify( TokenArray);
-      console.log("THis is the notification being created ",notification)
-      addNotification(notification)
-        .then((response) => {
-          this.setState({
-            loading: false,
-            showSnackBar: true,
-            snackBarMessage: "Notification sent successfully",
-            snackBarVariant: "success",
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-          this.setState({
-            loading: false,
-            showSnackBar: true,
-            snackBarMessage: "Error creating Notification",
-            snackBarVariant: "error",
-          });
-        });
-    }
-  };
+  //   event.preventDefault();
+  //   const { match, history } = this.props;
+  //   const { loading, notification, image } = this.state;
+  //   if (!loading) {
+  //     this.setState({ loading: true });
+  //     notification.TokenArray = JSON.stringify( TokenArray);
+  //     console.log("THis is the notification being created ",notification)
+  //     addNotification(notification)
+  //       .then((response) => {
+  //         this.setState({
+  //           loading: false,
+  //           showSnackBar: true,
+  //           snackBarMessage: "Notification sent successfully",
+  //           snackBarVariant: "success",
+  //         });
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+  //         this.setState({
+  //           loading: false,
+  //           showSnackBar: true,
+  //           snackBarMessage: "Error creating Notification",
+  //           snackBarVariant: "error",
+  //         });
+  //       });
+  //   }
+  // };
 
   closeSnackBar = () => {
     const { history } = this.props;
@@ -232,7 +231,7 @@ export default class Notifications extends React.Component {
                     id="demo-form2"
                     data-parsley-validate
                     className="form-horizontal form-label-left"
-                    onSubmit={this.postNotification}
+                 //   onSubmit={this.postNotification}
                   >
                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">

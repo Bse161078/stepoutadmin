@@ -11,10 +11,15 @@ class Logout extends Component {
     axios.defaults.headers.common['Authorization'] = '';
     if (process.env.NODE_ENV === 'production') {
       Cookie.remove('sneakerlog_access_token')
+      localStorage.setItem('subscriber',false)
+
     }
     else {
       Cookie.remove('sneakerlog_access_token');
+      localStorage.setItem('subscriber',false)
+
     }
+    localStorage.setItem('subscriber',false)
     //this.props.history.push("/login");
     window.location.href = ("/login");
   }
