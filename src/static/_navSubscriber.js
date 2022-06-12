@@ -7,15 +7,9 @@ export default {
         icon: "icon-globe",
       },
       {
-          name: "Stats",
-          url: "/Stats",
-          icon: "icon-chart",
-      },
-      
-      {
-        name: "Privacy Policy",
-        url: "/privacy-policy",
-        icon: "icon-key",
+        name: "Promotions",
+        url: "/Promotions",
+        icon: "icon-globe",
       },
       {
         name: "Logout",

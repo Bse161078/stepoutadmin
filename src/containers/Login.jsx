@@ -89,12 +89,11 @@ class Login extends Component {
 
   onSigninSuccess = (userId) => {
     console.log("signin".userId)
-  if(this.state.selected.includes("Subs"))
-  {
+
     if (userId) {
       firebase
         .firestore()
-        .collection("SubscriberVenue")
+        .collection("Subscriber")
         .doc(userId)
         .get()
         .then((doc) => {
@@ -129,56 +128,8 @@ class Login extends Component {
           console.log("Error getting document:", error);
         });
       }
-    }
-    else
-    {
-      if (userId) {
-        firebase
-          .firestore()
-          .collection("SubscriberVenue")
-          .doc(userId)
-          .get()
-          .then((doc) => {
-            if (doc.exists) {
-
-               //console.log("Document data:", doc.data());
-               this.setState({
-                loading:false,
-                showSnackBar:true,
-                snackBarMessage:"You are not authorized",
-                snackBarVariant:'error'
-              })
-              Cookie.set("sneakerlog_access_token", { expires: 14 });                
-            } 
-            else
-             {
-              // doc.data() will be undefined in this case
-              console.log("adminePanel")
-
-              //    alert("You are not authorized to access");
-                 Cookie.set("sneakerlog_access_token", { expires: 14 });
-                 this.props.history.push("/Venues");
-                 this.setState({
-                   loading:false,
-                   showSnackBar:true,
-                   snackBarMessage:"You are authorized",
-                   snackBarVariant:'success'
-                 })
-               }   // this.setState({ loading: false });
-              
-          })
-          .catch(function (error) {
-            console.log("Error getting document:", error);
-          });
-        }
-
-       
-              // console.log("Document data:", doc.data());
-              
-              // doc.data() will be undefined in this case
-           
-        
-    }
+    
+    
   };
   closeSnackBar = () => {
     this.setState({ showSnackBar: false });
@@ -212,7 +163,7 @@ class Login extends Component {
                       
                       <img className={`companyLogo`} src={golf} />
                     </div>
-                    <h1>Login</h1>
+                    <h1>Subscriber Login</h1>
                     <p className="text-muted py-2">Sign In to your account</p>
                     <Formsy onValidSubmit={this.submit.bind(this)}>
                       <InputGroup className="mb-3">
@@ -247,13 +198,6 @@ class Login extends Component {
                           }
                         />
                       </InputGroup>
-                      <div style={{marginBottom:10}}>
-                        <select class="form-select" value={this.state.selected} 
-                        onChange={this.handleSelect.bind(this)} >
-                          <option value="Admins">Admin</option>
-                          <option value="Subscribers">Subscriber</option>
-                          </select>
-                      </div>
                       <Row>
                         <Col xs="6">
                           <Button

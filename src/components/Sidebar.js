@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
 import { Badge, Nav, NavItem, NavLink as RsNavLink } from "reactstrap";
 import classNames from "classnames";
-import nav from "../static/_nav";
 import navSubscriber from "../static/_navSubscriber";
 
 import SidebarMinimizer from "./SidebarMinimizer";
@@ -175,17 +174,12 @@ class Sidebar extends Component {
 			const link = url ? url.substring(0, 4) : "";
 			return link === "http";
 		};
-		console.log("subscribernav",navSubscriber,nav)
 
 		// sidebar-nav root
 		return (
 			<div className="sidebar">
 				<nav className="sidebar-nav">
-					{
-						this.state.subscriberPortal==="true"?
-					<Nav>{navList(navSubscriber.items)}</Nav>:
-					<Nav>{navList( nav.items)}</Nav>
-					}
+					<Nav>{navList(navSubscriber.items)}</Nav>
 				</nav>
 				<SidebarMinimizer />
 			</div>

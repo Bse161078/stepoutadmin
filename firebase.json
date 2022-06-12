@@ -1,7 +1,7 @@
 {
   "hosting": {
     "public": "build",
-    "site": "stepoutadmin-6c4b7",
+    "site": "stepoutsubscriber",
     "ignore": [
       "firebase.json",
       "**/.*",

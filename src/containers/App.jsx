@@ -8,31 +8,15 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Sidebar from "../components/Sidebar";
 import Breadcrumb from "../components/Breadcrumb";
-import Stats from "../containers/Stats";
 import { Container } from "reactstrap";
-import BlogsForm from "./BlogsForm";
-import Users from "../containers/Users";
-import UserForm from "../containers/UserForm";
-import Admins from "./Admins";
-import AdminForm from "./AdminForm";
-import PrivacyPolicy from "./PrivacyPolicy";
-import PrivacyPolicyForm from "./PrivacyPolicyForm";
-import TermsService from "./TermsService";
-import TermsServiceForm from "./TermsServiceForm";
-import Notifications from "./Notifications";
-import FAQForm from "./FAQForm";
 import * as types from "../static/_types";
 import { firebase } from "../backend/firebase";
 import { getSignedInUser } from "../backend/services/authService";
 import { RootContext } from "../../src/backend/Context";
-import Venues from "./Venues";
-import Blogs from "./Blogs";
-import Trips from "./Trips";
-import TripsForm from "./TripsForm";
 import VenuesForm from "./VenuesForm";
-import Reservations from "./Reservations"
-import TripReservation from "./TripReservation"
+import Promotions from "./Promotions"
 import SubscriberVenue from "./SubscriberVenue"
+import PromotionForm from './PromotionForm'
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -88,62 +72,24 @@ class App extends React.Component {
                 <Switch>
                   {/* <Route exact={true} path='/' component={Stats}/>      */}
 
-                  <Route exact={true} path="/users" component={Users} />
-                    <Route
-                        exact={true}
-                        path="/Venues"
-                        component={Venues}
-                    />
+                   
                      <Route
                         exact={true}
                         path="/Venue"
                         component={SubscriberVenue}
                     />
-                    <Route
-                        exact={true}
-                        path="/Blogs"
-                        component={Blogs}
-                    />
-                    <Route
-                        exact={true}
-                        path="/Trips"
-                        component={Trips}
-                    />
-                    <Route
-                        exact={true}
-                        path="/Blogs/AddBlog"
-                        component={BlogsForm}
-                    />
-                     <Route
-                        exact={true}
-                        path="/Blogs/EditBlog"
-                        component={BlogsForm}
-                    />
-                    <Route
-                        exact={true}
-                        path="/Trips/AddTrip"
-                        component={TripsForm}
-                    />
-                    <Route
-                        exact={true}
-                        path="/Trips/EditTrip"
-                        component={TripsForm}
-                    />
-                  <Route
+                   <Route
                     exact={true}
-                    path="/Venues/AddVenue"
-                    component={VenuesForm}
+                    path="/Promotions"
+                    component={Promotions}
                   />
+                
                   <Route
                     exact={true}
                     path="/Venue/AddVenue"
                     component={VenuesForm}
                   />
-                    <Route
-                    exact={true}
-                    path="/Venues/EditVenue"
-                    component={VenuesForm}
-                  />
+                   
                    <Route
                     exact={true}
                     path="/Venue/EditVenue"
@@ -151,67 +97,11 @@ class App extends React.Component {
                   />
                   <Route
                     exact={true}
-                    path="/Users"
-                    component={Users}
+                    path="/Venue/AddPromotion"
+                    component={PromotionForm}
                   />
-                   <Route
-                    exact={true}
-                    path="/Users/AddUser"
-                    component={UserForm}
-                  />
-                    <Route
-                    exact={true}
-                    path="/Users/EditUser"
-                    component={UserForm}
-                  />
-                  <Route exact={true} path="/admin" component={Admins} />
-                  <Route
-                    exact={true}
-                    path="/admin/admin-form"
-                    component={AdminForm}
-                  />
-                  <Route
-                    exact={true}
-                    path="/admin/edit-admin/:adminId"
-                    component={AdminForm}
-                  />
-
-                  <Route
-                    exact={true}
-                    path="/notifications"
-                    component={Notifications}
-                  />
-                  <Route
-                    exact={true}
-                    path="/Stats"
-                    component={Stats}
-                  />
-                  <Route
-                    exact={true}
-                    path="/privacy-policy"
-                    component={PrivacyPolicyForm}
-                  />
-                  <Route
-                    exact={true}
-                    path="/reservations"
-                    component={Reservations}
-                  />
-                  <Route
-                    exact={true}
-                    path="/trip-reservations"
-                    component={TripReservation}
-                  />
-                  {/* <Route exact={true} path="/privacy-policy/privacy-policy-form" component={PrivacyPolicyForm}/> */}
-                  {/* <Route exact={true} path="/privacy-policy/edit-privacy-policy/:privacyPolicyId" component={PrivacyPolicyForm}/> */}
-
-                  <Route
-                    exact={true}
-                    path="/terms-service"
-                    component={TermsServiceForm}
-                  />
-
-                  <Route exact={true} path="/faq" component={FAQForm} />
-                  <Redirect to={"/Venues"} from="/" />
+               
+                  <Redirect to={"/Venue"} from="/" />
                 </Switch>
               </Container>
             </main>

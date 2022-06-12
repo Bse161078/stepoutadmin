@@ -74,8 +74,6 @@ export async function getSignedInUser() {
       if (user) {
         // User is signed in.
         const res = await user;
-        console.log("HHA  res  HHAHA", res);
-        console.log("HAHAHAHHAHA", user);
         return res;
       } else {
         // No user is signed in.

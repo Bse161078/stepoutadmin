@@ -11,41 +11,6 @@ function AddressSuggestion(props) {
                 if (components[i].types[j]==type) return components[i].long_name;
         return "";
     }
-//    const handleAddressChange = async (address)=>{
-//         setAddress(address)
-       
-//         console.log('address',address)
-//       }
-    // const   handleSelect = async (address) => {
-    //     console.log("This is the dares", address);
-    // //     try{
-    // //       const results = await geocodeByAddress(address);
-    // //       console.log('results = ',results)
-    
-    // //       if(results.length>0) {
-    
-    // //           const addressComponents=results[0].address_components;
-    // //           console.log('addressComponents = ',addressComponents)
-    // //           const latLng = await getLatLng(results[0]);
-    // //           var userZipCode = this.extractFromAdress(addressComponents, "postal_code");
-    // //           var userCity = this.extractFromAdress(addressComponents, "locality");
-    // //           var userState = this.extractFromAdress(addressComponents, "administrative_area_level_1");
-    // //           //address=extractFromAdress(addressComponents, "political");
-    // //           var useraddress = this.extractFromAdress(addressComponents,"description")
-    // //           localStorage.setItem(
-    // //               "userCurrentLocation",
-    // //               JSON.stringify({latitude: latLng.lat, longitude: latLng.lng})
-    // //           );
-             
-    // //       }
-    
-    
-    // //   }catch (e) {
-    // //       console.error("Error", e)
-    // //   }
-    //   setAddress(address)
-    //   props.address=address
-    //   };
   return (
     <div>  
    <PlacesAutocomplete

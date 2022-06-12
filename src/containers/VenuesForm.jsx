@@ -55,9 +55,11 @@ export default class VenuesForm extends React.Component {
         Image:editVenue.Image?editVenue.Image:'',
         Images:editVenue.Images?editVenue.Images:[],
         Videos:editVenue.Videos?editVenue.Videos:[],
-        freeze:editVenue.freeze?editVenue.freeze:'Unfreeze',
-        Promotion:editVenue.Promotion?editVenue.Promotion:'',
-        pending:editVenue.pending?editVenue.pending:'',
+        Isfreeze:false,
+        Promotion:editVenue.Promotion?editVenue.Promotion:[],
+        VenueStatus:editVenue.pending?editVenue.pending:"Pending",
+        Website:editVenue.Website?editVenue.Website:'',
+        status:editVenue.status?editVenue.status:'active'
       },
       restaurants:editVenue.Restaurants?editVenue.Restaurants:'',
       indooractivity:editVenue.IndoorActivities?editVenue.IndoorActivities:"",
@@ -86,9 +88,21 @@ export default class VenuesForm extends React.Component {
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
-    console.log("venue",this.state.venue)
   }
-  
+  handleInputChange = (event) => {
+    const { value, name } = event.target;
+
+    const { venue } = this.state;
+    venue[name] = value;
+    this.setState({ venue });
+  }
+handlePromotion = (event) =>
+{
+  const { value, name } = event.target;
+  const {venue} = this.state;
+  venue[name]=[value]
+  this.setState({venue})
+}
   uploadImage (evt) {
     return new  Promise((resolve,reject)=>{
       console.log(evt,'uploadimage');
@@ -97,7 +111,6 @@ export default class VenuesForm extends React.Component {
       storageRef.on("state_changed" , async()=>{
         let downloadUrl = await storage.getDownloadURL();
        // this.setState({venue:venue})
-        console.log('hamzaimage',downloadUrl,storage,evt);
         resolve(downloadUrl)        
     })
   
@@ -114,7 +127,6 @@ export default class VenuesForm extends React.Component {
   handleEditVenue=async(addvenue)=>{
     let Images=[]
     let Videos=[]
-    console.log("addvenue",addvenue,this.state.Videos)
     if(addvenue.Image==='')
     {
     const imageUrl=await this.uploadImage(this.state.Dimage);
@@ -234,7 +246,12 @@ handleAddVenue=async(addvenue)=>{
 }
   addvenue.Images=Images
   addvenue.Videos=Videos;
-  this.setState({loading:true})
+  addvenue.status='active'
+  this.setState({loading:true,
+  addSVenue:{
+    status:'active'
+  }
+  })
   console.log("venue",addvenue)
   try{
     const { history } = this.props;
@@ -333,7 +350,6 @@ handleSAddVenue=async(addvenue)=>{
    this.state.Videos=vid
     img.splice(0,1)
     this.state.Cimage=img
-    console.log('targetCimage',this.state.Cimage)
     this.state.venue.Images=""
     this.state.venue.Videos=''
     this.setState(prevState => ({
@@ -359,7 +375,6 @@ handleSAddVenue=async(addvenue)=>{
     })
      )
      console.log("dimage",this.state.venue)
-    console.log("target",event.target.files[0],"targetachieve",this.state.Dimage)
   };
 
 
@@ -412,9 +427,7 @@ handleSAddVenue=async(addvenue)=>{
        restaurants.splice(0,1)
        venue.Restaurants=restaurants
        this.state.restaurants=''
-        this.setState({venue})
-        console.log("This is the restaurants",venue.Restaurants,value,restaurants)
-       
+        this.setState({venue})       
       }
   }
 
@@ -436,7 +449,6 @@ handleSAddVenue=async(addvenue)=>{
    venue.OutdoorActivities=restaurants
    this.state.outdooractivity=''
     this.setState(venue)
-    console.log("This is the outdooractivities",venue.OutdoorActivities,value,restaurants) 
   }
 
    handleAddressChange = async (address)=>{
@@ -469,7 +481,6 @@ handleSAddVenue=async(addvenue)=>{
    venue.IndoorActivities=restaurants
    this.state.indooractivity=''
     this.setState(venue)
-    console.log("This is the indooractivities",venue.IndoorActivities,value,restaurants)
   };
   
    handlePlayVideo = () => {
@@ -499,8 +510,6 @@ handleSAddVenue=async(addvenue)=>{
       outdooractivity
     } = this.state;
    
-    console.log("subscriberVenue",subscribervenue)
-
     var {indoorId,outdoorId,resId} =this.state
     const { match, history } = this.props;
     const isEdit = !!match.params.userId;
@@ -666,6 +675,22 @@ handleSAddVenue=async(addvenue)=>{
 
                     <div className="form-group row">
                       <label className="control-label col-md-3 col-sm-3">
+                        Website link
+                      </label>
+                      <div className="col-md-6 col-sm-6">
+                        <input
+                          required
+                          type="url"
+                          name="Website"
+                          className="form-control"
+                          value={venue.Website}
+                          onChange={this.handleInputChange}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-group row">
+                      <label className="control-label col-md-3 col-sm-3">
                         Description 
                       </label>
                       <div className="col-md-6 col-sm-6">
@@ -717,25 +742,7 @@ handleSAddVenue=async(addvenue)=>{
                         />
                       </div>
                     </div>
-                    {(window.location.href.includes('Venue/EditVenue')||window.location.href.includes('Venue/AddVenue'))&&
-                     <div className="form-group row">
-                        <label className="control-label col-md-3 col-sm-3">
-                        Venue Status
-                      </label>
-                      <div className="col-md-6 col-sm-6">
-                        <input type="radio" id="freeze" name="freeze" checked={venue.freeze==='Freeze'?true:false} value={"Freeze"}
-
-                         onChange={this.handleInputChange}
-                      />
-                        <label for="male">Freeze</label>
-                        <input type="radio" id="unfreeze" name="freeze" checked={venue.freeze==='Unfreeze'?true:false}  value={"Unfreeze"}
-                       onChange={this.handleInputChange}
-                      />
-                        <label for="female">UnFreeze</label>
-                      </div>
-                    </div>
-                    }
-                    {(window.location.href.includes('Venue/EditVenue')||window.location.href.includes('Venue/AddVenue'))&&
+                   
                      <div className="form-group row">
                         <label className="control-label col-md-3 col-sm-3">
                         Promotion
@@ -747,10 +754,10 @@ handleSAddVenue=async(addvenue)=>{
                           name="Promotion"
                           className="form-control"
                           value={venue.Promotion}
-                          onChange={this.handleInputChange}
+                          onChange={this.handlePromotion}
                         />
                       </div>
-                    </div>}
+                    </div>
                     {window.location.href.includes('Venues')&&venue.Promotion&&
                      <div className="form-group row">
                         <label className="control-label col-md-3 col-sm-3">
@@ -780,29 +787,14 @@ handleSAddVenue=async(addvenue)=>{
                           onClick={()=>{
 
                             if(this.state.venue.Name&&this.state.venue.Address&&this.state.Dimage!=""){
-                           if(window.location.href.includes("Venues/AddVenue"))
-                           {
-                             
-                             this.state.loading=true
-                             this.setState({loading:true})
-                             this.handleAddVenue(this.state.venue)
-                           }
-                           else  if(window.location.href.includes("Venue/AddVenue"))
+                           
+                            if(window.location.href.includes("Venue/AddVenue"))
                            {
                              this.state.loading=true
                              this.setState({loading:true})
                              this.handleSAddVenue(this.state.venue)
                            }
-                          else if(window.location.href.includes('Venues/EditVenue'))
-                          {
-                             this.state.loading=true
-                             this.setState({loading:true})
-                             
-                             if(venue.Promotion)
-                             this.handleSEditVenue(venue)
-                             else
-                             this.handleEditVenue(this.state.venue)
-                          }
+                        
                           else if(window.location.href.includes('Venue/EditVenue'))
                           {
                              this.state.loading=true

@@ -2,7 +2,11 @@
   "projects": {
     "default": "nuga-test",
     "nuga": "nuga-test",
-    "step": "stepoutadmin"
+    "step": "stepoutadmin",
+    "subscribe": "stepoutadmin",
+    "subscriber": "stepoutsubscriber",
+    "l": "stepoutsubscriber",
+    "asd": "stepoutsubscriber"
   },
   "targets": {}
 }
